@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "pillow": "9.4.0",
+  "palette_sha256": "b39f80c05ad9aa1c6edde098fc502fa9204bdbc6817c1c5b7f3bab631f85316d",
+  "script_sha256": "1b7b0b232a448ae37012df84175c86b48e8427200651eea05134e0b4c1521b37",
+  "copyright_sha256": "4ec4cbf73cdc0ffe69f63c770a864524f571a50d8f882d36ffd00e4e40b607be",
+  "palette_entries": 256,
+  "ui_entries": 16,
+  "gray_entries": 32,
+  "learned_entries": 208,
+  "dac_channel_bits": 6,
+  "framebuffer_bytes_800x600": 480000,
+  "all_image_extensions": {
+    ".jpeg": 1,
+    ".jpg": 658,
+    ".png": 6263
+  },
+  "samples": [
+    {
+      "source": "images/ship/sparrow.png",
+      "sha256": "8a94f6e14c079b36ca3e345b48546a99df9a0fe9c22c6a6bda4cc873d24241f6",
+      "training": true,
+      "original_size": [
+        70,
+        80
+      ],
+      "packed_size": [
+        70,
+        80
+      ],
+      "prefix": "A000",
+      "mean_abs_channel_error": 1.87,
+      "index_bytes": 5600,
+      "alpha_bytes": 2800,
+      "rgba_bytes": 22400
+    },
+    {
+      "source": "images/ship/falcon.png",
+      "sha256": "4cbbbb984b6f7ae717bd3017fdaa96ff748e9a20256f36368586389eb8a43807",
+      "training": true,
+      "original_size": [
+        160,
+        300
+      ],
+      "packed_size": [
+        77,
+        144
+      ],
+      "prefix": "A001",
+      "mean_abs_channel_error": 1.738,
+      "index_bytes": 11088,
+      "alpha_bytes": 5544,
+      "rgba_bytes": 44352
+    },
+    {
+      "source": "images/planet/earth.png",
+      "sha256": "e1deafb0b1b7b42c4a4484522fd4123775523493c29d261f11f53ffe560feee5",
+      "training": true,
+      "original_size": [
+        180,
+        180
+      ],
+      "packed_size": [
+        144,
+        144
+      ],
+      "prefix": "A002",
+      "mean_abs_channel_error": 2.042,
+      "index_bytes": 20736,
+      "alpha_bytes": 10368,
+      "rgba_bytes": 82944
+    },
+    {
+      "source": "images/planet/lava0.png",
+      "sha256": "4c3f10ae814608e212eec61b00fee4e25540507481b7a21725e4f9f650f9dcec",
+      "training": true,
+      "original_size": [
+        100,
+        100
+      ],
+      "packed_size": [
+        100,
+        100
+      ],
+      "prefix": "A003",
+      "mean_abs_channel_error": 1.762,
+      "index_bytes": 10000,
+      "alpha_bytes": 5000,
+      "rgba_bytes": 40000
+    },
+    {
+      "source": "images/planet/forest0.png",
+      "sha256": "d8013fd7f919e39ae753d06f69c4c823f1fdc7d06328b1d23637d65def33018e",
+      "training": true,
+      "original_size": [
+        200,
+        200
+      ],
+      "packed_size": [
+        144,
+        144
+      ],
+      "prefix": "A004",
+      "mean_abs_channel_error": 2.661,
+      "index_bytes": 20736,
+      "alpha_bytes": 10368,
+      "rgba_bytes": 82944
+    },
+    {
+      "source": "images/land/canyon3.jpg",
+      "sha256": "7dd2448e1006af60281c08e94ebe0dfff6d47fc0ba4dfc4737f286ced48001b8",
+      "training": true,
+      "original_size": [
+        720,
+        360
+      ],
+      "packed_size": [
+        192,
+        96
+      ],
+      "prefix": "A005",
+      "mean_abs_channel_error": 3.259,
+      "index_bytes": 18432,
+      "alpha_bytes": 9216,
+      "rgba_bytes": 73728
+    },
+    {
+      "source": "images/ship/star barge.png",
+      "sha256": "74aaa854bedeef5ee1d43fb3a567282f05e8cb56bbb040f59ccf4fbefebe17a1",
+      "training": false,
+      "original_size": [
+        70,
+        80
+      ],
+      "packed_size": [
+        70,
+        80
+      ],
+      "prefix": "A006",
+      "mean_abs_channel_error": 1.856,
+      "index_bytes": 5600,
+      "alpha_bytes": 2800,
+      "rgba_bytes": 22400
+    },
+    {
+      "source": "images/planet/lava3.png",
+      "sha256": "ae2726c9b6f6dcc51c2bb89eb5a6be6f0241637c02dd95e8c5f7b07412f0c137",
+      "training": false,
+      "original_size": [
+        140,
+        140
+      ],
+      "packed_size": [
+        140,
+        140
+      ],
+      "prefix": "A007",
+      "mean_abs_channel_error": 3.255,
+      "index_bytes": 19600,
+      "alpha_bytes": 9800,
+      "rgba_bytes": 78400
+    },
+    {
+      "source": "images/land/water7.jpg",
+      "sha256": "d1d75b5d77613edfd827d27beff4fdbb744f27c668c724e678b4402d52723cfe",
+      "training": false,
+      "original_size": [
+        720,
+        360
+      ],
+      "packed_size": [
+        192,
+        96
+      ],
+      "prefix": "A008",
+      "mean_abs_channel_error": 4.452,
+      "index_bytes": 18432,
+      "alpha_bytes": 9216,
+      "rgba_bytes": 73728
+    }
+  ],
+  "limits": [
+    "Curated sample only; no animation, additive, premultiplied or swizzle proof.",
+    "Host conversion, not DOS render performance or gameplay equivalence.",
+    "Asset thumbnail limits are experimental, not runtime logical dimensions."
+  ]
+}

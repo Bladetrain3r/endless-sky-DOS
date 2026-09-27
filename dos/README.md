@@ -97,3 +97,12 @@ reference builds/tests. Next: compile a typed, linked data slice with stable IDs
 and paged text, checked against upstream semantics. Then software menu/flight
 with actual preprocessed assets and separate render/sim measurements. See
 FEASIBILITY.md and EQUIVALENCE.md. Low-level implementation choices are delegated.
+
+## Indexed-color asset proof
+
+[Palette contract and reproduction](palette/README.md): provisional shared256-color
+flight palette, reserved UI/grayscale entries, separate four-bit coverage. Nine
+real assets converted in Docker, three held out from training; comparison image
+in `.work/palette/comparison.png`. No DOS renderer or final palette claim.
+[Typed content plan](storage/TYPED-SLICE-PLAN.md) selects resolved map/orbit/trade
+data exported after native loading; implementation remains next.

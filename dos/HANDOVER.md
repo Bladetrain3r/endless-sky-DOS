@@ -51,3 +51,12 @@ content slice checked against upstream, stable IDs and bounded object residency.
 Native ASan+UBSan storage gates passed including root Docker rerun; no leak claim.
 Exact coverage/hash recorded in storage-baseline.json. Disposable sanitizer test
 binaries removed after success; sources/fixtures remain reproducible.
+
+Palette milestone: dos/palette/README.md + proof.py; nine real assets, six train/
+three held out, Docker Pillow9.4.0. Provisional256 colors (16UI/32gray/208art),
+six-bit DAC values, separate packed4-bit alpha roundtrip checked. Root visually
+reviewed .work/palette/comparison.png; reference columns remain true-color.
+reports/palette-baseline.json preserves hashes/errors; upstream assets untouched.
+No DOS palette upload/render timing, special blending or swizzle qualification.
+Next: typed map/orbit/trade slice per storage/TYPED-SLICE-PLAN.md (Sol draft, root
+source spot-check); then representative flight scene including additive/swizzles.

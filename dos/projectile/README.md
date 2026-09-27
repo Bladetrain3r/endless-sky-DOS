@@ -120,4 +120,6 @@ its result. Prior projectile and stationary-range gates still pass.
 player facing straight ahead:80shots,7hits,3stilllive,0drops, target returns to
 its starting pose. Frame cost25.421ms average/29.938ms max; countedheap2,897,898B.
 See `../reports/flight-6-ships-practice-moving-profile.json`. The stationary input
-comparison also passes on the same build. Moving-range human acceptance pending.
+comparison also passes on the same build. Sept28 human playtest accepted: firing while stationary and moving works, and
+leading is predictable on the steady route. This is playtest feedback, not an
+additional native-equivalence measurement.

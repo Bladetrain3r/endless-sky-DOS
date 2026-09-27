@@ -1,5 +1,5 @@
 # Endless Sky DOS handover
-Updated2026-09-28; moving firing range staged; human check pending.
+Updated2026-09-28; moving firing range staged and human accepted.
 
 ## Current checkpoint
 - Flight: `python3 dos/flight/watch.py --pilot` (Docker/X11,120seconds).
@@ -56,7 +56,7 @@ Updated2026-09-28; moving firing range staged; human check pending.
 - .work/flight/run currentEXE/profile/assets; run.py --practice-test --frames300
  reproducesrange; run.py --replay --frames450 checks flight endstate.
 
-## Collision foundation / next
+## Collision / next
 - dos/collision/: originalMask::Create3hulls123points;11772queries pass,
  strictcontains/hit;DOSmaxfractionerror4.44e-16. UsedbypracticeBarge now.
 - Binary64transfer fixed212decimalboundarydifferences; defaultDOSFPUworks.
@@ -64,8 +64,8 @@ Updated2026-09-28; moving firing range staged; human check pending.
 - Sept28 user: firing works, target hits look correct, no oddities moving/firing.
 - Movingtests:postmovepose witness,480tickclosedroute,lead80/80 vsunled72/80,
  resetrepeatable(nativeASan+DOS). App2laps25.421msavg29.938max,heap2,897,898B.
-- Next: humanmovingrange feedback +native shield/damage/resourcecontracts; beamsseparate.
-- Optionaltrainer+demoscenemusic in dos/WISHLIST.md; noaudioimplementation.
+- Sept28 user: static/moving fire work; leading predictable on steadyroute.
+- Next: native shield/damage/resourcecontracts and destructionfeedback; beamsseparate.
 
 ## Retained content / boundaries
 - dos/world/active.h,c:ownedvalidatedsystemarena;all694systems qualificationpass.

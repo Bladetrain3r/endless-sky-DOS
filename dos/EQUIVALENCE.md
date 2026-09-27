@@ -51,3 +51,8 @@ disagreements and passing binary fixtures; do not silently relax discrete gates.
 Ordinary-bolt checkpoint: `projectile/README.md` separates native constructor/Move
 parity from the local firing-range composition tests. A correct Mask query alone
 does not establish full Engine eligibility, damage ordering, beams or hardpoints.
+
+Passive resource checkpoint: `resources/README.md` records energy/heat generation,
+shot costs and overheat hysteresis against native Ship methods. The flight trainer
+keeps propulsion supplied even during overheating; this is not full disabled-ship
+behavior. Explicit stress presets alter supply/heat limits only for testing.

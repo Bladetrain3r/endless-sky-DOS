@@ -3,7 +3,7 @@
 The user brief is [Wishlist.md](../Wishlist.md), retained unchanged. The target
 is a reasonably complete vanilla experience on DOS, 16 MB and fixed 20,000
 DOSBox cycles, preferably 800x600 at 30 FPS. This directory starts the port's
-measurement and planning record. **There is no playable DOS port yet.**
+measurement and planning record. **There is a playable flight/combat sandbox, not a complete DOS port.**
 
 Current upstream checkout: `061a9461a93898fb691504536589d1dcddc5d79b`
 (CMake project version 0.11.4). See [feasibility](FEASIBILITY.md) and
@@ -103,8 +103,8 @@ FEASIBILITY.md and EQUIVALENCE.md. The [regular-flight kernel](motion/README.md)
 now matches14 native movement trajectories in DOS and passes all65,536 direction
 checks. A controllable stock Sparrow now uses it in the flight scene;
 `python3 dos/flight/watch.py --pilot` starts the bounded flight sandbox. The [collision qualification](collision/README.md) now preserves original hull
-geometry and passes native/DOS queries. It also identifies a pending body/image
-scale correction before weapons integration. Optional trainer ideas are in
+geometry and passes native/DOS queries. The body/image scale correction and ordinary projectile/damage integration now
+pass; [passive firing resources](resources/README.md) are the next bounded slice. Optional trainer ideas are in
 [the additions wishlist](WISHLIST.md). Low-level choices remain delegated.
 
 ## Indexed-color asset proof

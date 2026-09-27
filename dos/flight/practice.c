@@ -38,10 +38,22 @@ int practice_damage_load(Practice *p,const char *path)
        shield<=0. || shield>1000. || hull<=0. || hull>1000.) return 0;
     p->shield_damage=shield;p->hull_damage=hull;return 1;
 }
+/* Stress profiles are deliberate trainer overrides, not native ship stats. */
+int practice_resources_load(Practice *p,const char *path,int stress)
+{
+    if(!resource_load(&p->resource_profile,path)) return 0;
+    if(stress==1) { p->resource_profile.capacity=40.; p->resource_profile.generation=.25; }
+    else if(stress==2) { p->resource_profile.max_heat=450.; p->resource_profile.heat_generation=0.; }
+    p->resource_enabled=1;
+    resource_reset(&p->resources,&p->resource_profile);
+    return 1;
+}
 void practice_reset(Practice *p)
 {
     memset(p->bolts,0,sizeof(p->bolts));
     p->shots=p->hits=p->dropped=p->active=p->peak=p->flash=p->cooldown=0;
+    p->blocked_energy=p->blocked_heat=0;
+    if(p->resource_enabled) resource_reset(&p->resources,&p->resource_profile);
     p->rng=17; p->target_ticks=0;
     p->health=(DamageState){30.,26.}; /* Reduced training target, not stock Barge stats. */
     p->destroyed=0; p->explosion=0;
@@ -55,6 +67,7 @@ static double random_unit(Practice *p)
 void practice_step(Practice *p,const Pilot *pilot,int fire)
 {
     unsigned i;
+    if(p->resource_enabled) resource_tick(&p->resources,&p->resource_profile);
     if(p->explosion) --p->explosion;
     if(!p->destroyed) {
         ++p->target_ticks;
@@ -65,6 +78,12 @@ void practice_step(Practice *p,const Pilot *pilot,int fire)
     /* Existing shots move first. New shots join for this tick's collision pass
      * without receiving a Move, like Engine::CalculateUnpaused. */
     for(i=0;i<PRACTICE_BOLTS;++i) bolt_move(&p->bolts[i]);
+    if(fire && !p->cooldown && p->resource_enabled &&
+       !resource_can_fire(&p->resources,&p->resource_profile)) {
+        if(p->resources.overheated) ++p->blocked_heat;
+        else ++p->blocked_energy;
+        fire=0; /* No RNG consumption, reload or cost for a denied attempt. */
+    }
     if(fire && !p->cooldown) {
         for(i=0;i<PRACTICE_BOLTS && p->bolts[i].alive;++i) {}
         if(i<PRACTICE_BOLTS) {
@@ -77,6 +96,7 @@ void practice_step(Practice *p,const Pilot *pilot,int fire)
                         pilot->state.y+20.*uy-.5*pilot->state.vy,
                         pilot->state.vx,pilot->state.vy,angle,p->speed,p->lifetime);
             ++p->shots;
+            if(p->resource_enabled) resource_fire(&p->resources,&p->resource_profile);
         } else ++p->dropped;
         p->cooldown=(unsigned)p->reload;
     }

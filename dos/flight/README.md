@@ -4,7 +4,8 @@ The800×600,256-color DOS executable loads Sol from the compact world pack and
 now offers a controllable stock Sparrow using native-matched movement. Earth,
 Luna, the Falcon and scripted traffic provide reference points. This is a flight
 sandbox with one training blaster and a destructible scripted target.
-No ship collisions, landing, AI, missions, resource accounting or saves.
+No ship collisions, landing, AI, missions or saves. Firing now has a passive
+energy/heat budget; propulsion is still outside that budget.
 The player's engines are treated as fully supplied.64 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
 
@@ -72,8 +73,35 @@ flashes and counters. The reduced training target has30 shields/26 hull, no rege
 seven ordinary blaster hits to destroy. Shields/hull appear in the lower HUD.
 Destruction removes it from collision and triggers a brief procedural explosion;
 R restores it. Add `--invulnerable-target` for the previously accepted aiming range.
-Background ships/planets are not hittable. This is one supplied test blaster, not the stock Sparrow's beam weapons.
+Background ships/planets are not hittable. This is one test blaster, not the stock Sparrow's beam weapons.
 See [projectile qualification and deliberate limits](../projectile/README.md).
+
+### Energy and heat
+
+The lower HUD shows battery energy, heat as a percentage of the overheat limit,
+and READY / RELOADING / LOW ENERGY / OVERHEATED. Each successful shot spends
+energy and adds heat. Release Space to recharge and cool; R restores a full
+battery and cold ship as well as the target. Native generation permits a small
+amount of energy above battery capacity for the current tick.
+
+The normal profile uses the stock Sparrow's passive supply and cooling with one
+Energy Blaster. Its generator can comfortably sustain this single gun: low energy
+and overheating are not expected in this particular loadout. To exercise limits:
+
+```sh
+python3 dos/flight/watch.py --pilot --resource-stress energy
+python3 dos/flight/watch.py --pilot --resource-stress heat
+```
+
+These are **deliberate trainer overrides**, labelled in the HUD. Energy stress
+sets capacity40 and generation0.25/tick. Heat stress sets the heat limit450 and
+removes generator heat, so weapon heat alone triggers the test. Hold Space for
+several seconds, including after destroying the target, to reach a limit; release
+to recover. Overheating uses the native strict upper threshold and recovery below
+90% of the limit; it suspends generation as well as firing. Flight remains fully
+supplied even when overheated—an explicit trainer exception to native disabling.
+There is no heat hull damage, active cooling, repair, status-effect accounting,
+ammunition, fuel cost or movement cost in this slice. See [resource qualification](../resources/README.md).
 
 The fitted acceleration, turn rate and drag come from the qualified native
 Sparrow trace, via `pilot_assets.py`; `PILOT.DAT` is a tiny prototype profile,
@@ -200,6 +228,10 @@ python3 dos/flight/run.py --camera --headless-demo
 python3 dos/flight/run.py --replay --frames 450
 python3 dos/flight/run.py --replay --headless-demo
 python3 dos/flight/test_controls.py
+python3 dos/flight/test_controls.py --resource-stress energy
+python3 dos/flight/test_controls.py --resource-stress heat
+python3 dos/flight/run.py --practice-test --resource-stress energy --frames 480
+python3 dos/flight/run.py --practice-test --resource-stress heat --frames 900
 # Optional reproduction of the slow correctness reference:
 python3 dos/flight/run.py --reference
 ```
@@ -238,7 +270,7 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: native firing costs and regeneration/disabled-ship contracts. Bounded
+Next: propulsion resource costs and regeneration/disabled-ship contracts. Bounded
 unprotected shield/hull damage is now implemented; see ../damage/README.md.
 Ordinary bolt traces and the first firing range are qualified in ../projectile/README.md;
 complete combat and heavier scenes remain unqualified.

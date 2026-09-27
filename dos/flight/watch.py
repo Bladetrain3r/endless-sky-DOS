@@ -14,6 +14,7 @@ RUN=ROOT/'.work/flight/run'
 
 def main():
     parser=argparse.ArgumentParser()
+    parser.add_argument('--resource-stress',choices=('energy','heat'),help='deliberate energy/heat limits for testing')
     parser.add_argument('--stationary',action='store_true',help='keep the camera fixed for comparison')
     parser.add_argument('--invulnerable-target',action='store_true',help='retain the indestructible comparison target')
     parser.add_argument('--stationary-target',action='store_true',help='retain the fixed practice target')
@@ -25,10 +26,12 @@ def main():
     seconds=args.seconds if args.seconds is not None else (120 if args.pilot else 30)
     if not 1<=seconds<=120: parser.error('seconds must be1..120')
     if args.pilot and args.stationary: parser.error('use Tab during pilot mode to switch camera')
+    if args.resource_stress and (not args.pilot or args.accepted): parser.error("resource-stress requires current --pilot build")
     if args.invulnerable_target and (not args.pilot or args.accepted): parser.error('invulnerable-target requires current --pilot build')
     if args.stationary_target and (not args.pilot or args.accepted): parser.error('stationary-target requires current --pilot build')
     camera=' --pilot' if args.pilot else ('' if args.stationary else ' --camera')
     if args.stationary_target: camera+=' --stationary-target'
+    if args.resource_stress: camera+=' --resource-stress '+args.resource_stress
     if args.invulnerable_target: camera+=' --invulnerable-target'
     display=os.environ.get('DISPLAY','')
     if not display.startswith((':','unix:')):

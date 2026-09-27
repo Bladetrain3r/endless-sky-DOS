@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Exercise the actual staged flight application through DOSBox's keyboard."""
+import argparse
 import hashlib
 import json
 import os
@@ -14,7 +15,7 @@ RUN = ROOT / '.work/flight/run'
 IMAGE = 'modern-arena-tools:0.1'
 
 
-def guest():
+def guest(stress=None):
     result = RUN / 'KEYS.TXT'
     result.unlink(missing_ok=True)
     process = subprocess.Popen(['dosbox', '-conf', '.work/flight/run/keys.conf'],
@@ -47,10 +48,10 @@ def guest():
         send('keyup', 'd', .2)
         send('key', 'Tab', .2)
         send('key', 'r', .2)
-        send('keydown', 'space', .8)
+        send('keydown', 'space', 8. if stress else .8)
         send('keydown', 'w', .5)
         send('keyup', 'w', .2)
-        send('keyup', 'space', 1.0)
+        send('keyup', 'space', 3.2 if stress else 1.0)
         send('key', 'Tab', .2)
         send('key', 'Escape', .1)
         process.wait(timeout=20)
@@ -59,7 +60,14 @@ def guest():
         assert int(fields['pilot_input_bits']) == 249 and fields['pilot_keyboard'] == '1', fields
         # About 1.5s held fire at5Hz, then >1s released. Broad scheduling
         # allowance still rejects a stuck fire bit after release.
-        assert 7 <= int(fields['practice_shots']) <= 10 and int(fields['practice_hits']) >= 2, fields
+        if stress:
+            assert 7 <= int(fields['practice_shots']) < 40, fields
+            assert int(fields['blocked_'+stress+'_ticks']) > 0, fields
+            assert fields['overheated'] == '0', fields
+            if stress == 'energy': assert float(fields['energy']) >= 40., fields
+            else: assert float(fields['heat']) < 405., fields
+        else:
+            assert 7 <= int(fields['practice_shots']) <= 10, fields
         assert fields['practice_dropped'] == '0', fields
         assert fields['target_destroyed'] == '1' and int(fields['practice_hits']) == 7, fields
         assert float(fields['target_hull']) < 0 and float(fields['target_shields']) == 0, fields
@@ -74,23 +82,30 @@ def guest():
 
 
 def main():
-    if '--guest' in sys.argv: return guest()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--guest',action='store_true')
+    parser.add_argument('--resource-stress',choices=('energy','heat'))
+    args = parser.parse_args()
+    if args.guest: return guest(args.resource_stress)
+    stress_option = ' --resource-stress '+args.resource_stress if args.resource_stress else ''
     base = (ROOT / 'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     config = base + ('[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
-                     'FLIGHT.EXE --demo --pilot --stationary-target --seconds 20 > KEYS.TXT\nexit\n')
+                     f'FLIGHT.EXE --demo --pilot --stationary-target --seconds 20{stress_option} > KEYS.TXT\nexit\n')
     (RUN / 'keys.conf').write_text(config)
     tested_hash = hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     result = subprocess.run(['docker', 'run', '--rm', '--network', 'none', '--user',
         f'{os.getuid()}:{os.getgid()}', '-e', 'HOME=/tmp', '-v', f'{ROOT}:/work', '-w', '/work',
-        IMAGE, 'timeout', '55s', 'xvfb-run', '-a', 'python3', 'dos/flight/test_controls.py', '--guest'],
+        IMAGE, 'timeout', '55s', 'xvfb-run', '-a', 'python3', 'dos/flight/test_controls.py', '--guest',
+        *(['--resource-stress',args.resource_stress] if args.resource_stress else [])],
         check=True, capture_output=True, text=True, timeout=65)
     fields = json.loads(result.stdout)
     assert tested_hash == hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
-    report = {'result': fields, 'exe_sha256': tested_hash, 'dos_config': config,
+    report = {'result': fields, 'exe_sha256': tested_hash, 'resource_stress': args.resource_stress,
+              'resource_profile_sha256': hashlib.sha256((RUN/'RESOURCE.DAT').read_bytes()).hexdigest(), 'dos_config': config,
               'test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'image_id': subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
               'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; physical feel awaits human check.'}
-    (ROOT / 'dos/reports/flight-controls.json').write_text(json.dumps(report, indent=2) + '\n')
+    (ROOT / ('dos/reports/flight-controls'+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(fields, indent=2))
 
 

@@ -15,6 +15,9 @@
     "destruction_hits": "7",
     "dead_target_excluded": "pass",
     "reset_during_explosion": "pass",
+    "resource_composition": "pass",
+    "energy_starve_recover": "pass",
+    "heat_lock_recover": "pass",
     "status": "pass"
   },
   "dos": {
@@ -33,6 +36,9 @@
     "destruction_hits": "7",
     "dead_target_excluded": "pass",
     "reset_during_explosion": "pass",
+    "resource_composition": "pass",
+    "energy_starve_recover": "pass",
+    "heat_lock_recover": "pass",
     "status": "pass"
   },
   "oracle": {
@@ -127,16 +133,18 @@
     "engine_order": "Engine::MoveShip calls Ship::Fire into newProjectiles while moving ships; Engine::CalculateUnpaused then moves existing projectiles, prunes removed, appends newProjectiles, fills collision sets, and checks collision for all projectiles. Thus a new shot can collide on its launch frame before its first Move. See source/Engine.cpp MoveShip and CalculateUnpaused."
   },
   "source_sha256": {
-    "dos/projectile/check.c": "9cfae5e124444b08ec150417875736c3a1b35b9669dad37286c9e0e53c846152",
+    "dos/projectile/check.c": "afaae1919c1449e31fb25732cfef8b761e84b3a0d9fe78c3310b45371d3005cf",
     "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
-    "dos/flight/practice.c": "7b17b022f2f7b29a708ba758bee4ae297e2e35fbbafdd5e9e25530023e75e9b9",
+    "dos/flight/practice.c": "9cfce0492e8d596cfc2ac21329ffd6e09ce788933aa8759cfa368214ea49c7b8",
     "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
     "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
     "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/resources/resources.c": "6a543e936c9ab2e44b93dc67d51b616a9637b7410dd247151401963ce2039153",
     "dos/projectile/projectile.h": "7b37dcda30f678302d967c62a7660178642d65e89d93d20e33f63a08a2cea536",
-    "dos/flight/practice.h": "a492c78563d693ec360a5fbe045fe83f77266e91bcab59cae3e8eb832da461dd",
+    "dos/flight/practice.h": "31f59b5a4b1f0b06f002bcfddd8ef9fb2298e5119d75060899fbdb7bf8eb0b7b",
     "dos/damage/damage.h": "89d622acf18301568b941aa793dbbbaade66f1d07057346997e6fdebb119eb29",
-    "dos/projectile/check.py": "fbdd9d4275ad0c7b3d9c809d3453dc58aeb462ce03a454c67f015f25e1052eb8",
+    "dos/resources/resources.h": "5e618042dc6aaf5bc4f81bbca51e88d2598dc46969c3d990cb06b3ada1584be2",
+    "dos/projectile/check.py": "477f80a17ba298bcc748b02329c99b1ca1802da5264a42c5b475379eca08d10f",
     "dos/projectile/assets.py": "d0d08eaad5b85d36c23af4eee15853ca905845b01bd342003d93106c3005a246"
   },
   "trace_sha256": "4445d55de8a393599dfc3e65692c53b1bf66527590fa2abe73e9b80d5435fcf0",
@@ -177,7 +185,7 @@
     "-mno-sse",
     "-mno-sse2"
   ],
-  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/projectile/run\nc:\nCWSDPMI -s-\nBOLTCHEK.EXE TRACE.BIN BLASTER.DAT MASKS.BIN DAMAGE.DAT > RESULT.TXT\nexit\n",
+  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/projectile/run\nc:\nCWSDPMI -s-\nBOLTCHEK.EXE TRACE.BIN BLASTER.DAT MASKS.BIN DAMAGE.DAT RESOURCE.DAT > RESULT.TXT\nexit\n",
   "sanitizers": "ASan+UBSan; no leak claim",
   "tolerance": "Position/velocity <=1e-10; exact heading, dead/removal flags through native frame48.",
   "scope": "Native constructor/Move parity; composition tests for swept nearest-hit, zero/start-inside/miss, expiry, trainer cadence/reset and bounded pool. Not full Engine collision/faction/damage equivalence."

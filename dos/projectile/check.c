@@ -162,9 +162,55 @@ static void destruction(const char *profile,const char *masks,const char *damage
     CHECK(p.target_ticks==tick && !p.explosion);
     printf("destruction_hits=7\ndead_target_excluded=pass\nreset_during_explosion=pass\n");
 }
+static void budgets(const char *profile,const char *masks,const char *resource)
+{
+    static Practice p; Pilot pilot={0}; unsigned i,shots; uint32_t rng;
+    ResourceProfile original;
+    CHECK(practice_load(&p,profile,masks) && practice_resources_load(&p,resource,0));
+    original=p.resource_profile;pilot.state=(MotionState){400,300,0,0,0};
+    for(i=0;i<960;++i) practice_step(&p,&pilot,1);
+    CHECK(p.shots==80 && !p.blocked_energy && !p.blocked_heat);
+    CHECK(p.resources.heat>0. && p.resources.energy>original.capacity-original.shot_energy);
+    CHECK(practice_resources_load(&p,resource,1));practice_reset(&p);
+    for(i=0;i<960;++i) practice_step(&p,&pilot,1);
+    CHECK(p.shots<80 && p.blocked_energy>0 && p.blocked_heat==0);
+    shots=p.shots;
+    for(i=0;i<240;++i) practice_step(&p,&pilot,0);
+    CHECK(p.shots==shots && p.resources.energy>=p.resource_profile.capacity);
+    practice_step(&p,&pilot,1);CHECK(p.shots==shots+1);
+    /* A denied attempt neither advances spread RNG nor starts a reload. */
+    p.resources.energy=0.;p.cooldown=0;rng=p.rng;shots=p.shots;
+    practice_step(&p,&pilot,1);
+    CHECK(p.shots==shots && p.rng==rng && !p.cooldown);
+    CHECK(practice_resources_load(&p,resource,2));practice_reset(&p);
+    for(i=0;i<1800;++i) practice_step(&p,&pilot,1);
+    CHECK(p.shots<150 && p.blocked_heat>0 && !p.blocked_energy);
+    shots=p.shots;
+    for(i=0;i<600;++i) practice_step(&p,&pilot,0);
+    CHECK(p.shots==shots && !p.resources.overheated);
+    practice_step(&p,&pilot,1);CHECK(p.shots==shots+1);
+    p.resources.overheated=1;p.resources.heat=p.resource_profile.max_heat*1.1;
+    p.cooldown=0;rng=p.rng;shots=p.shots;
+    practice_step(&p,&pilot,1);
+    CHECK(p.shots==shots && p.rng==rng && !p.cooldown);
+    practice_reset(&p);
+    CHECK(p.resources.energy==p.resource_profile.capacity && p.resources.heat==0. &&
+          !p.resources.overheated && !p.blocked_energy && !p.blocked_heat && p.rng==17);
+    CHECK(p.resource_profile.max_heat==450.); /* Reset retains the selected preset. */
+    {
+        ResourceState expected=p.resources;
+        resource_tick(&expected,&p.resource_profile);
+        for(i=0;i<PRACTICE_BOLTS;++i) bolt_launch(&p.bolts[i],-1000,-1000,0,0,0,0,100);
+        practice_step(&p,&pilot,1);
+        CHECK(p.dropped==1 && p.shots==0 && p.resources.energy==expected.energy &&
+              p.resources.heat==expected.heat && p.rng==17);
+    }
+    printf("resource_composition=pass\nenergy_starve_recover=pass\nheat_lock_recover=pass\n");
+}
 int main(int argc,char **argv)
 {
-    if(argc!=5) return 2;
+    if(argc!=6) return 2;
     native_trace(argv[1]);sweeps();trainer(argv[2],argv[3]);moving(argv[2],argv[3]);destruction(argv[2],argv[3],argv[4]);
+    budgets(argv[2],argv[3],argv[5]);
     printf("status=pass\n");return 0;
 }

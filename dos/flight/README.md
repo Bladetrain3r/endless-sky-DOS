@@ -19,8 +19,9 @@ python3 dos/flight/watch.py
 Opens the reference Docker DOSBox through local X11/XWayland for30 seconds.
 Escape exits early; Ctrl+F9 quits DOSBox. Windowed800×600, audio disabled.
 It shares only the local X socket and, when available, the existing read-only
-Xauthority file; it does not change `xhost`. The headless equivalent was tested;
-actual desktop launch still needs a human check. A local-emulator alternative:
+Xauthority file; it does not change `xhost`. Headless checks pass, and the user
+confirmed the demo launches; the exact launch route was not recorded.
+A local-emulator alternative:
 
 ```sh
 dosbox -conf .work/flight/demo.conf
@@ -110,3 +111,12 @@ faction recoloring and runtime rotation remain unqualified.
 
 Next: investigate remaining draw cost with representative camera motion before
 choosing caching or further specialization; then native ship/motion behavior.
+
+## Human check — 2026-09-27
+
+User confirms the demo works, translational motion looks smooth and performance
+feels stable. Abrupt turning was observed and explained: the script selects the
+next of16 resident headings once per second (22.5 degrees), with no sprite reload.
+Accepted as a rendering-demo checkpoint; smoother turning remains future work.
+This feedback does not change the measured frame times or establish native
+gameplay/physics equivalence.

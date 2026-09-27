@@ -6,11 +6,13 @@ Updated2026-09-27; first indexed DOS flight scene works, no playable game port.
   Sol loaded through owned active-system API, Earth/Luna and source ship sprites.
 - `.work/flight/flight-6-ships.png` is captured DOS index framebuffer preview.
 - Watch: `python3 dos/flight/watch.py` (Docker/local X11);30second scripted run,
-  Escape exits. Desktop launch untested; equivalent headless demo passed.
+  Escape exits. User confirms demo launches, smooth motion/stable performance.
   Alternative local DOSBox: `dosbox -conf .work/flight/demo.conf`.
 - Rebuild/bench: `python3 dos/flight/run.py`; --ships20 --frames60 for busier run;
   --headless-demo checks4seconds real-time; --reference reproduces scalar path.
 - Latest staged executable uses optimized spans, not the scalar reference.
+- Human accepts demo;22.5degree/1second heading snaps are known test behavior,
+  not final turning. Exact human launch route not recorded; no new timings.
 - 20kcycles/16MiB/no swap:6moving+1stationaryFalcon average37.730ms (~26.5FPS),
   draw31.413ms/present6.290ms;20moving+Falcon59.817ms (~16.7FPS).
 - Scalar first pass160.858ms; span captured frame matches exactly SHA3013819d...

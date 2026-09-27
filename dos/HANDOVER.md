@@ -1,5 +1,5 @@
 # Endless Sky DOS handover
-Updated2026-09-28; one-gun firing range staged; human check pending.
+Updated2026-09-28; one-gun firing range staged and human accepted.
 
 ## Current checkpoint
 - Flight: `python3 dos/flight/watch.py --pilot` (Docker/X11,120seconds).
@@ -61,7 +61,8 @@ Updated2026-09-28; one-gun firing range staged; human check pending.
  strictcontains/hit;DOSmaxfractionerror4.44e-16. UsedbypracticeBarge now.
 - Binary64transfer fixed212decimalboundarydifferences; defaultDOSFPUworks.
  Packedmask2060B; fixed3-maskstorage49392B. Originalimages/masksunchanged.
-- Next: humanfire/movingfirefeedback, movingtargets and native shield/damage/
+- Sept28 user: firing works, target hits look correct, no oddities moving/firing.
+- Next: movingtargets and native shield/damage/
  resourcecontracts beforeordinarycombat. Realhardpoints/beams remainseparate.
 - Optionaltrainer+demoscenemusic in dos/WISHLIST.md; noaudioimplementation.
 

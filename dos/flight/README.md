@@ -10,7 +10,8 @@ still an experimental rotation shortcut; simulation uses all65,536 headings.
 
 User playtest2026-09-27: flight works and movement feels physically right;
 operator notes limited familiarity with the original game. Sept28: user confirms
-corrected smaller scale and much smoother turning. Practice fire awaits playtest.
+corrected smaller scale and much smoother turning. Subsequent Sept28 playtest: firing works, target hits look correct, and no
+oddities observed while moving or firing; basic firing range accepted.
 
 World sprites now use native half-PNG dimensions at one screen pixel per world
 unit: `Drawable::Width/Height` supply the 0.5 factor to `DrawList::Push`.

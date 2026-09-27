@@ -89,7 +89,9 @@ counted resident heap (excluding runtime/stack and480,000BVRAM). The `pilot_draw
 phase now includes the practice target, tracer drawing and hit label. These are
 firing-range timings, not a complete-game combat budget. Actual DOSBox injected
 Space plus flight/reset/camera keys also register shots and hits with no discarded
-simulation time. Physical keyboard feel awaits human playtest.
+simulation time. User playtest Sept28: firing works, target hits look correct, and no oddities
+observed while moving or firing. Basic firing range accepted; this is human
+feedback on the bounded trainer, not additional native-equivalence evidence.
 
 Evidence: `../reports/projectile-equivalence.json`,
 `../reports/flight-6-ships-practice-profile.json`, `../reports/flight-controls.json`.

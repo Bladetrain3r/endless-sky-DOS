@@ -7,6 +7,14 @@ sandbox: no collision, combat, landing, AI, missions, resource accounting or sav
 The player's engines are treated as fully supplied.16 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
 
+User playtest2026-09-27: flight works and movement feels physically right;
+operator notes limited familiarity with the original game.
+
+Collision research found a scale correction still to make: this prototype draws
+ships at full PNG size, while native `Body::Unit()` and collision masks use half
+that size in world coordinates. Movement math remains qualified; shooting will
+wait for that mapping to be corrected. See [collision notes](../collision/README.md).
+
 ## Fly
 
 ```sh

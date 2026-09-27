@@ -102,7 +102,10 @@ some frames exceed33.3ms, and full-game30FPS remains unproven. See
 FEASIBILITY.md and EQUIVALENCE.md. The [regular-flight kernel](motion/README.md)
 now matches14 native movement trajectories in DOS and passes all65,536 direction
 checks. A controllable stock Sparrow now uses it in the flight scene;
-`python3 dos/flight/watch.py --pilot` starts the bounded flight sandbox. Low-level implementation choices are delegated.
+`python3 dos/flight/watch.py --pilot` starts the bounded flight sandbox. The [collision qualification](collision/README.md) now preserves original hull
+geometry and passes native/DOS queries. It also identifies a pending body/image
+scale correction before weapons integration. Optional trainer ideas are in
+[the additions wishlist](WISHLIST.md). Low-level choices remain delegated.
 
 ## Indexed-color asset proof
 

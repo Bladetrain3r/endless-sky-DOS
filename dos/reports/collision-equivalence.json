@@ -1,0 +1,132 @@
+{
+  "native": {
+    "cases": "11772",
+    "failures": "0",
+    "contains_failures": "0",
+    "hit_failures": "0",
+    "max_fraction_error": "0",
+    "mask_storage_bytes": "49392",
+    "status": "pass"
+  },
+  "dos": {
+    "fpu_precision_bits": "768",
+    "cases": "11772",
+    "failures": "0",
+    "contains_failures": "0",
+    "hit_failures": "0",
+    "max_fraction_error": "4.4408920985006262e-16",
+    "mask_storage_bytes": "49392",
+    "status": "pass"
+  },
+  "source_sha256": {
+    "dos/collision/check.c": "74bfbf846970c3f4c2c5badd083776bafd5f60d91310cddecfb9fce0c220abfa",
+    "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/collision/mask.h": "4bc3166c00f7b99654bd248d67977e666dfb8f846a7deb05bf7081b415e91440",
+    "dos/collision/check.py": "c43da94e0af47ae537dc65449e8da18b6521ec2c343bca5953c3797b1e49aa32"
+  },
+  "masks_sha256": "26d8dab40eec8a444685abdaead340f49a5cd4c743c5bada463d31cd6e5c09af",
+  "queries_sha256": "3b4eff1a4e737377b290093a67da3d372c7d921356ec69afd103fcd960be8104",
+  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/collision/run\nc:\nCWSDPMI -s-\nCOLLIDE.EXE MASKS.BIN TESTS.BIN > RESULT.TXT\nCOLLIDE.EXE MASKS.BIN TESTS.BIN precision53 > FPU53.TXT\nexit\n",
+  "dos_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2"
+  ],
+  "oracle": {
+    "schema": 1,
+    "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+    "image_id": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
+    "baseline_binary_sha256": "77fcb7ff282a9b82d5fce13125bb403c9a7e65b98661f73786a4f99007654414",
+    "oracle_source_sha256": "1a1f9993c9ce17dc6061dd297338ba307e1f67d1c5552b5547a123ca1e80bfc8",
+    "runner_source_sha256": "6b270a9e5c34eaf662bb2d5300f6306f1fb33904759ba7cf8d858069a064ee0f",
+    "oracle_binary_sha256": "5abd7e2261eff2d996b5018bd7c66aa74cb45fedcf1ee3407e9c982ce1b76939",
+    "masks_sha256": "dea5322b1fb77b1ca1f335d874a41955506c50a3558ab2af035b27b35079fb4f",
+    "tests_sha256": "0d83f5013b85e64ce0ed4168fbaa3494d6cc2d17fae8635e7b0f2bad59acdf9b",
+    "original_images_sha256": {
+      "sparrow": "8a94f6e14c079b36ca3e345b48546a99df9a0fe9c22c6a6bda4cc873d24241f6",
+      "star barge": "74aaa854bedeef5ee1d43fb3a567282f05e8cb56bbb040f59ccf4fbefebe17a1",
+      "falcon": "4cbbbb984b6f7ae717bd3017fdaa96ff748e9a20256f36368586389eb8a43807"
+    },
+    "compiler_flags": [
+      "-DAVIF_DLL",
+      "-isystem",
+      "/usr/include/SDL2",
+      "-isystem",
+      "/usr/include/AL",
+      "-O3",
+      "-DNDEBUG",
+      "-std=c++20",
+      "-flto=auto",
+      "-fno-fat-lto-objects",
+      "-Wall",
+      "-pedantic-errors",
+      "-Wold-style-cast",
+      "-fno-rtti"
+    ],
+    "rows": 11772,
+    "per_mask_rows": [
+      3888,
+      3732,
+      4152
+    ],
+    "outcomes": {
+      "contains": 1487,
+      "miss": 8033,
+      "hit": 2201,
+      "starts_inside": 1538,
+      "zero_vector": 1092
+    },
+    "geometry": [
+      {
+        "id": 0,
+        "name": "sparrow",
+        "outlines": 1,
+        "points": 38,
+        "radius": 19.90555425641986,
+        "image_dimensions": "70x80"
+      },
+      {
+        "id": 1,
+        "name": "star barge",
+        "outlines": 1,
+        "points": 25,
+        "radius": 20.17608742589403,
+        "image_dimensions": "70x80"
+      },
+      {
+        "id": 2,
+        "name": "falcon",
+        "outlines": 3,
+        "points": 60,
+        "radius": 71.96537159942201,
+        "image_dimensions": "160x300"
+      }
+    ],
+    "mask_coordinates": "Original Mask::Create, frame 0 of original 1x PNG, premultiplied via ImageBuffer::Read; SmoothAndCenter yields 0.5x sprite coordinates around image center",
+    "test_schedule": "Per mask: twelve fixed headings with zero/start-inside/miss/lines and seeded random; every exported vertex and edge midpoint including zero vector and rotated cases; 2400 seeded arbitrary-angle lines",
+    "fields": "mask_id,angle_steps,sx,sy,vx,vy,contains,collision_fraction",
+    "seed": "0x5a17d3eab921460f, xorshift64star; deterministic generation order"
+  },
+  "malformed_masks_rejected": 8,
+  "dos_53bit_precision_diagnostic": {
+    "fpu_precision_bits": "512",
+    "cases": "11772",
+    "failures": "0",
+    "contains_failures": "0",
+    "hit_failures": "0",
+    "max_fraction_error": "4.4408920985006262e-16",
+    "mask_storage_bytes": "49392",
+    "status": "pass"
+  },
+  "fpu_requirement": "Default DOS precision and explicit PC_53 both tested; flight runtime unchanged",
+  "sanitizers": "Native ASan+UBSan; leak checking disabled",
+  "swap_files": []
+}

@@ -6,23 +6,25 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 int resource_load(ResourceProfile *profile, const char *path)
 {
     FILE *file;
     ResourceProfile parsed;
-    char header[32], tail[2];
-    int fields;
-    if(!profile || !path || !(file = fopen(path, "r"))) return 0;
-    fields = fscanf(file, "%31s", header);
-    if(fields != 1 || strcmp(header, "ESRESOURCE1")) { fclose(file); return 0; }
-    fields = fscanf(file, "%lf %lf %lf %lf %lf %lf %lf", &parsed.capacity,
-        &parsed.generation, &parsed.heat_generation, &parsed.dissipation,
-        &parsed.max_heat, &parsed.shot_energy, &parsed.shot_heat);
-    if(fields != 7 || fscanf(file, "%1s", tail) != EOF || ferror(file)) {
+    unsigned char header[8],data[56]; double value[7]; unsigned i,j;
+    if(!profile || !path || sizeof(double)!=8 || !(file=fopen(path,"rb"))) return 0;
+    if(fread(header,1,8,file)!=8 || memcmp(header,"ESRES2\0\0",8) ||
+       fread(data,1,56,file)!=56 || fgetc(file)!=EOF || ferror(file)) {
         fclose(file); return 0;
     }
     fclose(file);
+    for(i=0;i<7;++i) {
+        uint64_t bits=0;
+        for(j=0;j<8;++j) bits|=(uint64_t)data[i*8+j]<<(j*8);
+        memcpy(&value[i],&bits,8);
+    }
+    parsed=(ResourceProfile){value[0],value[1],value[2],value[3],value[4],value[5],value[6]};
     if(!isfinite(parsed.capacity) || parsed.capacity < 0. || parsed.capacity > 1e9 ||
         !isfinite(parsed.generation) || fabs(parsed.generation) > 1e9 ||
         !isfinite(parsed.heat_generation) || fabs(parsed.heat_generation) > 1e9 ||

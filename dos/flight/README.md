@@ -4,9 +4,8 @@ The800×600,256-color DOS executable loads Sol from the compact world pack and
 now offers a controllable stock Sparrow using native-matched movement. Earth,
 Luna, the Falcon and scripted traffic provide reference points. This is a flight
 sandbox with one training blaster and a destructible scripted target.
-No ship collisions, landing, AI, missions or saves. Firing now has a passive
-energy/heat budget; propulsion is still outside that budget.
-The player's engines are treated as fully supplied.64 baked sprite headings are
+No ship collisions, landing, AI, missions or saves. Propulsion and firing now share an
+energy/heat budget.64 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
 
 User playtest2026-09-27: flight works and movement feels physically right;
@@ -14,6 +13,8 @@ operator notes limited familiarity with the original game. Sept28: user confirms
 corrected smaller scale and much smoother turning. Subsequent Sept28 playtest: firing works, target hits look correct, and no
 oddities observed while moving or firing; basic firing range accepted. Subsequent moving-range test also accepted:
 stationary/moving fire works and leading is predictable on the steady route.
+Sept28: user also confirms firing stops while overheated and resumes after cooling,
+and energy recharge limits firing in the stress preset. Propulsion coupling is newer.
 
 World sprites now use native half-PNG dimensions at one screen pixel per world
 unit: `Drawable::Width/Height` supply the 0.5 factor to `DrawList::Push`.
@@ -76,17 +77,18 @@ R restores it. Add `--invulnerable-target` for the previously accepted aiming ra
 Background ships/planets are not hittable. This is one test blaster, not the stock Sparrow's beam weapons.
 See [projectile qualification and deliberate limits](../projectile/README.md).
 
-### Energy and heat
+### Shared energy and heat
 
 The lower HUD shows battery energy, heat as a percentage of the overheat limit,
-and READY / RELOADING / LOW ENERGY / OVERHEATED. Each successful shot spends
-energy and adds heat. Release Space to recharge and cool; R restores a full
+and READY / RELOADING / GUN LOW ENERGY / OVERHEATED. Thrust, steering and
+successful shots spend energy and add heat. Release the controls to recharge
+and cool; R restores a full
 battery and cold ship as well as the target. Native generation permits a small
 amount of energy above battery capacity for the current tick.
 
-The normal profile uses the stock Sparrow's passive supply and cooling with one
-Energy Blaster. Its generator can comfortably sustain this single gun: low energy
-and overheating are not expected in this particular loadout. To exercise limits:
+The normal profile uses the stock Sparrow's supply, cooling and engine costs with
+one training Energy Blaster. Its battery comfortably covers this short trainer
+session. To deliberately exercise limits:
 
 ```sh
 python3 dos/flight/watch.py --pilot --resource-stress energy
@@ -97,11 +99,21 @@ These are **deliberate trainer overrides**, labelled in the HUD. Energy stress
 sets capacity40 and generation0.25/tick. Heat stress sets the heat limit450 and
 removes generator heat, so weapon heat alone triggers the test. Hold Space for
 several seconds, including after destroying the target, to reach a limit; release
-to recover. Overheating uses the native strict upper threshold and recovery below
-90% of the limit; it suspends generation as well as firing. Flight remains fully
-supplied even when overheated—an explicit trainer exception to native disabling.
+to recover. Try thrust and turning while holding Space: steering gets first use
+of the available energy, then thrust, then the gun. With insufficient energy,
+steering/thrust operate at their native fractional strength. BACK still has no
+reverse engine and spends nothing; simultaneous forward/back cancel.
+
+Overheating uses the native strict upper threshold and recovery below90% of the
+limit. It suspends generation, steering, thrust and firing. Native disabled drag
+slows the ship gradually; healthy coasting retains velocity. A depleted ship with
+no generation also drifts to a stop. This is the passive resource subset of
+`NeedsEnergy`, not a full ship-disable implementation. R resets the shared budget
+and movement together.
+
 There is no heat hull damage, active cooling, repair, status-effect accounting,
-ammunition, fuel cost or movement cost in this slice. See [resource qualification](../resources/README.md).
+ammunition or fuel cost in this slice. See [resource qualification](../resources/README.md)
+and [propulsion qualification](../propulsion/README.md).
 
 The fitted acceleration, turn rate and drag come from the qualified native
 Sparrow trace, via `pilot_assets.py`; `PILOT.DAT` is a tiny prototype profile,
@@ -227,6 +239,7 @@ python3 dos/flight/run.py --camera --frames 360
 python3 dos/flight/run.py --camera --headless-demo
 python3 dos/flight/run.py --replay --frames 450
 python3 dos/flight/run.py --replay --headless-demo
+python3 dos/flight/test_power.py
 python3 dos/flight/test_controls.py
 python3 dos/flight/test_controls.py --resource-stress energy
 python3 dos/flight/test_controls.py --resource-stress heat
@@ -270,7 +283,7 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: propulsion resource costs and regeneration/disabled-ship contracts. Bounded
+Next: shield regeneration, wider disabled-ship contracts and real hardpoints/beams. Bounded
 unprotected shield/hull damage is now implemented; see ../damage/README.md.
 Ordinary bolt traces and the first firing range are qualified in ../projectile/README.md;
 complete combat and heavier scenes remain unqualified.

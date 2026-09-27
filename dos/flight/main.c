@@ -4,6 +4,7 @@
 #include "pilot.h"
 #include "input.h"
 #include "practice.h"
+#include "power.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -50,7 +51,7 @@ int main(int argc,char **argv)
 {
     const char *names[]={"SPARROW.SPR","BARGE.SPR","FALCON.SPR","EARTH.SPR","LUNA.SPR","GLOW.SPR"};
     Sprite sprites[6]={{0}}; ActiveSystem system={0}; Scene scene; Pilot pilot={0};
-    WorldStore *world=NULL; Practice *practice=NULL;
+    WorldStore *world=NULL; Practice *practice=NULL; PropulsionProfile drive={0};
     unsigned char palette[768],*frame=NULL,*blend=NULL,*add=NULL,*hud_pixels=NULL;
     Timing sim={0},draw={0},present={0},total={0};
     Timing background={0},orbital={0},traffic={0},effect={0},hud={0},pilot_draw_time={0};
@@ -105,7 +106,8 @@ int main(int argc,char **argv)
         practice=malloc(sizeof(*practice));
         if(!practice || !practice_load(practice,"BLASTER.DAT","MASKS.BIN") ||
            !practice_damage_load(practice,"DAMAGE.DAT") ||
-           !practice_resources_load(practice,"RESOURCE.DAT",resource_stress)) {
+           !practice_resources_load(practice,"RESOURCE.DAT",resource_stress) ||
+           !propulsion_load(&drive,"PROPULSE.DAT")) {
             error="practice_assets_failed"; goto done;
         }
         practice->moving_target=!stationary_target;
@@ -116,9 +118,9 @@ int main(int argc,char **argv)
     /* These opaque labels never change in this prototype. Prepare once. */
     memset(frame,10,800*40); memset(frame+800*570,10,800*30);
     video_text(frame,12,10,"ENDLESS SKY DOS - SOL / EARTH",1);
-    video_text(frame,12,24,controlled?(resource_stress==1?"TRAINER: ENERGY STRESS - ENGINES SUPPLIED":
-                resource_stress==2?"TRAINER: HEAT STRESS - ENGINES SUPPLIED":
-                "TRAINER: GUN RESOURCES - ENGINES SUPPLIED"):
+    video_text(frame,12,24,controlled?(resource_stress==1?"TRAINER: ENERGY STRESS - SHARED POWER":
+                resource_stress==2?"TRAINER: HEAT STRESS - SHARED POWER":
+                "TRAINER: SHARED ENERGY / HEAT"):
                "SCRIPTED FLIGHT PROTOTYPE - NOT GAMEPLAY",2);
     video_text(frame,12,578,controlled?"W/UP THRUST  A/D TURN  SPACE FIRE  TAB CAMERA  R RESET  ESC EXIT":
                "ESC EXIT    256 COLORS    60 HZ TEST MOTION",1);
@@ -153,8 +155,9 @@ int main(int argc,char **argv)
             scene_step(&scene);
             if(controlled) {
                 if(replay) pilot_keys(&pilot,&scene,practice_test?INPUT_FIRE:pilot_replay_keys(pilot.ticks));
-                pilot_step(&pilot,&scene);
-                practice_step(practice,&pilot,!!(pilot.previous_keys & INPUT_FIRE));
+                practice_begin_tick(practice);
+                pilot_powered_step(&pilot,&scene,&practice->resources,&practice->resource_profile,&drive);
+                practice_finish_tick(practice,&pilot,!!(pilot.previous_keys & INPUT_FIRE));
             }
             accumulator-=1000./60.;
         }
@@ -183,7 +186,7 @@ int main(int argc,char **argv)
                      practice->resources.energy,practice->resource_profile.capacity,
                      100.*practice->resources.heat/practice->resource_profile.max_heat,
                      practice->resources.overheated?"OVERHEATED":
-                     practice->resources.energy<practice->resource_profile.shot_energy?"LOW ENERGY":
+                     practice->resources.energy<practice->resource_profile.shot_energy?"GUN LOW ENERGY":
                      practice->cooldown?"RELOADING":"READY");
             video_text(frame,12,590,label,practice->resources.overheated?4:2);
             if(practice->destructible)

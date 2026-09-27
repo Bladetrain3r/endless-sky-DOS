@@ -52,6 +52,11 @@ def guest(stress=None):
         send('keydown', 'w', .5)
         send('keyup', 'w', .2)
         send('keyup', 'space', 3.2 if stress else 1.0)
+        if stress:
+            # Engines must work again after cooling/recharge. Then allow the
+            # small stress battery to refill before checking recovery below.
+            send('keydown', 'w', .3)
+            send('keyup', 'w', 3.2)
         send('key', 'Tab', .2)
         send('key', 'Escape', .1)
         process.wait(timeout=20)
@@ -90,7 +95,7 @@ def main():
     stress_option = ' --resource-stress '+args.resource_stress if args.resource_stress else ''
     base = (ROOT / 'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     config = base + ('[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
-                     f'FLIGHT.EXE --demo --pilot --stationary-target --seconds 20{stress_option} > KEYS.TXT\nexit\n')
+                     f'FLIGHT.EXE --demo --pilot --stationary-target --seconds 25{stress_option} > KEYS.TXT\nexit\n')
     (RUN / 'keys.conf').write_text(config)
     tested_hash = hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     result = subprocess.run(['docker', 'run', '--rm', '--network', 'none', '--user',
@@ -101,7 +106,8 @@ def main():
     fields = json.loads(result.stdout)
     assert tested_hash == hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     report = {'result': fields, 'exe_sha256': tested_hash, 'resource_stress': args.resource_stress,
-              'resource_profile_sha256': hashlib.sha256((RUN/'RESOURCE.DAT').read_bytes()).hexdigest(), 'dos_config': config,
+              'resource_profile_sha256': hashlib.sha256((RUN/'RESOURCE.DAT').read_bytes()).hexdigest(),
+              'propulsion_profile_sha256': hashlib.sha256((RUN/'PROPULSE.DAT').read_bytes()).hexdigest(), 'dos_config': config,
               'test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'image_id': subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
               'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; physical feel awaits human check.'}

@@ -54,5 +54,12 @@ does not establish full Engine eligibility, damage ordering, beams or hardpoints
 
 Passive resource checkpoint: `resources/README.md` records energy/heat generation,
 shot costs and overheat hysteresis against native Ship methods. The flight trainer
-keeps propulsion supplied even during overheating; this is not full disabled-ship
-behavior. Explicit stress presets alter supply/heat limits only for testing.
+now couples propulsion through `propulsion/README.md`: native movement costs,
+partial steering before thrust, shared weapon budget and overheat/energy drift.
+This remains a bounded resource model, not full disabled-ship behavior. Explicit
+stress presets alter supply/heat limits only for testing.
+
+Resource boundary lesson: DOS decimal conversion changed simple fractions by a
+tiny amount, leaving tiny power for thrust and triggering a finite drag correction. Use
+exact binary64 profile/fixture transfer before judging arithmetic equivalence;
+small input error does not imply a small gameplay error near branch boundaries.

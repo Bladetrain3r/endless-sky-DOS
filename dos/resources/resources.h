@@ -15,7 +15,7 @@ typedef struct ResourceState {
     int overheated;
 } ResourceState;
 
-/* Validated ESRESOURCE1 text profile; returns 1 on success, 0 on failure. */
+/* Validated ESRES2 little-endian binary64 profile; returns 1 on success, 0 on failure. */
 int resource_load(ResourceProfile *profile, const char *path);
 void resource_reset(ResourceState *state, const ResourceProfile *profile);
 void resource_tick(ResourceState *state, const ResourceProfile *profile);

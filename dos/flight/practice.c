@@ -64,10 +64,18 @@ static double random_unit(Practice *p)
     p->rng=p->rng*1664525u+1013904223u;
     return (double)p->rng/4294967296.;
 }
+void practice_begin_tick(Practice *p)
+{
+    if(p->resource_enabled) resource_tick(&p->resources,&p->resource_profile);
+}
 void practice_step(Practice *p,const Pilot *pilot,int fire)
 {
+    practice_begin_tick(p);
+    practice_finish_tick(p,pilot,fire);
+}
+void practice_finish_tick(Practice *p,const Pilot *pilot,int fire)
+{
     unsigned i;
-    if(p->resource_enabled) resource_tick(&p->resources,&p->resource_profile);
     if(p->explosion) --p->explosion;
     if(!p->destroyed) {
         ++p->target_ticks;

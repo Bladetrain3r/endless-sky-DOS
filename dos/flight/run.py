@@ -15,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/run'
 IMAGE='modern-arena-tools:0.1'
 SOURCES=['dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
-         'dos/flight/scene.c','dos/flight/sprite_reference.c','dos/world/active.c',
+         'dos/flight/scene.c','dos/flight/power.c','dos/propulsion/propulsion.c','dos/flight/sprite_reference.c','dos/world/active.c',
          'dos/resources/resources.c','dos/damage/damage.c','dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/flight/pilot.c','dos/flight/input.c','dos/flight/input_state.c','dos/motion/motion.c']
 FLAGS=['-std=gnu99','-O2','-march=i386','-mtune=i586','-mno-mmx','-mno-sse',
@@ -62,12 +62,13 @@ def main():
     subprocess.run(docker+['python3','dos/projectile/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/damage/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/resources/assets.py'],check=True)
+    subprocess.run(docker+['python3','dos/propulsion/assets.py'],check=True)
     shutil.copyfile(ROOT/'.work/world/run/WORLD.PAK',RUN/'WORLD.PAK')
     archive=ROOT/'.work/toolchain/csdpmi7b.zip'
     assert digest(archive)=='deacda0488e1cdd7c4a9f32fab45662b34c0ed6b2d7d4d13bc07041b62004a8c'
     with zipfile.ZipFile(archive) as z:
         (RUN/'CWSDPMI.EXE').write_bytes(z.read('bin/CWSDPMI.EXE'))
-    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h','dos/resources/resources.h']
+    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h','dos/resources/resources.h','dos/propulsion/propulsion.h']
     source_hashes={s:digest(ROOT/s) for s in inputs}
     subprocess.run(docker+['.work/toolchain/djgpp/bin/i586-pc-msdosdjgpp-gcc',*FLAGS,
                           *(['-DREFERENCE_RENDERER'] if args.reference else []),*SOURCES,'-lm','-o','.work/flight/run/FLIGHT.EXE'],check=True)
@@ -131,6 +132,7 @@ def main():
     report=dict(reference_renderer=args.reference,kind='bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
                 image_id=subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
                 compiler_flags=FLAGS,config=conf,source_sha256=source_hashes,
+                propulsion_profile_sha256=digest(RUN/'PROPULSE.DAT'),
                 resource_profile_sha256=digest(RUN/'RESOURCE.DAT'),
                 resource_stress=args.resource_stress,
                 damage_profile_sha256=digest(RUN/'DAMAGE.DAT'),
@@ -138,7 +140,7 @@ def main():
                 pilot_profile=json.loads((RUN/'pilot.json').read_text()),pack_sha256=digest(RUN/'WORLD.PAK'),frame_sha256=digest(RUN/'FRAME.IDX'),
                 exe_bytes=(RUN/'FLIGHT.EXE').stat().st_size,assets=json.loads((RUN/'assets.json').read_text()),
                 scope='Explicit residency counts world store+decoded system, frame, sprites, blend tables. Excludes runtime/code/stack/stdio and VRAM.',
-                limits=['Background traffic is scripted; pilot replay uses healthy supplied stock-Sparrow motion. One-gun passive energy/heat budget; supplied engines even while overheated; reduced target health, optional invulnerability, no AI/regen/status effects.',
+                limits=['Background traffic is scripted; pilot replay uses stock-Sparrow motion. Shared propulsion/gun energy/heat; native overheat drift; reduced target health, optional invulnerability, no AI/regen/status effects.',
                         'Sol Earth/Luna fixed epoch0; scene placement selected for inspection.',
                         'Benchmark advances2simticks per render; demo60Hz accumulator/30Hz render target.',
                         'No faction recoloring or native animation interpolation yet.'])

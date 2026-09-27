@@ -1,0 +1,63 @@
+{
+  "results": {
+    "native": {
+      "status": "pass",
+      "generation_movement_gun_order": "pass",
+      "partial_turn_before_thrust": "pass",
+      "shared_overheat_recovery": "pass",
+      "reset_and_camera": "pass"
+    },
+    "dos": {
+      "status": "pass",
+      "generation_movement_gun_order": "pass",
+      "partial_turn_before_thrust": "pass",
+      "shared_overheat_recovery": "pass",
+      "reset_and_camera": "pass"
+    }
+  },
+  "source_sha256": {
+    "dos/flight/power_test.c": "859729639541fe82ea0c917d9c0a7c6d4904432008e1e93bc58eff054166bef9",
+    "dos/flight/power.c": "e38b7b93a9dcdadc6f508ff8cf29cb9febf54438a6261401f3a985015b990ff3",
+    "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
+    "dos/flight/practice.c": "23d6d93c1aa539c4ac652bc6c775c44b924ff8637dfaf1468e0c29a081353322",
+    "dos/propulsion/propulsion.c": "0288c5eda365de84b44682c17e32704f739afdf3b84bd78a10a72aa223c58d6c",
+    "dos/resources/resources.c": "b7d884b4933290413f897c27d2c00081c763fb0ccd7175bd088917a386b2272a",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
+    "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
+    "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/flight/power.h": "2cd17d55727af0054348a1ec82771d376807107fddda3b4b87f0321a0909fd4b",
+    "dos/flight/pilot.h": "80c5fed814002b335e32faf087b6ee95f0e72ff98343d8db4c9f805853f82149",
+    "dos/flight/practice.h": "5b2b57563918987cdfc21b85afeaca1339b90b0d0f4f01fb6727c1efb8cf8cd5",
+    "dos/propulsion/propulsion.h": "edc6b87151a43c079776694f90c1d3d8fdf68e54044ba18dfe7f8abd0c462bac",
+    "dos/resources/resources.h": "1ac3b936bf92909e38068274f0293bfa00f171a50e940e02199d8cd9db12846e",
+    "dos/motion/motion.h": "5f3db1677f424f1d3d8f5176dde5e7710781b87a24236f863d0f88f85de5cc56",
+    "dos/projectile/projectile.h": "7b37dcda30f678302d967c62a7660178642d65e89d93d20e33f63a08a2cea536",
+    "dos/collision/mask.h": "4bc3166c00f7b99654bd248d67977e666dfb8f846a7deb05bf7081b415e91440",
+    "dos/damage/damage.h": "89d622acf18301568b941aa793dbbbaade66f1d07057346997e6fdebb119eb29",
+    "dos/flight/test_power.py": "522e53214c992b78fb8ab08172599917eab137d8147af7be48aebfe65ca58b3d"
+  },
+  "profile_sha256": {
+    "PILOT.DAT": "3be0027be676f407148d71af018af753b2ff7596a2bfacca57afb0a42cfc43a8",
+    "PROPULSE.DAT": "87cc98683b1af5b8ed0805575a36d278d974eb83d2338bb89ec93a3ab2eacd29",
+    "RESOURCE.DAT": "f126bfc9de4a2914a875ea097668d269565bb95094626c42c7b45c01ca4fd77c",
+    "BLASTER.DAT": "5e94657ca5666e69b4faf8f1cb1d4ab6dd5051e0d22b1b8937343b0801bf2fe2",
+    "MASKS.BIN": "26d8dab40eec8a444685abdaead340f49a5cd4c743c5bada463d31cd6e5c09af",
+    "CWSDPMI.EXE": "2de899fecaa90632b8b9bdfc0305cb0375e59ae252c37e32d06c1ed3f98a8f44"
+  },
+  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/flight/power/run\nc:\nCWSDPMI -s-\nPOWER.EXE > RESULT.TXT\nexit\n",
+  "dos_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2"
+  ],
+  "scope": "App composition: generation -> powered pilot/camera -> weapon, partial steering priority, heat drift/recovery, reset. Native Ship kernel comparison is separate propulsion-equivalence.json.",
+  "sanitizers": "Portable native ASan/UBSan; leak checking disabled"
+}

@@ -17,12 +17,6 @@ static int same(double a, double b, double *max_error)
 
 static int reject_bad_profiles(const char *valid_path)
 {
-    const char *bad[] = {
-        "ESRESOURCE1\n1 2 nan .1 3 4 5\n",
-        "ESRESOURCE1\n1 2 3 .1 4 5\n",
-        "ESRESOURCE1\n10000000000 2 3 .1 4 5 6\n",
-        "ESRESOURCE1\n1 2 3 .1 4 5 6 trailing\n"
-    };
     const char *slash = strrchr(valid_path, '/');
     char path[512];
     ResourceProfile profile, sentinel = {11., 12., 13., .14, 15., 16., 17.};
@@ -31,9 +25,15 @@ static int reject_bad_profiles(const char *valid_path)
     if(prefix + sizeof("BADRES.TMP") > sizeof(path)) return 0;
     memcpy(path, valid_path, prefix);
     strcpy(path + prefix, "BADRES.TMP");
-    for(i = 0; i < sizeof(bad) / sizeof(bad[0]); ++i) {
-        file = fopen(path, "w");
-        if(!file || fputs(bad[i], file) == EOF || fclose(file)) return 0;
+    for(i=0;i<4;++i) {
+        double v[7]={4000.,1.9,2.9,.00077,18600.,5.8,18.};
+        if(i==0) v[2]=NAN;
+        if(i==2) v[0]=1e10;
+        file=fopen(path,"wb");
+        if(!file) return 0;
+        if(fwrite("ESRES2\0\0",1,8,file)!=8 || fwrite(v,8,i==1?6:7,file)!=(i==1?6:7)) return 0;
+        if(i==3 && fputc('X',file)==EOF) return 0;
+        if(fclose(file)) return 0;
         profile = sentinel;
         if(resource_load(&profile, path) || memcmp(&profile, &sentinel, sizeof(profile))) {
             remove(path); return 0;
@@ -45,7 +45,8 @@ static int reject_bad_profiles(const char *valid_path)
 int main(int argc, char **argv)
 {
     FILE *file;
-    char line[512], name[80], previous[80] = "";
+    char header[8],name[80],previous[80]="";
+    unsigned row_count,row;
     ResourceProfile stock, profile;
     ResourceState state;
     int rows = 0, cases = 0, tick, initial_overheated, request, expected_can, expected_fired;
@@ -55,17 +56,17 @@ int main(int argc, char **argv)
     if(argc != 3 || !resource_load(&stock, argv[2]) || !reject_bad_profiles(argv[2])) return 2;
     if(fabs(stock.capacity - 4000.) > 1e-9 || fabs(stock.shot_energy - 5.8) > 1e-9)
         return 2;
-    file = fopen(argv[1], "r");
-    if(!file || !fgets(line, sizeof(line), file)) return 2;
-    while(fgets(line, sizeof(line), file)) {
-        if(sscanf(line, "%79[^,],%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%d,%d,%d,%d,%lf,%lf,%d",
-            name, &tick, &profile.capacity, &profile.generation,
-            &profile.heat_generation, &profile.dissipation, &profile.max_heat,
-            &profile.shot_energy, &profile.shot_heat, &initial_energy,
-            &initial_heat, &initial_overheated, &request, &expected_can,
-            &expected_fired, &expected_energy, &expected_heat, &expected_overheated) != 18) {
-            fprintf(stderr, "Malformed native row %d\n", rows + 1); return 1;
-        }
+    file=fopen(argv[1],"rb");
+    if(!file || fread(header,1,8,file)!=8 || memcmp(header,"ESRTRC1",8) ||
+       fread(&row_count,4,1,file)!=1 || row_count!=927) return 2;
+    for(row=0;row<row_count;++row) {
+        double v[17];
+        if(fread(name,1,80,file)!=80 || name[79] || fread(v,8,17,file)!=17) return 1;
+        tick=(int)v[0];
+        profile=(ResourceProfile){v[1],v[2],v[3],v[4],v[5],v[6],v[7]};
+        initial_energy=v[8];initial_heat=v[9];initial_overheated=(int)v[10];
+        request=(int)v[11];expected_can=(int)v[12];expected_fired=(int)v[13];
+        expected_energy=v[14];expected_heat=v[15];expected_overheated=(int)v[16];
         if(strcmp(name, previous)) {
             if(tick != 0) return 1;
             strcpy(previous, name);
@@ -96,6 +97,7 @@ int main(int argc, char **argv)
             witnessed_exact |= 2;
         ++rows;
     }
+    if(fgetc(file)!=EOF || ferror(file)) return 1;
     fclose(file);
     if(cases != 9 || rows != 927 || !witnessed_starve || !witnessed_hot ||
        !witnessed_recovery || !witnessed_overflow || witnessed_exact != 3) return 1;

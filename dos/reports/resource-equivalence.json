@@ -100,19 +100,28 @@
       "status": "pass",
       "cases": "9",
       "rows": "927",
-      "max_error": "4.5474735088646412e-13"
+      "max_error": "0"
     }
   },
   "source_sha256": {
-    "dos/resources/check.c": "1b8e5b513247c4e29416c15ffb3db308337047139469ee61cd819267c5128b4b",
-    "dos/resources/resources.c": "6a543e936c9ab2e44b93dc67d51b616a9637b7410dd247151401963ce2039153",
-    "dos/resources/resources.h": "5e618042dc6aaf5bc4f81bbca51e88d2598dc46969c3d990cb06b3ada1584be2",
-    "dos/resources/check.py": "2dc495e7bf58a06e9eed9607c6798a196f5de9b2887d61dde2322987085b42e3",
-    "dos/resources/assets.py": "b97e5db381e344d06ba4e862465331780e3050e25715ea3b7556c2ba5225ce12"
+    "dos/resources/check.c": "52fef7e382a12e774be4d381617aaaaf913ab95d28120ccd82503458263f7f68",
+    "dos/resources/resources.c": "b7d884b4933290413f897c27d2c00081c763fb0ccd7175bd088917a386b2272a",
+    "dos/resources/resources.h": "1ac3b936bf92909e38068274f0293bfa00f171a50e940e02199d8cd9db12846e",
+    "dos/resources/check.py": "e1daa47f88b6790cb43f6577b1be4b8a5a9bf6335874368686b47f3bde0d5c12",
+    "dos/resources/assets.py": "0cfd53304ecdccabfa06f79d9fc8f6fa10e7a19a81ca246df81c12c53ff72f3d"
   },
-  "trace_sha256": "2c2f85b4ed828cabe8ce2f145cfdcbaa823efc3fbd0982fb660cd09553636a84",
-  "profile_sha256": "7ad4cf509556e4423bf8f1e41b0c217664571f98b3555383486ac7d3f08a2a9c",
-  "profile": "ESRESOURCE1\n4000 1.8999999999999999 2.8999999999999999 0.00077000000000000007 18600 5.8000000000000007 18\n",
+  "trace_sha256": "8ccb39755c393002d9d498f2065f045a4bd519a4693f1a7d0ba39331448c434b",
+  "profile_sha256": "f126bfc9de4a2914a875ea097668d269565bb95094626c42c7b45c01ca4fd77c",
+  "profile_format": "ESRES2 magic +7little-endian binary64",
+  "profile_values": {
+    "capacity": 4000.0,
+    "generation": 1.9,
+    "heat_generation": 2.9,
+    "dissipation": 0.0007700000000000001,
+    "max_heat": 18600.0,
+    "shot_energy": 5.800000000000001,
+    "shot_heat": 18.0
+  },
   "dos_flags": [
     "-std=gnu99",
     "-O2",
@@ -125,7 +134,7 @@
     "-mno-sse",
     "-mno-sse2"
   ],
-  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/resources/run\nc:\nCWSDPMI -s-\nRESOURCE.EXE NATIVE.CSV RESOURCE.DAT > RESULT.TXT\nexit\n",
+  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/resources/run\nc:\nCWSDPMI -s-\nRESOURCE.EXE TRACE.BIN RESOURCE.DAT > RESULT.TXT\nexit\n",
   "tolerance": "Absolute energy/heat error <=1e-9; can_fire, fired, overheated exact.",
   "scope": "Full-health stock Sparrow outfitting and one Energy Blaster; direct native Ship::DoGeneration, CanFire and ExpendAmmo with synthetic capacity/generation/heat stress. No movement, repair/status/fuel/solar/active cooling or hardpoint cooldown.",
   "sanitizers": "ASan+UBSan on portable checker/kernel; original native object build unchanged, unsanitized."

@@ -31,7 +31,10 @@ int practice_damage_load(Practice *p,const char *path);
 int practice_resources_load(Practice *p,const char *path,int stress);
 void practice_reset(Practice *p);
 void practice_target(Practice *p);
+/* Standalone gun-only tick, retained for focused projectile tests. */
 void practice_step(Practice *p,const Pilot *pilot,int fire);
+void practice_begin_tick(Practice *p);
+void practice_finish_tick(Practice *p,const Pilot *pilot,int fire);
 void practice_draw(unsigned char *frame,const Practice *p,const Scene *scene,
                    const Sprite *barge,const unsigned char *blend,const unsigned char *add);
 #endif

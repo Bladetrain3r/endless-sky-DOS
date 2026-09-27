@@ -1,13 +1,13 @@
 # Endless Sky DOS handover
-Updated2026-09-27; moving camera + faster spans/HUD pass, no playable game port.
+Updated2026-09-27; native/DOS regular-flight equivalence passes; no playable port.
 
 ## Current checkpoint
 - dos/flight/README.md: actual800x600x8 DOS VBE prototype, palette/DAC verification,
   Sol loaded through owned active-system API, Earth/Luna and source ship sprites.
 - `.work/flight/flight-6-ships-camera.png` is latest captured DOS frame preview.
 - Watch: `python3 dos/flight/watch.py` (Docker/local X11);30second scripted run,
-  Escape exits; default now pans. --stationary restores oldview. Prior demo human
-  confirmed smooth/stable; newcamera view awaits human feedback.
+  Escape exits; default now pans. --stationary restores oldview. Sept27 user confirms both stationary
+  and moving-camera runs successful and smooth.
   Alternative local DOSBox: `dosbox -conf .work/flight/demo.conf`.
 - Rebuild/bench: `python3 dos/flight/run.py`; --ships20 --frames60 for busier run;
   --headless-demo checks4seconds real-time; --reference reproduces scalar path.
@@ -28,7 +28,15 @@ Updated2026-09-27; moving camera + faster spans/HUD pass, no playable game port.
  16prebaked sprite headings, normal4-bit-alpha plus one additive effect;
  faction swizzles/half-additive/premultiplied assets/interpolation unqualified.
 - Average clears30FPS in smallcamera scene; someframesmissbudget/fullgameunproven.
- Next native ship/motion behavior with reference; retain camera stress gates.
+ Next integrate qualified motion into controllable scene; retain camera stress gates.
+
+## Regular-flight kernel (separate from staged scene)
+- dos/motion/README.md; check.py runs native Ship::Move oracle + portable C under
+ native sanitizers and DOS.13cases/11700ticks; native exact, DOSpos5.46e-12,vel1.42e-14.
+- All65536headings exact; unit-vector error1.11e-16; no1MiB lookup allocation.
+- 64syntheticships600ticks ~884ms (~1.47ms/tick) at20k/16MiB/no swap.
+ Motion only: noAI/resources/collision; healthy supplied ordinary flight contract.
+- dos/reports/motion-equivalence.json records hashes/config/cost; .work/motion ~9MiB.
 
 ## Active world and validation
 - dos/world/active.h,c:validated immutable store, name/ID lookup, owned decoded

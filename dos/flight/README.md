@@ -22,7 +22,8 @@ parallax. Use `python3 dos/flight/watch.py --stationary` for a fixed view.
 Escape exits early; Ctrl+F9 quits DOSBox. Windowed800×600, audio disabled.
 It shares only the local X socket and, when available, the existing read-only
 Xauthority file; it does not change `xhost`. Headless checks pass, and the user
-confirmed the demo launches; the exact launch route was not recorded.
+confirmed both stationary and moving-camera runs successful and smooth on
+2026-09-27; the exact launch route was not recorded.
 A local-emulator alternative:
 
 ```sh

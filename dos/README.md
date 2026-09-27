@@ -99,7 +99,10 @@ explicit access-layer heap. The [first flight scene](flight/README.md) now loads
 owned active-system data and draws real indexed assets in DOS. Six scripted ships
 plus a stationary Falcon now average33.1FPS on the moving-camera route at20k;
 some frames exceed33.3ms, and full-game30FPS remains unproven. See
-FEASIBILITY.md and EQUIVALENCE.md. Low-level implementation choices are delegated.
+FEASIBILITY.md and EQUIVALENCE.md. The [regular-flight kernel](motion/README.md)
+now matches13 native movement trajectories in DOS and passes all65,536 direction
+checks. It remains separate from the scripted renderer pending control/scene
+integration. Low-level implementation choices are delegated.
 
 ## Indexed-color asset proof
 

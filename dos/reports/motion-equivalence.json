@@ -1,0 +1,171 @@
+{
+  "kind": "bounded-regular-flight-differential-not-complete-ship-port",
+  "native": {
+    "angle_cases": "65536",
+    "angle_max_error": "0",
+    "cases": "13",
+    "steps": "11700",
+    "position_max_error": "0",
+    "velocity_max_error": "0",
+    "benchmark_steps": "38400",
+    "benchmark_ms": "2.345000",
+    "ms_per_64_ship_tick": "0.003908",
+    "state_bytes": "2560",
+    "checksum": "32371.26697040824",
+    "status": "pass"
+  },
+  "dos": {
+    "angle_cases": "65536",
+    "angle_max_error": "1.1102230246251565e-16",
+    "cases": "13",
+    "steps": "11700",
+    "position_max_error": "5.4569682106375694e-12",
+    "velocity_max_error": "1.4210854715202004e-14",
+    "benchmark_steps": "38400",
+    "benchmark_ms": "884.071138",
+    "ms_per_64_ship_tick": "1.473452",
+    "state_bytes": "2304",
+    "checksum": "32371.26697040824",
+    "status": "pass"
+  },
+  "oracle": {
+    "schema": 1,
+    "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+    "image_id": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
+    "baseline_binary_sha256": "77fcb7ff282a9b82d5fce13125bb403c9a7e65b98661f73786a4f99007654414",
+    "oracle_source_sha256": "2fa3adc9928f3ad82d5d69fad98244e9f2a8738abd5a7edc41fdb03af0f2b8fa",
+    "runner_source_sha256": "e8ea272e9dc2e0418dae1baac7e19257d99bd7b964c9cbeeb44f5f2b34d41710",
+    "oracle_binary_sha256": "e0c289ae6157d5038a18f9a5fa440e4a74eada981fb295fba5610cd5fb8e2e8d",
+    "csv_sha256": "b9b31b8f290964f01f985bcb217edf97cc8d69ae9465bf9922486fc2d9a2fff5",
+    "angles_sha256": "d37233274c24641a356623e127527a925f399345315c0f0df323930870e9c966",
+    "resource_data_sha256": "7ced33b3622658aa4309ba8a4614604b9a326a6c20220ade8575206976baad72",
+    "resource_data_files": 204,
+    "compiler_flags": [
+      "-DAVIF_DLL",
+      "-isystem",
+      "/usr/include/SDL2",
+      "-isystem",
+      "/usr/include/AL",
+      "-O3",
+      "-DNDEBUG",
+      "-std=c++20",
+      "-flto=auto",
+      "-fno-fat-lto-objects",
+      "-Wall",
+      "-pedantic-errors",
+      "-Wold-style-cast",
+      "-fno-rtti"
+    ],
+    "rows": 11713,
+    "ticks_per_case": 900,
+    "cases": [
+      "sparrow_back",
+      "sparrow_coast",
+      "sparrow_forward",
+      "sparrow_mixed",
+      "sparrow_reverse_fixture",
+      "sparrow_stop",
+      "sparrow_turn",
+      "star_barge_back",
+      "star_barge_coast",
+      "star_barge_forward",
+      "star_barge_mixed",
+      "star_barge_stop",
+      "star_barge_turn"
+    ],
+    "initial_conditions": {
+      "all": {
+        "position": [
+          125,
+          -73
+        ],
+        "heading_degrees": 0,
+        "velocity": [
+          0,
+          0
+        ],
+        "system": "Sol",
+        "recharge": "All",
+        "crew": "hire to required"
+      },
+      "coast_velocity": [
+        2,
+        -3
+      ],
+      "back_velocity": [
+        1,
+        -1
+      ],
+      "stop_velocity": [
+        0.3,
+        0.01
+      ],
+      "mixed_velocity": [
+        1.25,
+        -0.75
+      ],
+      "mixed_heading_degrees": 359,
+      "reverse_fixture": "Sparrow plus one X1100 Ion Reverse Thruster via public AddOutfit"
+    },
+    "schedule": {
+      "forward": "forward all ticks",
+      "coast": "no commands all ticks",
+      "turn": "forward, turn +1 all ticks",
+      "back": "back all ticks",
+      "stop": "forward+STOP all ticks",
+      "mixed": "1-120 forward; 121-240 coast; 241-360 forward turn -.5; 361-480 back; 481-600 forward turn +.25; 601-720 forward+back; 721-900 coast"
+    },
+    "fields": "case,tick,cmd_forward,cmd_back,cmd_stop,cmd_turn,accel,reverse_accel,turn_rate,drag,mult,x,y,vx,vy,angle_steps",
+    "resource_checks": "Every tick: crew >= required, not disabled/destroyed/NeedsEnergy, energy/fuel >= 0, hull > 0",
+    "minimum_energy_margin": 3998.5,
+    "minimum_heat_margin": 3766.233766233766,
+    "throttle_check": "Before each Move, AvailableResources.CanExpend(combined turn and thrust costs); selected fittings have only energy/heat movement costs",
+    "stop_check": "First STOP tick leaves lateral velocity 0.3 and clamps facing-normal velocity to zero",
+    "scope": "Standalone public Ship::Move, no Engine::Fire; bounded at 900 ticks before forget removal"
+  },
+  "source_sha256": {
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/motion/check.c": "02a8af679f8bf7ddfdb3699dec95119cfca940d160423e9f2e818da66dd1e598",
+    "dos/motion/motion.h": "5f3db1677f424f1d3d8f5176dde5e7710781b87a24236f863d0f88f85de5cc56",
+    "dos/motion/check.py": "b877fdd7a9429b657d160cb39594aa34abbd06e6c4a373bc3cad16354105e884"
+  },
+  "native_flags": [
+    "-std=gnu99",
+    "-O1",
+    "-g",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsanitize=address,undefined",
+    "-fno-omit-frame-pointer",
+    "-no-pie"
+  ],
+  "dos_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "sanitizers": "ASan+UBSan; leak checking disabled",
+  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/motion/run\nc:\nCWSDPMI -s-\nMOTION.EXE TRACE.CSV ANGLES.BIN > RESULT.TXT\nexit\n",
+  "trace_sha256": "b9b31b8f290964f01f985bcb217edf97cc8d69ae9465bf9922486fc2d9a2fff5",
+  "angles_sha256": "d37233274c24641a356623e127527a925f399345315c0f0df323930870e9c966",
+  "exe_sha256": "5d84bcb7b4740009642ffc33c6a6ff81cae0783ae50ca55b8f04c06845be007e",
+  "exe_bytes": 246411,
+  "images": {
+    "endless-sky-dos-native-reference:local": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
+    "modern-arena-tools:0.1": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c"
+  },
+  "limits": [
+    "Healthy supplied regular flight only; no full simulation or graphics cost.",
+    "Benchmark is 64 synthetic ships for 600 ticks, not game FPS.",
+    "State bytes are only stack actor states, not complete guest residency.",
+    "Accepted visual demo unchanged; kernel not integrated into flight scene."
+  ]
+}

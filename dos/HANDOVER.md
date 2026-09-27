@@ -1,5 +1,5 @@
 # Endless Sky DOS handover
-Updated2026-09-28; destructible firing range staged; human check pending.
+Updated2026-09-28; destructible firing range human accepted:7hits,explosion,R reset.
 
 ## Current checkpoint
 - Flight: `python3 dos/flight/watch.py --pilot` (Docker/X11,120seconds).
@@ -65,7 +65,7 @@ Updated2026-09-28; destructible firing range staged; human check pending.
 - Movingtests:postmovepose witness,480tickclosedroute,lead80/80 vsunled72/80,
  resetrepeatable(nativeASan+DOS). App2laps25.421msavg29.938max,heap2,897,898B.
 - Sept28 user: static/moving fire work; leading predictable on steadyroute.
-- Next: human damage/explosionfeedback; firingresourcecosts,regen/disabledcontracts; beamsseparate.
+- Next: firing energy/heat and recovery;regen/disabledcontracts and beamsseparate.
 
 ## Retained content / boundaries
 - dos/world/active.h,c:ownedvalidatedsystemarena;all694systems qualificationpass.

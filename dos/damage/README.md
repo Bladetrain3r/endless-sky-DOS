@@ -69,7 +69,7 @@ The stationary600-tick app route records50shots,7hits,0drops; destruction at tic
 with no subsequent hits. Frame cost25.932ms average/30.762ms maximum, counted heap
 2,897,942B excluding runtime/stack and480,000BVRAM. Actual injected-key firing
 also destroys the target in7hits, with no discarded simulation time. Root inspected
-`.work/flight/explosion-early.png`; human acceptance of this slice is pending.
+`.work/flight/explosion-early.png`; Sept28 human playtest confirms the seven-hit kill, visible explosion and R reset.
 This is a firing-range budget, not a full battle benchmark.
 
 The rotating moving-target app route also passes:80shots,7hits,death at tick949,

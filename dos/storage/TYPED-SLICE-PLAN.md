@@ -1,7 +1,11 @@
 # First typed content slice: resolved map and starting economy
 
-Status: proposed implementation contract, 2026-09-27. No typed pack or DOS
-world loader exists yet. Use the indexed pack selected in [README.md](README.md).
+Status: first immutable snapshot and DOS validator implemented, 2026-09-27;
+see [results and exact format](../world/README.md). This original plan remains
+the broader target; active-system decoding/paging and mutation are not built.
+The implementation uses inline attribute strings and a single reusable record
+buffer instead of attribute IDs and two pages; measured explicit heap37,510B.
+Full native orbit-printer coverage is limited by its upstream --all crash.
 
 ## Choice and boundary
 

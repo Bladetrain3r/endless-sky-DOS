@@ -1,0 +1,98 @@
+{
+  "kind": "typed-world-validation-not-gameplay",
+  "results": {
+    "WORLD": {
+      "status": "ok",
+      "records": "1323",
+      "systems": "694",
+      "planets": "619",
+      "commodities": "10",
+      "links": "1612",
+      "objects": "5518",
+      "trades": "4800",
+      "memberships": "629",
+      "payload_hash_hex": "16e59fad",
+      "memory_peak_bytes": "37510",
+      "free_pages_before": "3757",
+      "free_pages_after": "3743",
+      "validation_ms": "1125.831"
+    },
+    "BADREF": {
+      "status": "failed",
+      "records": "4",
+      "systems": "0",
+      "planets": "0",
+      "commodities": "0",
+      "links": "0",
+      "objects": "0",
+      "trades": "0",
+      "memberships": "0",
+      "payload_hash_hex": "811c9dc5",
+      "memory_peak_bytes": "343",
+      "free_pages_before": "3757",
+      "free_pages_after": "3755",
+      "validation_ms": "1.209"
+    },
+    "SHORT": {
+      "status": "failed",
+      "records": "0",
+      "systems": "0",
+      "planets": "0",
+      "commodities": "0",
+      "links": "0",
+      "objects": "0",
+      "trades": "0",
+      "memberships": "0",
+      "payload_hash_hex": "00000000",
+      "memory_peak_bytes": "0",
+      "free_pages_before": "3757",
+      "free_pages_after": "3755",
+      "validation_ms": "0.857"
+    }
+  },
+  "pack": {
+    "schema": 1,
+    "counts": {
+      "systems": 694,
+      "planets": 619,
+      "commodities": 10,
+      "records": 1323,
+      "links": 1612,
+      "objects": 5518,
+      "trades": 4800,
+      "memberships": 629
+    },
+    "pack_bytes": 648042,
+    "directory_bytes": 31752,
+    "maximum_record_bytes": 5758,
+    "tracked_heap_bytes": 37510,
+    "payload_hash_hex": "16e59fad",
+    "sha256": "29c835a46288e69ce4fe5dd5eac594c1c653dfcce679ece70d3784356d1b091b",
+    "roundtrip": "all native fields and references exact",
+    "native_json_sha256": "6512957e4953cd36652da4a3f53581c063923e13f2dc5c6b9bae3afc1cb5d372",
+    "builder_sha256": "1ca146713af645d2916e5958be978542323a81b001e0c031875837081debafdf"
+  },
+  "image_id": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c",
+  "compiler_flags": [
+    "-std=gnu99",
+    "-Os",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "exe_bytes": 205749,
+  "config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/world/run\nc:\nCWSDPMI -s-\nWORLD.EXE WORLD.PAK > WORLD.TXT\nCWSDPMI -s-\nWORLD.EXE BADREF.PAK > BADREF.TXT\nCWSDPMI -s-\nWORLD.EXE SHORT.PAK > SHORT.TXT\nexit\n",
+  "reader_sha256": "459a066e5d7cb2734dc792a73d86eba04ce06878eeb7602f7e881491c94e5be3",
+  "swap": "disabled; no swap file observed",
+  "memory_scope": "directory+single payload malloc requests; excludes code, stdio, stack, runtime",
+  "limitations": [
+    "Sequential validation and reference lookup, not decoded live world or game FPS.",
+    "FNV is accidental corruption detection, not authentication.",
+    "Free-page samples before/after are not peak memory measurements."
+  ]
+}

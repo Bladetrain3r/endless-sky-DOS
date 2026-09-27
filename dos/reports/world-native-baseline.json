@@ -1,0 +1,245 @@
+{
+  "native.json": {
+    "command": [
+      "/work/world/export-native",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/empty-config",
+      "--tq-threads",
+      "1"
+    ],
+    "sha256": "6512957e4953cd36652da4a3f53581c063923e13f2dc5c6b9bae3afc1cb5d372",
+    "bytes": 1262982,
+    "returncode": 0
+  },
+  "systems.txt": {
+    "command": [
+      "/baseline/build/endless-sky",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/empty-config",
+      "--tq-threads",
+      "1",
+      "--systems"
+    ],
+    "sha256": "767522a3f59c3115ca858d94a776cb735b29474b0adf525ebed7fb4ecdd9e598",
+    "bytes": 6298,
+    "returncode": 0
+  },
+  "systems-attributes.txt": {
+    "command": [
+      "/baseline/build/endless-sky",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/empty-config",
+      "--tq-threads",
+      "1",
+      "--systems",
+      "--attributes"
+    ],
+    "sha256": "45a272f9bc6b7a348b5e33a4e5126f7da13574cf396840f46642ea177062defc",
+    "bytes": 25199,
+    "returncode": 0
+  },
+  "planets.txt": {
+    "command": [
+      "/baseline/build/endless-sky",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/empty-config",
+      "--tq-threads",
+      "1",
+      "--planets"
+    ],
+    "sha256": "66a5418d81abf506b55c87f6205e2f173a3ff422cc34e4a4e0462d64b0345aef",
+    "bytes": 7266,
+    "returncode": 0
+  },
+  "planets-attributes.txt": {
+    "command": [
+      "/baseline/build/endless-sky",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/empty-config",
+      "--tq-threads",
+      "1",
+      "--planets",
+      "--attributes"
+    ],
+    "sha256": "799e417feba337e0313ec01a0554b809dd94f822769901abaa9ef855c01b4ea1",
+    "bytes": 99876,
+    "returncode": 0
+  },
+  "orbits-all.txt": {
+    "command": [
+      "/baseline/build/endless-sky",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/empty-config",
+      "--tq-threads",
+      "1",
+      "--orbits",
+      "--all"
+    ],
+    "sha256": "aee8775e69febae1e3cf3af052eba7df797d28e0ad6c971f30ad9dae10a0572c",
+    "bytes": 65536,
+    "returncode": -11
+  },
+  "orbits-sol.txt": {
+    "command": [
+      "/baseline/build/endless-sky",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/empty-config",
+      "--tq-threads",
+      "1",
+      "--orbits",
+      "--systems",
+      "Sol"
+    ],
+    "sha256": "08c79f0a4e43242212c76ea0abb2e54467a2d2b3b780717bc6e4818cc531f46a",
+    "bytes": 1285,
+    "returncode": 0
+  },
+  "counts": {
+    "systems": 694,
+    "planets": 619,
+    "commodities": 10
+  },
+  "baseline_binary_sha256": "77fcb7ff282a9b82d5fce13125bb403c9a7e65b98661f73786a4f99007654414",
+  "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+  "docker_image_id": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
+  "source_file_sha256": "574842672b7dde381584d8a46946ab2dda645c204ab5c025f980ab33a363a9d2",
+  "runner_file_sha256": "eb7a1b9545f7054c6e930c4c99e7c2e756665a30f18ef01ff5bda0f8fe9471cf",
+  "baseline_system_header_sha256": "026d332eb0bbba46dec84fff71d23c73938a12ae8d752ae9a29205da7cf991e6",
+  "staged_system_header_sha256": "0d42378a1971fafa3a9d64c1bf841941df59805f72353395c904d672d1a174fd",
+  "export_binary_sha256": "c70b7f78041136daaefacc64853246152e5893637413b4d2a89dd27e86b6fc67",
+  "resource_data_sha256": "7ced33b3622658aa4309ba8a4614604b9a326a6c20220ade8575206976baad72",
+  "resource_data_files": 204,
+  "plugins": [],
+  "recompiled_system_users": 47,
+  "fixture-native.json": {
+    "command": [
+      "/work/world/export-native",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/fixture-config",
+      "--tq-threads",
+      "1"
+    ],
+    "sha256": "05f4b08d8bdc4a225204b94b5659369f5ae40ead743640ff6e52e38f3bec5b53",
+    "bytes": 1265735,
+    "returncode": 0
+  },
+  "fixture-orbits-alpha.txt": {
+    "command": [
+      "/baseline/build/endless-sky",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/fixture-config",
+      "--tq-threads",
+      "1",
+      "--orbits",
+      "--systems",
+      "DOS Fixture Alpha"
+    ],
+    "sha256": "d425135e8aeeccd212a80a9fd45662ef37eee5a8f5519ae8b8a03c0ce8dab6d0",
+    "bytes": 254,
+    "returncode": 0
+  },
+  "fixture-orbits-beta.txt": {
+    "command": [
+      "/baseline/build/endless-sky",
+      "--resources",
+      "/src",
+      "--config",
+      "/work/world/fixture-config",
+      "--tq-threads",
+      "1",
+      "--orbits",
+      "--systems",
+      "DOS Fixture Beta"
+    ],
+    "sha256": "8a21dc26d8b548c29a0d0a2e1a4166953e94a981ea7fb0404af8b772c501e989",
+    "bytes": 188,
+    "returncode": 0
+  },
+  "fixture_assertions": "passed",
+  "fixture_sha256": "0b2638e037504348998cc89d747caad7add7fa8951285fcc92046ad3db596633",
+  "root_oracle_checks": {
+    "systems": {
+      "keys": 694,
+      "attribute_rows": 694,
+      "result": "exact"
+    },
+    "planets": {
+      "keys": 619,
+      "attribute_rows": 619,
+      "result": "exact"
+    },
+    "orbits": {
+      "Sol": {
+        "objects": 19,
+        "result": "exact at PrintData six-significant-digit precision"
+      },
+      "DOS Fixture Alpha": {
+        "objects": 3,
+        "result": "exact at PrintData six-significant-digit precision"
+      },
+      "DOS Fixture Beta": {
+        "objects": 2,
+        "result": "exact at PrintData six-significant-digit precision"
+      }
+    }
+  },
+  "root_sanitizer_checks": {
+    "status": "pass",
+    "sanitizer": "ASan+UBSan; leak detection disabled",
+    "builder_rejections": 5,
+    "reader_corruptions_rejected": 13,
+    "fixture_records": 4,
+    "vanilla_checked": true,
+    "stable_order": true
+  },
+  "root_native_fixture_pack": {
+    "schema": 1,
+    "counts": {
+      "systems": 699,
+      "planets": 622,
+      "commodities": 10,
+      "records": 1331,
+      "links": 1615,
+      "objects": 5524,
+      "trades": 4802,
+      "memberships": 632
+    },
+    "pack_bytes": 649445,
+    "directory_bytes": 31944,
+    "maximum_record_bytes": 5758,
+    "tracked_heap_bytes": 37702,
+    "payload_hash_hex": "ed6284f4",
+    "sha256": "f6bd3f45c2f007f53d209ae3da596abfd54d1417f8c261d04870ea8eddf8a1a4",
+    "roundtrip": "all native fields and references exact",
+    "native_json_sha256": "05f4b08d8bdc4a225204b94b5659369f5ae40ead743640ff6e52e38f3bec5b53",
+    "builder_sha256": "1ca146713af645d2916e5958be978542323a81b001e0c031875837081debafdf"
+  },
+  "root_native_fixture_reader": "ASan/UBSan binary passes:1331records,37702explicitbytes,payload hash ed6284f4",
+  "root_tool_sha256": {
+    "export.cpp": "574842672b7dde381584d8a46946ab2dda645c204ab5c025f980ab33a363a9d2",
+    "export_native.py": "eb7a1b9545f7054c6e930c4c99e7c2e756665a30f18ef01ff5bda0f8fe9471cf",
+    "pack.py": "1ca146713af645d2916e5958be978542323a81b001e0c031875837081debafdf",
+    "read.c": "459a066e5d7cb2734dc792a73d86eba04ce06878eeb7602f7e881491c94e5be3",
+    "check_oracles.py": "9dd796e22fa73e0428ece0d577b13bf65000bfacf8029fe95730abcdf779023f",
+    "test_pack.py": "2a17aadbd17eff0dff17b0b298d66aff119f349b706848f98a9fabe42362434e",
+    "run_dos.py": "a67f932fba84d3d66c5fb9f1d9628e2a64120ea9b6fddf7cbee44d4b6daa5137"
+  }
+}

@@ -1,6 +1,6 @@
 # Endless Sky DOS handover
 
-Updated2026-09-27; storage comparison complete, no playable DOS port yet.
+Updated2026-09-27; typed snapshot/DOS validator pass, no playable DOS port yet.
 User Wishlist.md delegates decisions and requests near-vanilla DOS,16MiB,
 20kcycles,800x600 preferred,30FPS target; audio/setup and three benchmark presets.
 Root read brief; two bounded Sol source audits reviewed; source remains unchanged.
@@ -45,8 +45,8 @@ All9193source blocks/10,500,260B preserved and checked. DOS16MB/20k/no swap: pac
 exe vs SQL919505B; files10,573,820 vs12,328,960B. SQLite32cache thrashes hot set.
 Choose pack for first read-only runtime content, cache optional for streaming.
 SQLite runs on DOS via reviewed immutable VFS; NOT writable/save-qualified.
-Rawblocks not parsedworld; no full-game RAM/parity claim. Next typed/linked
-content slice checked against upstream, stable IDs and bounded object residency.
+Rawblock comparison alone was not parsedworld/full-game RAM proof. Typed
+snapshot milestone below supersedes its next-step pointer; game parity unproven.
 
 Native ASan+UBSan storage gates passed including root Docker rerun; no leak claim.
 Exact coverage/hash recorded in storage-baseline.json. Disposable sanitizer test
@@ -58,5 +58,15 @@ six-bit DAC values, separate packed4-bit alpha roundtrip checked. Root visually
 reviewed .work/palette/comparison.png; reference columns remain true-color.
 reports/palette-baseline.json preserves hashes/errors; upstream assets untouched.
 No DOS palette upload/render timing, special blending or swizzle qualification.
-Next: typed map/orbit/trade slice per storage/TYPED-SLICE-PLAN.md (Sol draft, root
-source spot-check); then representative flight scene including additive/swizzles.
+Typed slice now dos/world/README.md; pack+DOS validation, not active simulation.
+1323records:694systems/619planets/10commodities,5518objects,1612links,4800prices.
+648042Bdisk,37510B explicit heap(directory+scratch),~1.13s validation20k/16MB
+no swap; reports/world-baseline.json. Exact nativeJSON field/reference roundtrip;
+all native system/planet key+attribute rows and Sol/fixture orbit checks pass.
+ASan/UBSan13corruption cases+5builder refusals; DOS badref/truncation reject.
+Native --orbits --all crashes upstream; preserve failure, no full orbit-oracle claim.
+Export tool stages introspection, consistently recompiles affected native objects;
+original source/reference binary untouched. Fixture covers forwardrefs/add-remove/
+overwrite/inaccessible links/multisystem planet/present zero trade price.
+Next decoded active-system API, then flight scene additive effects/recolors.
+Snapshot excludes mutable economy/events/ships/missions. No gameplay FPS claim.

@@ -93,9 +93,10 @@ for build tools or qualified transactional saves. No writable DOS VFS exists yet
 ## Next executable milestone
 
 Initial DOS graphics, C++/DPMI and content-store probes pass; the unmodified native
-reference builds/tests. Next: compile a typed, linked data slice with stable IDs
-and paged text, checked against upstream semantics. Then software menu/flight
-with actual preprocessed assets and separate render/sim measurements. See
+reference builds/tests. The [typed world snapshot](world/README.md) now exports
+resolved map/orbit/trade data and validates it in DOS:648,042B on disk,37,510B
+explicit access-layer heap. Next: decoded active-system ownership and software
+menu/flight with actual assets, separate render/sim measurements. See
 FEASIBILITY.md and EQUIVALENCE.md. Low-level implementation choices are delegated.
 
 ## Indexed-color asset proof
@@ -105,4 +106,5 @@ flight palette, reserved UI/grayscale entries, separate four-bit coverage. Nine
 real assets converted in Docker, three held out from training; comparison image
 in `.work/palette/comparison.png`. No DOS renderer or final palette claim.
 [Typed content plan](storage/TYPED-SLICE-PLAN.md) selects resolved map/orbit/trade
-data exported after native loading; implementation remains next.
+data exported after native loading; snapshot/validator implemented in `world/`,
+live gameplay object ownership remains next.

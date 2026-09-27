@@ -37,6 +37,7 @@ def main():
     parser.add_argument('--frames',type=int,default=120)
     parser.add_argument('--headless-demo',action='store_true')
     parser.add_argument('--reference',action='store_true')
+    parser.add_argument('--camera',action='store_true')
     args=parser.parse_args()
     if not 1<=args.frames<=3600: parser.error('frames must be1..3600')
     RUN.mkdir(parents=True,exist_ok=True)
@@ -48,19 +49,21 @@ def main():
     assert digest(archive)=='deacda0488e1cdd7c4a9f32fab45662b34c0ed6b2d7d4d13bc07041b62004a8c'
     with zipfile.ZipFile(archive) as z:
         (RUN/'CWSDPMI.EXE').write_bytes(z.read('bin/CWSDPMI.EXE'))
-    source_hashes={s:digest(ROOT/s) for s in SOURCES}
+    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h']
+    source_hashes={s:digest(ROOT/s) for s in inputs}
     subprocess.run(docker+['.work/toolchain/djgpp/bin/i586-pc-msdosdjgpp-gcc',*FLAGS,
                           *(['-DREFERENCE_RENDERER'] if args.reference else []),*SOURCES,'-lm','-o','.work/flight/run/FLIGHT.EXE'],check=True)
-    assert source_hashes=={s:digest(ROOT/s) for s in SOURCES}, 'source changed during build'
+    assert source_hashes=={s:digest(ROOT/s) for s in inputs}, 'source changed during build'
     base=(ROOT/'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     options=f'--ships {args.ships} --frames {args.frames}'
+    if args.camera: options+=' --camera'
     if args.headless_demo: options+=' --demo --seconds 4'
     conf=base+'[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
     conf+=f'FLIGHT.EXE {options} > FLIGHT.TXT\nexit\n'
     (RUN/'bench.conf').write_text(conf)
     # Local watch command uses the user's DOSBox, still with explicit reference settings.
     hostconf=base+f'[autoexec]\nmount c "{RUN}"\nc:\nCWSDPMI -s-\n'
-    hostconf+='FLIGHT.EXE --demo --seconds 30 > DEMO.TXT\nexit\n'
+    hostconf+='FLIGHT.EXE --demo --seconds 30 --camera > DEMO.TXT\nexit\n'
     (ROOT/'.work/flight/demo.conf').write_text(hostconf)
     for filename in ('FLIGHT.TXT','FRAME.IDX'):
         (RUN/filename).unlink(missing_ok=True)
@@ -92,6 +95,8 @@ def main():
                         'No faction recoloring or native animation interpolation yet.'])
     stem='flight-demo' if args.headless_demo else f'flight-{args.ships}-ships'
     if args.reference: stem+='-reference'
+    if args.camera: stem+='-camera'
+    else: stem+='-profile'
     shutil.copyfile(RUN/'preview.png',ROOT/'.work/flight'/f'{stem}.png')
     shutil.copyfile(RUN/'FRAME.IDX',ROOT/'.work/flight'/f'{stem}.idx')
     (ROOT/'dos/reports'/f'{stem}.json').write_text(json.dumps(report,indent=2)+'\n')

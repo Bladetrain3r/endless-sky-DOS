@@ -3,7 +3,11 @@
 #define FLIGHT_SPRITE_H
 #include <stddef.h>
 #include <stdint.h>
-typedef struct { uint16_t x,y,length; uint8_t type; } SpriteSpan;
+typedef struct {
+    uint32_t source_offset,screen_offset;
+    uint16_t x,y,length;
+    uint8_t type;
+} SpriteSpan;
 typedef struct {
     unsigned width,height,frames,mode;
     unsigned char *pixels;

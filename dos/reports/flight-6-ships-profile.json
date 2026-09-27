@@ -1,0 +1,215 @@
+{
+  "reference_renderer": false,
+  "kind": "scripted-indexed-flight-prototype-not-native-gameplay",
+  "results": {
+    "status": "ok",
+    "mode": "benchmark",
+    "frames": "120",
+    "ships": "6",
+    "load_ms": "2580.306",
+    "explicit_resident_bytes": "2667926",
+    "free_pages_before": "3744",
+    "free_pages_resident": "3200",
+    "system": "Sol",
+    "objects": "19",
+    "simulation_ticks": "240",
+    "video_verify": "pass",
+    "wall_elapsed_ms": "4573.925",
+    "discarded_sim_ms": "0.000",
+    "camera_enabled": "0",
+    "camera_x": "0",
+    "camera_y": "0",
+    "background_avg_ms": "7.159",
+    "background_min_ms": "7.118",
+    "background_max_ms": "11.800",
+    "orbital_avg_ms": "4.436",
+    "orbital_min_ms": "4.434",
+    "orbital_max_ms": "4.446",
+    "traffic_avg_ms": "16.364",
+    "traffic_min_ms": "13.681",
+    "traffic_max_ms": "17.551",
+    "effect_avg_ms": "0.266",
+    "effect_min_ms": "0.264",
+    "effect_max_ms": "0.277",
+    "hud_avg_ms": "3.543",
+    "hud_min_ms": "3.540",
+    "hud_max_ms": "3.554",
+    "sim_avg_ms": "0.020",
+    "sim_min_ms": "0.018",
+    "sim_max_ms": "0.022",
+    "draw_avg_ms": "31.789",
+    "draw_min_ms": "29.064",
+    "draw_max_ms": "37.035",
+    "present_avg_ms": "6.291",
+    "present_min_ms": "6.288",
+    "present_max_ms": "6.302",
+    "frame_avg_ms": "38.107",
+    "frame_min_ms": "35.381",
+    "frame_max_ms": "43.352"
+  },
+  "image_id": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c",
+  "compiler_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\nFLIGHT.EXE --ships 6 --frames 120 > FLIGHT.TXT\nexit\n",
+  "source_sha256": {
+    "dos/flight/main.c": "121525adaec3101497c7a301a024c71605936cc6dad092084e65fd56ae93e124",
+    "dos/flight/video.c": "a4d9149b40ac6a936899abe8a0468521745e2fd003111610b9286aa8056521e1",
+    "dos/flight/sprite.c": "fc0ddb060450c84e60d90ba6b7fc73b5799554a0a1e2cf53a81fbfc947a6dc53",
+    "dos/flight/scene.c": "71fc55bf66828b2795ff4d529dae88a3148769cfdab27abfe97703802c2ae662",
+    "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf",
+    "dos/world/active.c": "d8b6d916e05f500c5770ac22d373d8264ec6381fa1dad5969dfa4e5e31ce20be"
+  },
+  "pack_sha256": "29c835a46288e69ce4fe5dd5eac594c1c653dfcce679ece70d3784356d1b091b",
+  "frame_sha256": "3013819d788e006b4c9996d14cd2c03fef958516c678c3d4e2ea20284ebc2ab1",
+  "exe_bytes": 275488,
+  "assets": {
+    "schema": 1,
+    "pillow": "9.4.0",
+    "sprites": [
+      {
+        "file": "SPARROW.SPR",
+        "source": "images/ship/sparrow.png",
+        "source_sha256": "8a94f6e14c079b36ca3e345b48546a99df9a0fe9c22c6a6bda4cc873d24241f6",
+        "original_size": [
+          70,
+          80
+        ],
+        "stored_size": [
+          109,
+          109
+        ],
+        "frames": 16,
+        "mode": "normal-alpha4",
+        "disk_bytes": 285168,
+        "decoded_bytes": 380192,
+        "sha256": "f936ff12ad15661819bc752fd0ca278495d4c7bf68f31de79e46b1861cb98ee9"
+      },
+      {
+        "file": "BARGE.SPR",
+        "source": "images/ship/star barge.png",
+        "source_sha256": "74aaa854bedeef5ee1d43fb3a567282f05e8cb56bbb040f59ccf4fbefebe17a1",
+        "original_size": [
+          70,
+          80
+        ],
+        "stored_size": [
+          109,
+          109
+        ],
+        "frames": 16,
+        "mode": "normal-alpha4",
+        "disk_bytes": 285168,
+        "decoded_bytes": 380192,
+        "sha256": "2a0151eb030f6d96ccee94d51d271b6c7a3102f52993cc9258bbd68171166d3f"
+      },
+      {
+        "file": "FALCON.SPR",
+        "source": "images/ship/falcon.png",
+        "source_sha256": "4cbbbb984b6f7ae717bd3017fdaa96ff748e9a20256f36368586389eb8a43807",
+        "original_size": [
+          160,
+          300
+        ],
+        "stored_size": [
+          160,
+          300
+        ],
+        "frames": 1,
+        "mode": "normal-alpha4",
+        "disk_bytes": 72016,
+        "decoded_bytes": 96000,
+        "sha256": "bb7cfaab9b851adda62ad889f5e3fc9fd602dd0fafc7ca53ae488f73e66681ce"
+      },
+      {
+        "file": "EARTH.SPR",
+        "source": "images/planet/earth.png",
+        "source_sha256": "e1deafb0b1b7b42c4a4484522fd4123775523493c29d261f11f53ffe560feee5",
+        "original_size": [
+          180,
+          180
+        ],
+        "stored_size": [
+          180,
+          180
+        ],
+        "frames": 1,
+        "mode": "normal-alpha4",
+        "disk_bytes": 48616,
+        "decoded_bytes": 64800,
+        "sha256": "c4fd2a039359a104b31db6c681b3b3e1e9a7875c2c329ef194e707c29a6a1440"
+      },
+      {
+        "file": "LUNA.SPR",
+        "source": "images/planet/luna.png",
+        "source_sha256": "8a301da477c3efaecc8dd8140c3c06a0f9c4e912d50d2158e3cc5cd5960224e2",
+        "original_size": [
+          80,
+          80
+        ],
+        "stored_size": [
+          80,
+          80
+        ],
+        "frames": 1,
+        "mode": "normal-alpha4",
+        "disk_bytes": 9616,
+        "decoded_bytes": 12800,
+        "sha256": "c8f61c3471a3481246abbc2a5c697fafd756250f42a559a137f6cc9e181a5182"
+      },
+      {
+        "file": "GLOW.SPR",
+        "source": "images/effect/blaster impact+0.png",
+        "source_sha256": "8a40015084439a20823ce15ceb42750d79324b36af43b22c7b5b9fab9c0591f5",
+        "original_size": [
+          30,
+          30
+        ],
+        "stored_size": [
+          30,
+          30
+        ],
+        "frames": 1,
+        "mode": "premultiplied-additive",
+        "disk_bytes": 916,
+        "decoded_bytes": 900,
+        "sha256": "597426e281a0788d253c7aeb0c167e6e5d0eac8b81b716765c7a203028c1f000"
+      }
+    ],
+    "palette_sha256": "b39f80c05ad9aa1c6edde098fc502fa9204bdbc6817c1c5b7f3bab631f85316d",
+    "tables": {
+      "BLEND.LUT": {
+        "bytes": 1048576,
+        "sha256": "5dc6769043005b42661188a21ad67ffda966aa5f632309248cf92917d7156235"
+      },
+      "ADD.LUT": {
+        "bytes": 65536,
+        "sha256": "d8eca1c461d4d5d513a338e0c1cf8b9ae8734ff1c021027f1ed8fe3ce7935a5f"
+      }
+    },
+    "copyright_sha256": "4ec4cbf73cdc0ffe69f63c770a864524f571a50d8f882d36ffd00e4e40b607be",
+    "script_sha256": "18df7d8f22d2c0cae8655f680d21bbf32d03f8e42abec2af4bd2cfb364ca9dcc",
+    "limitations": [
+      "16 prebaked headings, no runtime rotation qualification.",
+      "No collision geometry changed; prototype has no collision simulation.",
+      "Only normal PNG and one straight-alpha additive frame qualified.",
+      "All asset attribution remains in upstream copyright; local experiment only."
+    ]
+  },
+  "scope": "Explicit residency counts world store+decoded system, frame, sprites, blend tables. Excludes runtime/code/stack/stdio and VRAM.",
+  "limits": [
+    "Scripted integer traffic; no native AI, collision, combat, UI or ship physics.",
+    "Sol Earth/Luna fixed epoch0; scene placement selected for inspection.",
+    "Benchmark advances2simticks per render; demo60Hz accumulator/30Hz render target.",
+    "No faction recoloring or native animation interpolation yet."
+  ]
+}

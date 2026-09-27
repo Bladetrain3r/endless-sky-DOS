@@ -30,6 +30,8 @@ static int compile_spans(Sprite *s)
                     if(type==3) continue;
                     if(pass) {
                         SpriteSpan *span=&s->spans[count];
+                        span->source_offset=y*s->width+start;
+                        span->screen_offset=y*800+start;
                         span->x=(uint16_t)start; span->y=(uint16_t)y;
                         span->length=(uint16_t)(x-start); span->type=(uint8_t)type;
                     }
@@ -75,6 +77,21 @@ int sprite_load(Sprite *s,const char *path)
 done:
     fclose(f); if(!ok) sprite_free(s); return ok;
 }
+static void draw_run(unsigned char *dst,const unsigned char *src,unsigned length,
+                     unsigned type,unsigned pixels,const unsigned char *blend,
+                     const unsigned char *add)
+{
+    if(type==0) memcpy(dst,src,length);
+    else if(type==2) {
+        while(length--) { *dst=add[((unsigned)*src++<<8)|*dst]; ++dst; }
+    } else {
+        const unsigned char *alpha=src+pixels;
+        while(length--) {
+            *dst=blend[((unsigned)*alpha++<<16)|((unsigned)*src++<<8)|*dst];
+            ++dst;
+        }
+    }
+}
 void sprite_draw(unsigned char *screen,const Sprite *s,unsigned heading,int cx,int cy,
                  const unsigned char *blend,const unsigned char *add)
 {
@@ -83,25 +100,22 @@ void sprite_draw(unsigned char *screen,const Sprite *s,unsigned heading,int cx,i
     int x0=cx-(int)s->width/2,y0=cy-(int)s->height/2;
     const unsigned char *pixels=s->pixels+(size_t)frame*n*(s->mode?1:2);
     if(x0>=800 || y0>=600 || x0+(int)s->width<=0 || y0+(int)s->height<=0) return;
+    if(x0>=0 && y0>=0 && x0+(int)s->width<=800 && y0+(int)s->height<=600) {
+        unsigned char *origin=screen+(size_t)y0*800+x0;
+        for(i=s->first_span[frame];i<s->first_span[frame+1];++i) {
+            const SpriteSpan *span=&s->spans[i];
+            draw_run(origin+span->screen_offset,pixels+span->source_offset,
+                     span->length,span->type,n,blend,add);
+        }
+        return;
+    }
     for(i=s->first_span[frame];i<s->first_span[frame+1];++i) {
         const SpriteSpan *span=&s->spans[i];
         int y=y0+span->y,x=x0+span->x,length=span->length,skip=0;
-        const unsigned char *src;
-        unsigned char *dst;
         if(y<0 || y>=600 || x>=800 || x+length<=0) continue;
         if(x<0) { skip=-x; length-=skip; x=0; }
         if(x+length>800) length=800-x;
-        src=pixels+(size_t)span->y*s->width+span->x+skip;
-        dst=screen+(size_t)y*800+x;
-        if(span->type==0) memcpy(dst,src,(size_t)length);
-        else if(span->type==2) {
-            while(length--) { *dst=add[((unsigned)*src++<<8)|*dst]; ++dst; }
-        } else {
-            const unsigned char *alpha=src+n;
-            while(length--) {
-                *dst=blend[((unsigned)*alpha++<<16)|((unsigned)*src++<<8)|*dst];
-                ++dst;
-            }
-        }
+        draw_run(screen+(size_t)y*800+x,pixels+span->source_offset+skip,
+                 (unsigned)length,span->type,n,blend,add);
     }
 }

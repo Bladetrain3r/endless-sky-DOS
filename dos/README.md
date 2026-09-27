@@ -97,7 +97,8 @@ reference builds/tests. The [typed world snapshot](world/README.md) now exports
 resolved map/orbit/trade data and validates it in DOS:648,042B on disk,37,510B
 explicit access-layer heap. The [first flight scene](flight/README.md) now loads
 owned active-system data and draws real indexed assets in DOS. Six scripted ships
-plus a stationary Falcon average26.5FPS at20kcycles;30FPS remains unmet. See
+plus a stationary Falcon now average33.1FPS on the moving-camera route at20k;
+some frames exceed33.3ms, and full-game30FPS remains unproven. See
 FEASIBILITY.md and EQUIVALENCE.md. Low-level implementation choices are delegated.
 
 ## Indexed-color asset proof

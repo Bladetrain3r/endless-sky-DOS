@@ -5,7 +5,7 @@
   "sanitizers": "ASan+UBSan; leak detection disabled",
   "source_sha256": {
     "dos/flight/raster_test.c": "12482b5addf3b1b3333ab49e078c5d4677d3429cef95b395eb8d8f58409a124c",
-    "dos/flight/sprite.c": "fc0ddb060450c84e60d90ba6b7fc73b5799554a0a1e2cf53a81fbfc947a6dc53",
+    "dos/flight/sprite.c": "b6d6eb5622fa3f3350472c266bdeecfc007c9108ac9144fe441b7b3797ebe118",
     "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf"
   }
 }

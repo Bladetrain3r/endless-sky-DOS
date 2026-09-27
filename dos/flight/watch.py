@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Watch the already-built prototype in the reference DOSBox container via local X11."""
+import argparse
 import os
 from pathlib import Path
 import socket
@@ -12,6 +13,10 @@ RUN=ROOT/'.work/flight/run'
 
 
 def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--stationary',action='store_true',help='keep the camera fixed for comparison')
+    args=parser.parse_args()
+    camera='' if args.stationary else ' --camera'
     display=os.environ.get('DISPLAY','')
     if not display.startswith((':','unix:')):
         sys.exit('A local X11/XWayland DISPLAY is needed for the reference window.')
@@ -19,7 +24,7 @@ def main():
         sys.exit('Build first: python3 dos/flight/run.py')
     base=(ROOT/'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     (RUN/'watch.conf').write_text(base+'[autoexec]\nmount c /work/.work/flight/run\nc:\n'
-        'CWSDPMI -s-\nFLIGHT.EXE --demo --seconds 30 > DEMO.TXT\nexit\n')
+        f'CWSDPMI -s-\nFLIGHT.EXE --demo --seconds 30{camera} > DEMO.TXT\nexit\n')
     cmd=['docker','run','--rm','--network','none','--hostname',socket.gethostname(),'--user',f'{os.getuid()}:{os.getgid()}',
          '-e','HOME=/tmp','-e',f'DISPLAY={display}',
          '--mount','type=bind,src=/tmp/.X11-unix,dst=/tmp/.X11-unix,readonly',

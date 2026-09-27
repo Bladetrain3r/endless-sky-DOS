@@ -17,6 +17,8 @@ python3 dos/flight/watch.py
 ```
 
 Opens the reference Docker DOSBox through local X11/XWayland for30 seconds.
+The latest build pans the camera horizontally and vertically, with slower star
+parallax. Use `python3 dos/flight/watch.py --stationary` for a fixed view.
 Escape exits early; Ctrl+F9 quits DOSBox. Windowed800×600, audio disabled.
 It shares only the local X socket and, when available, the existing read-only
 Xauthority file; it does not change `xhost`. Headless checks pass, and the user
@@ -30,10 +32,32 @@ dosbox -conf .work/flight/demo.conf
 Both are scripted watch modes; there are no flight controls. Ignore ship handling
 as a design statement. Frame cadence, sprite edges, soft transparency and the
 overlapping flare are the useful things to inspect. Static preview:
-`.work/flight/flight-6-ships.png`. The preview comes from the DOS framebuffer;
+`.work/flight/flight-6-ships-camera.png`. The preview comes from the DOS framebuffer;
 VBE bank samples and all768 DAC components are also verified before exit.
 
-## Results at16MiB / fixed20,000 cycles
+## Moving-camera checkpoint at16MiB / fixed20,000 cycles
+
+On the same360-frame route, cached static HUD strips and precomputed sprite span
+addresses reduce average frame time from36.140ms to30.243ms (~33.1FPS uncapped).
+The captured framebuffer is byte-identical before/after. Worst observed frame:
+35.581ms, so this is **not a locked30FPS result**. With20 moving ships plus the
+stationary Falcon, the camera route averages45.790ms (~21.8FPS).
+
+HUD cost falls from3.543ms to0.709ms; fully visible sprites avoid repeated clip
+arithmetic while edge-crossing sprites keep the checked clipped path. Backgrounds
+and orbital objects are redrawn every frame; no stationary-camera cache hides
+those costs. The changes add156,120 counted bytes (spans andHUD), bringing explicit
+DOS residency to2,824,046 bytes (~2.69MiB), with the same exclusions below.
+
+Detailed background/orbital/traffic/effect/HUD timings are in the camera reports.
+The timed demo produced116frames and238motionticks over4.001seconds, with no
+reported discarded simulation time. A native sanitizer test checks2,880ticks of
+camera movement, its bounds/return to origin, unchanged world ship state, and63
+complete rendered frames against the scalar rasterizer. All324 sprite clipping/
+heading comparisons still pass. `flight-camera-qualification.json` records gates;
+`flight-camera-before.json` preserves the pre-optimization baseline.
+
+## Earlier stationary-camera measurements
 
 | Scene/path | Draw average | Video upload | Total average | Reciprocal of average |
 |---|---:|---:|---:|---:|
@@ -41,8 +65,8 @@ VBE bank samples and all768 DAC components are also verified before exit.
 |Same scene, span renderer|31.41ms|6.29ms|37.73ms|26.5FPS|
 |20 moving ships + stationary Falcon, span renderer|53.48ms|6.29ms|59.82ms|16.7FPS|
 
-These are uncapped scripted microbenchmarks, not native-game FPS. The30FPS goal
-is **not met yet**, and real simulation/audio/UI costs remain to be added.
+These are uncapped scripted microbenchmarks, not native-game FPS. These earlier results predate the camera/fast-path work above. A sustained
+30FPS game is still unproven; real simulation/audio/UI costs remain to be added.
 The span version's final captured frame exactly matches the scalar baseline.
 It skips zero-coverage regions, block-copies fully opaque spans, and uses the
 same tables for partially transparent/additive spans.324 native sanitizer cases
@@ -50,7 +74,7 @@ compare all prepared headings and screen edges against the scalar reference.
 Two malformed sprite files are rejected. Source and measurements live in
 `dos/reports/flight-*.json`; active-world ownership evidence is recorded separately.
 
-The scene uses2,667,926 bytes (~2.54MiB) of counted DOS heap allocations:
+The earlier scene used2,667,926 bytes (~2.54MiB) of counted DOS heap allocations:
 world store + owned Sol record,480,000-byte framebuffer, decoded sprites/spans,
 and shared blend tables. This excludes runtime/code/stack/stdio/allocator metadata,
 and480,000 bytes of video memory. Before/after free-page samples are not a peak.
@@ -70,7 +94,8 @@ in the parent README. All actual build/test commands use Docker:
 ```sh
 python3 dos/flight/run.py
 python3 dos/flight/run.py --ships 20 --frames 60
-python3 dos/flight/run.py --headless-demo
+python3 dos/flight/run.py --camera --frames 360
+python3 dos/flight/run.py --camera --headless-demo
 # Optional reproduction of the slow correctness reference:
 python3 dos/flight/run.py --reference
 ```
@@ -109,8 +134,9 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: investigate remaining draw cost with representative camera motion before
-choosing caching or further specialization; then native ship/motion behavior.
+Next: native ship/motion behavior against the reference, while retaining the
+camera stress route and watching the remaining frame-time budget. Finer sprite
+rotation and heavier scenes remain unqualified.
 
 ## Human check — 2026-09-27
 
@@ -120,3 +146,6 @@ next of16 resident headings once per second (22.5 degrees), with no sprite reloa
 Accepted as a rendering-demo checkpoint; smoother turning remains future work.
 This feedback does not change the measured frame times or establish native
 gameplay/physics equivalence.
+
+Camera-only sanitizer gate: run `python3 dos/flight/test_camera.py` inside the
+same native tools container used for `test_raster.py` above.

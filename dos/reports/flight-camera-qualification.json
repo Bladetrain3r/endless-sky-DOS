@@ -1,0 +1,32 @@
+{
+  "status": "pass",
+  "same_route_frame_identical": "dc88c45658601c3a985f130d42d3b522b25441cc153ed505dfbd57498ba2df9d",
+  "before_frame_ms": "36.140",
+  "after_frame_ms": "30.243",
+  "added_explicit_bytes": 156120,
+  "camera_tests": {
+    "status": "pass",
+    "camera_ticks_checked": "2880",
+    "scene_pixel_comparisons": "63",
+    "sources": {
+      "dos/flight/camera_test.c": "81fe5cb27dd2ddb2a7230d6c8db051b79aafedd50136ad317865211eef93abcc",
+      "dos/flight/scene.c": "71fc55bf66828b2795ff4d529dae88a3148769cfdab27abfe97703802c2ae662",
+      "dos/flight/sprite.c": "b6d6eb5622fa3f3350472c266bdeecfc007c9108ac9144fe441b7b3797ebe118",
+      "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf"
+    },
+    "sanitizers": "ASan+UBSan; leak checking disabled",
+    "invariants": "bounded continuous route returns to origin; camera never alters world ship state"
+  },
+  "raster_tests": {
+    "status": "pass",
+    "reference_pixel_cases": "324",
+    "malformed_sprites_rejected": "2",
+    "sanitizers": "ASan+UBSan; leak detection disabled",
+    "source_sha256": {
+      "dos/flight/raster_test.c": "12482b5addf3b1b3333ab49e078c5d4677d3429cef95b395eb8d8f58409a124c",
+      "dos/flight/sprite.c": "b6d6eb5622fa3f3350472c266bdeecfc007c9108ac9144fe441b7b3797ebe118",
+      "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf"
+    }
+  },
+  "scope": "Same360frame camera route; scripted traffic, no gameplay parity claim."
+}

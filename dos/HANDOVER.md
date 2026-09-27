@@ -1,32 +1,34 @@
 # Endless Sky DOS handover
-Updated2026-09-27; first indexed DOS flight scene works, no playable game port.
+Updated2026-09-27; moving camera + faster spans/HUD pass, no playable game port.
 
 ## Current checkpoint
 - dos/flight/README.md: actual800x600x8 DOS VBE prototype, palette/DAC verification,
   Sol loaded through owned active-system API, Earth/Luna and source ship sprites.
-- `.work/flight/flight-6-ships.png` is captured DOS index framebuffer preview.
+- `.work/flight/flight-6-ships-camera.png` is latest captured DOS frame preview.
 - Watch: `python3 dos/flight/watch.py` (Docker/local X11);30second scripted run,
-  Escape exits. User confirms demo launches, smooth motion/stable performance.
+  Escape exits; default now pans. --stationary restores oldview. Prior demo human
+  confirmed smooth/stable; newcamera view awaits human feedback.
   Alternative local DOSBox: `dosbox -conf .work/flight/demo.conf`.
 - Rebuild/bench: `python3 dos/flight/run.py`; --ships20 --frames60 for busier run;
   --headless-demo checks4seconds real-time; --reference reproduces scalar path.
 - Latest staged executable uses optimized spans, not the scalar reference.
 - Human accepts demo;22.5degree/1second heading snaps are known test behavior,
   not final turning. Exact human launch route not recorded; no new timings.
-- 20kcycles/16MiB/no swap:6moving+1stationaryFalcon average37.730ms (~26.5FPS),
-  draw31.413ms/present6.290ms;20moving+Falcon59.817ms (~16.7FPS).
+- 20k/16MiB/no swap camera360frames:6moving+Falcon30.243msavg (~33.1FPS),
+  max35.581ms (NOT locked30);20moving45.790ms (~21.8FPS). Camera-before36.140ms.
+- Cached static HUD + visible-sprite fast path/precomputed addresses; sameframe
+  byte-identical. Background/planets still redrawn; source+evidence hashes saved.
 - Scalar first pass160.858ms; span captured frame matches exactly SHA3013819d...
   Full hashes/configs/source/image refs in dos/reports/flight-*.json.
-- DOS explicit allocations2,667,926B (~2.54MiB):store+Sol,frame,sprites/spans,LUTs.
+- DOS explicit allocations2,824,046B (~2.69MiB),+156120B for spans/staticHUD.
   Excludes code/runtime/stack/stdio/allocator metadata and480000B VRAM.
-- Demo:107frames/239simticks over4037ms;0discardedms, stable60Hz test-motion clock
+- Camera demo:116frames/238simticks over4001ms;0discardedms,60Hz test-motion clock
   separate from30Hz display target. Benchmark always2ticks/frame, uncapped.
 - Scripted traffic/epoch0Sol view only; no native physics/AI/combat/collision/UI.
  16prebaked sprite headings, normal4-bit-alpha plus one additive effect;
  faction swizzles/half-additive/premultiplied assets/interpolation unqualified.
-- 30FPS target NOT met even before full simulation/audio/UI. Next investigate
- remaining draw cost with camera motion before choosing caching/specialization;
- then native ship behavior. Do not label this a near-complete playable port.
+- Average clears30FPS in smallcamera scene; someframesmissbudget/fullgameunproven.
+ Next native ship/motion behavior with reference; retain camera stress gates.
 
 ## Active world and validation
 - dos/world/active.h,c:validated immutable store, name/ID lookup, owned decoded
@@ -34,7 +36,8 @@ Updated2026-09-27; first indexed DOS flight scene works, no playable game port.
  active arena64KiB cap. Native64bit max active6096B/store37558B; DOSsizesdiffer.
 - Native ASan/UBSan root rerun:Sol/Sirius exact exported fields, all694systems,
  concurrentownership/100reloads/retentionafterstoreclose,5corruptionsreject.
-- Raster root ASan/UBSan:324 span/scalar cases (allheadings,edges),2badassetfiles.
+- Raster ASan/UBSan324cases;camera2880ticks/63fullscene pixelcomparisons pass.
+ `reports/flight-camera-qualification.json`; changedHUD/sprite samefinalpixels.
 - Video backend:8banks,5samples/bank andall768DACcomponents verified. Earlier
  patternprobe passed; live flight also passes. No full VRAM hash claim.
 - `dos/reports/flight-qualification.json` aggregates gates. No leak-check claim.

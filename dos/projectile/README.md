@@ -6,14 +6,18 @@ follows an eight-second oval. Add `--stationary-target` to the pilot launcher
 for the previously accepted fixed target.
 R resets flight, shots, hit count and spread seed. A HIT label flashes on contact;
 the HUD counts shots, hits and live bolts. Background traffic and planets remain
-cosmetic. The target is indestructible: no shields, damage, resources, friendly
-fire rules, AI retaliation or ship-on-ship collisions are implemented here.
+cosmetic. The current target is destructible with reduced30shield/26hull training
+stats; R restores it. `--invulnerable-target` retains the earlier aiming range.
+See `../damage/README.md` for the bounded native shield/hull contract. No firing
+resource costs, regeneration, friendly-fire rules, AI retaliation or ship-on-ship
+collisions are implemented here.
 
 This is deliberately a training loadout. The original fitted Sparrow carries two
 Beam Lasers; its flight parameters remain unchanged. This first gun uses a synthetic
 centreline muzzle20 world units forward, not the ship's original hardpoints.
 Original assets/data are untouched. Tracers are simple seven-pixel white lines,
-not native projectile artwork, stretching, additive blending or impact effects.
+not native projectile artwork, stretching or additive blending. The destruction
+starburst is procedural and cosmetic, not native explosion logic or area damage.
 
 ## Reference contract
 
@@ -61,7 +65,7 @@ Triangular angular spread uses the same two-uniform-draw form as native default
 `Distribution::GenerateInaccuracy`, with a small seeded LCG. Native RNG sequences
 are **not** reproduced. The seed resets with R for repeatable practice.
 
-## Boundaries, memory and checks
+## Initial invulnerable-range bounds, memory and checks
 
 Sixteen fixed projectile slots prevent unbounded allocation; the current gun
 needs at most four live slots in open space. Pool saturation drops a new shot,
@@ -97,10 +101,10 @@ feedback on the bounded trainer, not additional native-equivalence evidence.
 
 Evidence: `../reports/projectile-equivalence.json`,
 `../reports/flight-6-ships-practice-profile.json`, `../reports/flight-controls.json`.
-Next: native damage/shield/resource contracts before representing
-this as ordinary combat; beams and real hardpoint/loadout export remain separate work.
+Next: resource/regen/disabled-ship contracts before representing this as ordinary
+combat; beams and real hardpoint/loadout export remain separate work.
 
-## Moving range — 2026-09-28
+## Invulnerable moving-range checkpoint — 2026-09-28
 
 The default pilot target follows x=400+120sin(phase), y=200−60cos(phase),
 with phase=2π(tick mod480)/480, at60Hz. Its facing follows the tangent.

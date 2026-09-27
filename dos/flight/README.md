@@ -3,8 +3,8 @@
 The800×600,256-color DOS executable loads Sol from the compact world pack and
 now offers a controllable stock Sparrow using native-matched movement. Earth,
 Luna, the Falcon and scripted traffic provide reference points. This is a flight
-sandbox with one training blaster and an invulnerable scripted target.
-No damage, ship collisions, landing, AI, missions, resource accounting or saves.
+sandbox with one training blaster and a destructible scripted target.
+No ship collisions, landing, AI, missions, resource accounting or saves.
 The player's engines are treated as fully supplied.64 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
 
@@ -68,8 +68,11 @@ out of sight. `--seconds N` selects1–120seconds. Local DOSBox alternative:
 A labelled moving practice target starts ahead and follows an eight-second oval.
 Add `--stationary-target` to `watch.py --pilot` for the old fixed range.
 Hold Space to see bolts, hit
-flashes and counters. It cannot be destroyed; background ships/planets are not
-hittable. This is one supplied test blaster, not the stock Sparrow's beam weapons.
+flashes and counters. The reduced training target has30 shields/26 hull, no regeneration, and takes
+seven ordinary blaster hits to destroy. Shields/hull appear in the lower HUD.
+Destruction removes it from collision and triggers a brief procedural explosion;
+R restores it. Add `--invulnerable-target` for the previously accepted aiming range.
+Background ships/planets are not hittable. This is one supplied test blaster, not the stock Sparrow's beam weapons.
 See [projectile qualification and deliberate limits](../projectile/README.md).
 
 The fitted acceleration, turn rate and drag come from the qualified native
@@ -235,7 +238,8 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: native shield/damage/resource contracts; moving-target practice is staged.
+Next: native firing costs and regeneration/disabled-ship contracts. Bounded
+unprotected shield/hull damage is now implemented; see ../damage/README.md.
 Ordinary bolt traces and the first firing range are qualified in ../projectile/README.md;
 complete combat and heavier scenes remain unqualified.
 

@@ -1,0 +1,308 @@
+{
+  "reference_renderer": false,
+  "kind": "bounded-practice-fire",
+  "results": {
+    "status": "ok",
+    "mode": "benchmark",
+    "frames": "300",
+    "ships": "6",
+    "load_ms": "2535.579",
+    "explicit_resident_bytes": "2897942",
+    "free_pages_before": "3739",
+    "free_pages_resident": "3124",
+    "system": "Sol",
+    "objects": "19",
+    "simulation_ticks": "600",
+    "video_verify": "pass",
+    "wall_elapsed_ms": "7782.386",
+    "discarded_sim_ms": "0.000",
+    "camera_enabled": "0",
+    "camera_x": "0",
+    "camera_y": "0",
+    "pilot_ticks": "600",
+    "pilot_x": "400",
+    "pilot_y": "300",
+    "pilot_vx": "0",
+    "pilot_vy": "0",
+    "pilot_angle": "0",
+    "pilot_follow": "1",
+    "pilot_input_bits": "0",
+    "pilot_keyboard": "0",
+    "practice_shots": "50",
+    "practice_hits": "7",
+    "practice_active": "4",
+    "practice_peak": "4",
+    "practice_dropped": "0",
+    "target_moving": "0",
+    "target_ticks": "84",
+    "target_x": "400",
+    "target_y": "140",
+    "target_angle": "0",
+    "target_destroyed": "1",
+    "target_shields": "0",
+    "target_hull": "-1.5207547169811395",
+    "explosion_ticks": "0",
+    "background_avg_ms": "7.074",
+    "background_min_ms": "7.056",
+    "background_max_ms": "11.241",
+    "orbital_avg_ms": "1.565",
+    "orbital_min_ms": "1.564",
+    "orbital_max_ms": "1.576",
+    "traffic_avg_ms": "5.955",
+    "traffic_min_ms": "4.861",
+    "traffic_max_ms": "6.693",
+    "effect_avg_ms": "0.086",
+    "effect_min_ms": "0.085",
+    "effect_max_ms": "0.097",
+    "hud_avg_ms": "3.547",
+    "hud_min_ms": "3.259",
+    "hud_max_ms": "3.600",
+    "pilot_draw_avg_ms": "1.255",
+    "pilot_draw_min_ms": "1.101",
+    "pilot_draw_max_ms": "1.909",
+    "sim_avg_ms": "0.124",
+    "sim_min_ms": "0.105",
+    "sim_max_ms": "0.240",
+    "draw_avg_ms": "19.510",
+    "draw_min_ms": "18.322",
+    "draw_max_ms": "24.264",
+    "present_avg_ms": "6.292",
+    "present_min_ms": "6.288",
+    "present_max_ms": "6.302",
+    "frame_avg_ms": "25.932",
+    "frame_min_ms": "24.728",
+    "frame_max_ms": "30.762"
+  },
+  "image_id": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c",
+  "compiler_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\nFLIGHT.EXE --ships 6 --frames 300 --practice-test --stationary-target > FLIGHT.TXT\nexit\n",
+  "source_sha256": {
+    "dos/flight/main.c": "5f44f443cea1fbe33479ea8b449d789713162b33c9abc7dd207a97ba80457c26",
+    "dos/flight/video.c": "a4d9149b40ac6a936899abe8a0468521745e2fd003111610b9286aa8056521e1",
+    "dos/flight/sprite.c": "402be0f03bcc4e7d5213c9b6e5918f3b748b1bba090bc2af41200578fd47b84f",
+    "dos/flight/scene.c": "e4b6d91c3cb28da29bb2269c5684243270322017507af4a02704c8ce396c47a7",
+    "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf",
+    "dos/world/active.c": "d8b6d916e05f500c5770ac22d373d8264ec6381fa1dad5969dfa4e5e31ce20be",
+    "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/flight/practice.c": "7b17b022f2f7b29a708ba758bee4ae297e2e35fbbafdd5e9e25530023e75e9b9",
+    "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
+    "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
+    "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
+    "dos/flight/input.c": "e057927e9816a732241adac5c8777f62c0317402997c623d5aa8263928eae5c6",
+    "dos/flight/input_state.c": "1d21851504bcb54aba83e62960f1d613b6152921f698d31e38dbaa0bf577fc9f",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/flight/input.h": "9a01008c4eaf782aa25610ce1dee6e1d289cfe5d28a5dea228e0439ba6aaf1d9",
+    "dos/flight/input_state.h": "cc5dc2c95586eb111e0ef8e66cb617413cf458b31e0de48b9a1f565c3361c07c",
+    "dos/flight/pilot.h": "80c5fed814002b335e32faf087b6ee95f0e72ff98343d8db4c9f805853f82149",
+    "dos/flight/practice.h": "a492c78563d693ec360a5fbe045fe83f77266e91bcab59cae3e8eb832da461dd",
+    "dos/flight/scene.h": "4973b395a90cfca22319105459d3dc608753fdc566132da595823c7a6a373d6d",
+    "dos/flight/sprite.h": "a698db3ba5bb794f45c138c6bb455a1ab5006ac346e18930695a2ecaab673fdb",
+    "dos/flight/video.h": "8d2eca66af840597026c3947b6407d7650e26b50800b0ddf5d1a45cd25c1dfcd",
+    "dos/world/active.h": "65481859e1a5243932ba621dc448e32464cfb1e4ded802d6e52c84f56dd5b5f0",
+    "dos/motion/motion.h": "5f3db1677f424f1d3d8f5176dde5e7710781b87a24236f863d0f88f85de5cc56",
+    "dos/projectile/projectile.h": "7b37dcda30f678302d967c62a7660178642d65e89d93d20e33f63a08a2cea536",
+    "dos/collision/mask.h": "4bc3166c00f7b99654bd248d67977e666dfb8f846a7deb05bf7081b415e91440",
+    "dos/damage/damage.h": "89d622acf18301568b941aa793dbbbaade66f1d07057346997e6fdebb119eb29"
+  },
+  "damage_profile_sha256": "62fc3ad1a5e3e48937a21b2fe1afe926696fa3648178cc67ee8be9f5a7e9e753",
+  "practice_profile": {
+    "weapon": "Energy Blaster",
+    "stats": {
+      "lifetime": 48.0,
+      "random_lifetime": 0.0,
+      "velocity": 10.625,
+      "random_velocity": 0.0,
+      "reload": 12.0,
+      "inaccuracy": 3.0,
+      "acceleration": 0.0,
+      "drag": 0.0,
+      "turn": 0.0,
+      "homing": 0.0,
+      "fade_out": 0.0,
+      "penetration": 1.0,
+      "live_effects": 0.0,
+      "die_effects": 0.0,
+      "submunitions": 0.0
+    },
+    "native_csv_sha256": "7328b3a84f13a2dcee143873fbb5cc2dd4a395e8697db92455a202257d4b40c7",
+    "profile_sha256": "5e94657ca5666e69b4faf8f1cb1d4ab6dd5051e0d22b1b8937343b0801bf2fe2",
+    "masks_sha256": "26d8dab40eec8a444685abdaead340f49a5cd4c743c5bada463d31cd6e5c09af",
+    "scope": "One training gun, unlimited resources, synthetic centreline muzzle; stock Sparrow beam loadout unchanged in reference.",
+    "randomness": "Fixed LCG uniform pair, triangular spread; not native RNG sequence parity."
+  },
+  "pilot_profile": {
+    "model": "Sparrow",
+    "parameters": {
+      "accel": 0.11693548387096774,
+      "reverse_accel": 0.0,
+      "turn_rate": 2.475806451612903,
+      "drag": 0.0051075268817204296,
+      "mult": 1.0
+    },
+    "native_trace_sha256": "8661aaa6a778a8d10524a71abc6cb937d776fff6301d357dcb3c2228e1e26936",
+    "native_source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+    "resource_data_sha256": "7ced33b3622658aa4309ba8a4614604b9a326a6c20220ade8575206976baad72",
+    "file_sha256": "3be0027be676f407148d71af018af753b2ff7596a2bfacca57afb0a42cfc43a8",
+    "scope": "One native fitted stock ship; not an outfit or complete ship-data exporter."
+  },
+  "pack_sha256": "29c835a46288e69ce4fe5dd5eac594c1c653dfcce679ece70d3784356d1b091b",
+  "frame_sha256": "f12d2e0c5b62b9942c490ac27f1b3eb30aea2ddd625b24c425ac60179188c3cc",
+  "exe_bytes": 301338,
+  "assets": {
+    "schema": 1,
+    "pillow": "9.4.0",
+    "sprites": [
+      {
+        "file": "SPARROW.SPR",
+        "source": "images/ship/sparrow.png",
+        "source_sha256": "8a94f6e14c079b36ca3e345b48546a99df9a0fe9c22c6a6bda4cc873d24241f6",
+        "original_size": [
+          70,
+          80
+        ],
+        "stored_size": [
+          56,
+          56
+        ],
+        "world_pixels_per_source_pixel": 0.5,
+        "frames": 64,
+        "mode": "normal-alpha4",
+        "disk_bytes": 301072,
+        "decoded_bytes": 401408,
+        "sha256": "832adcdb361320cfd6b76d1b06d1c5d1647f3f871e63476db763cf9fe5a687f0"
+      },
+      {
+        "file": "BARGE.SPR",
+        "source": "images/ship/star barge.png",
+        "source_sha256": "74aaa854bedeef5ee1d43fb3a567282f05e8cb56bbb040f59ccf4fbefebe17a1",
+        "original_size": [
+          70,
+          80
+        ],
+        "stored_size": [
+          56,
+          56
+        ],
+        "world_pixels_per_source_pixel": 0.5,
+        "frames": 64,
+        "mode": "normal-alpha4",
+        "disk_bytes": 301072,
+        "decoded_bytes": 401408,
+        "sha256": "0a20aacde510928335ec894c6e79e4d7d3a613bcf6fd9570c7b854fe9121ebaa"
+      },
+      {
+        "file": "FALCON.SPR",
+        "source": "images/ship/falcon.png",
+        "source_sha256": "4cbbbb984b6f7ae717bd3017fdaa96ff748e9a20256f36368586389eb8a43807",
+        "original_size": [
+          160,
+          300
+        ],
+        "stored_size": [
+          80,
+          150
+        ],
+        "world_pixels_per_source_pixel": 0.5,
+        "frames": 1,
+        "mode": "normal-alpha4",
+        "disk_bytes": 18016,
+        "decoded_bytes": 24000,
+        "sha256": "a9bb7d98fc7ea2a4f8ac7c9544483bfe38bb82117c5f687b1ce1c44cfe0109ab"
+      },
+      {
+        "file": "EARTH.SPR",
+        "source": "images/planet/earth.png",
+        "source_sha256": "e1deafb0b1b7b42c4a4484522fd4123775523493c29d261f11f53ffe560feee5",
+        "original_size": [
+          180,
+          180
+        ],
+        "stored_size": [
+          90,
+          90
+        ],
+        "world_pixels_per_source_pixel": 0.5,
+        "frames": 1,
+        "mode": "normal-alpha4",
+        "disk_bytes": 12166,
+        "decoded_bytes": 16200,
+        "sha256": "7b598a690645bf67474d4c9698bde3ee20865c645b424f472471c24d3c2293cb"
+      },
+      {
+        "file": "LUNA.SPR",
+        "source": "images/planet/luna.png",
+        "source_sha256": "8a301da477c3efaecc8dd8140c3c06a0f9c4e912d50d2158e3cc5cd5960224e2",
+        "original_size": [
+          80,
+          80
+        ],
+        "stored_size": [
+          40,
+          40
+        ],
+        "world_pixels_per_source_pixel": 0.5,
+        "frames": 1,
+        "mode": "normal-alpha4",
+        "disk_bytes": 2416,
+        "decoded_bytes": 3200,
+        "sha256": "0192a3d15bc2e5ce1a8df82f332ec94465a4e3d32a76d6a57d099746fd967070"
+      },
+      {
+        "file": "GLOW.SPR",
+        "source": "images/effect/blaster impact+0.png",
+        "source_sha256": "8a40015084439a20823ce15ceb42750d79324b36af43b22c7b5b9fab9c0591f5",
+        "original_size": [
+          30,
+          30
+        ],
+        "stored_size": [
+          16,
+          16
+        ],
+        "world_pixels_per_source_pixel": 0.5,
+        "frames": 1,
+        "mode": "premultiplied-additive",
+        "disk_bytes": 272,
+        "decoded_bytes": 256,
+        "sha256": "7ac332d8d0a6088e3898ec82b43403250f3976cfb828d6a406ba2345351f7101"
+      }
+    ],
+    "palette_sha256": "b39f80c05ad9aa1c6edde098fc502fa9204bdbc6817c1c5b7f3bab631f85316d",
+    "tables": {
+      "BLEND.LUT": {
+        "bytes": 1048576,
+        "sha256": "5dc6769043005b42661188a21ad67ffda966aa5f632309248cf92917d7156235"
+      },
+      "ADD.LUT": {
+        "bytes": 65536,
+        "sha256": "d8eca1c461d4d5d513a338e0c1cf8b9ae8734ff1c021027f1ed8fe3ce7935a5f"
+      }
+    },
+    "copyright_sha256": "4ec4cbf73cdc0ffe69f63c770a864524f571a50d8f882d36ffd00e4e40b607be",
+    "script_sha256": "e240b8d3bff2c86b33ced8a0c5a83479f922436d17e4207c22d62862d0d803c1",
+    "limitations": [
+      "64 prebaked headings; nearest-frame angular error at most 2.8125 degrees.",
+      "No collision geometry changed; prototype has no collision simulation.",
+      "Only normal PNG and one straight-alpha additive frame qualified.",
+      "All asset attribution remains in upstream copyright; local experiment only."
+    ]
+  },
+  "scope": "Explicit residency counts world store+decoded system, frame, sprites, blend tables. Excludes runtime/code/stack/stdio and VRAM.",
+  "limits": [
+    "Background traffic is scripted; pilot replay uses healthy supplied stock-Sparrow motion. Supplied one-gun training range; reduced target health, optional invulnerability, no AI/regen/status effects.",
+    "Sol Earth/Luna fixed epoch0; scene placement selected for inspection.",
+    "Benchmark advances2simticks per render; demo60Hz accumulator/30Hz render target.",
+    "No faction recoloring or native animation interpolation yet."
+  ]
+}

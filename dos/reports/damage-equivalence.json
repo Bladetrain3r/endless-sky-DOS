@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "oracle": {
+    "schema": 1,
+    "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+    "image_id": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
+    "baseline_binary_sha256": "77fcb7ff282a9b82d5fce13125bb403c9a7e65b98661f73786a4f99007654414",
+    "oracle_source_sha256": "e117a25c2070dd4768d595523cb967a532ae53e994d789c36a12f86431f09470",
+    "runner_source_sha256": "a3ba301e958bd7a348022aa5dfa7be7851d369110a0b8f0da14d9b431811d6b9",
+    "oracle_binary_sha256": "a37d9b0fe3a6b45b5b743321be14d46c4b30008f79d6fc95081c0df91cf0d1e5",
+    "csv_sha256": "474411908f6bc80628cbb1af823a47ebb8c939e53968d7fb92fcc527a1c833a2",
+    "weapon_data_sha256": "53a794f727e0650e67259fd5d599555f3fd80a7cf63cb14c9f8fd974150d47a4",
+    "behavior_source_sha256": {
+      "DamageProfile.cpp": "7ca27ef346259158548ba8236e781680cca9ad5dfa0f80dd5073d2f3f8ba2b13",
+      "DamageProfile.h": "b907a940925f25cd88d2fafe982a8f92b3d6d4210a5428ebe2bc47dc82da146d",
+      "Entity.cpp": "d39ec60a85d497e3073eb31f65501084b0fd8b451b5c41a7e8b231af198395c7",
+      "Entity.h": "31896f83d412718be6df6d389f76028be896760a5ace7749f384885019d2481d",
+      "Weapon.cpp": "8833eed1507f345c289732d1ab857d0aaf09655f1ceb5dc1ff8c4858e42213ac",
+      "Weapon.h": "0477c5d8d04db530fe1df7c3c78f1a948a6b4a4fbefc248857c30cdcd43eef22",
+      "ship/ResourceLevels.cpp": "522815c6a988b27265d85397d274057f1adb631b7a2d4206b0af448410894ebf",
+      "ship/ResourceLevels.h": "f23ac3e42194eecc700e99eb9251cb6758d6b0360ca13ed645f0d90188a81cd9"
+    },
+    "compiler_flags": [
+      "-DAVIF_DLL",
+      "-isystem",
+      "/usr/include/SDL2",
+      "-isystem",
+      "/usr/include/AL",
+      "-O3",
+      "-DNDEBUG",
+      "-std=c++20",
+      "-flto=auto",
+      "-fno-fat-lto-objects",
+      "-Wall",
+      "-pedantic-errors",
+      "-Wold-style-cast",
+      "-fno-rtti"
+    ],
+    "rows": 18,
+    "cases": [
+      "already_zero_hull",
+      "bare_hull",
+      "exact_depletion",
+      "exact_hull_zero",
+      "full_shields",
+      "low_shield_repeated",
+      "partial_overflow",
+      "repeated_until_destroyed"
+    ],
+    "weapon": {
+      "shield_damage": 10.600000000000001,
+      "hull_damage": 6.6000000000000005,
+      "disabled_damage": 6.6000000000000005
+    },
+    "fields": [
+      "case",
+      "hit",
+      "before_shields",
+      "before_hull",
+      "dealt_shields",
+      "dealt_hull",
+      "after_shields",
+      "after_hull",
+      "destroyed"
+    ],
+    "interface": "Loaded Energy Blaster; each hit calls unchanged native DamageProfile::CalculateDamage and Entity::TakeDamage on a public minimal Entity subclass.",
+    "target_scope": "Plain Entity with unit damage protection and empty sprite; no piercing, permeability, disruption, cloak, blast, dropoff, regeneration, healing or firing cost. No Ship disabled/event/AI logic."
+  },
+  "results": {
+    "native_asan_ubsan": {
+      "status": "pass",
+      "rows": "18",
+      "cases": "8",
+      "max_error": "1.7763568394002505e-15"
+    },
+    "dosbox_16mib_20k": {
+      "status": "pass",
+      "rows": "18",
+      "cases": "8",
+      "max_error": "3.5527136788005009e-15"
+    }
+  },
+  "source_sha256": {
+    "dos/damage/check.c": "bc2d655aa3f9c5e8db99c12f7d17ca140b9f5056d4f3cbad8aab0b9687c2f50a",
+    "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/damage/damage.h": "89d622acf18301568b941aa793dbbbaade66f1d07057346997e6fdebb119eb29",
+    "dos/damage/check.py": "99ea9b5e847953f6a1786067bcd27025b7580825c1db608108a33e4e434f3b6d",
+    "dos/damage/assets.py": "1c7425bb59fd6fe35d8fd4df7fc5ca687e08ed35205f67d6db7ccb72acc5ca20"
+  },
+  "trace_sha256": "474411908f6bc80628cbb1af823a47ebb8c939e53968d7fb92fcc527a1c833a2",
+  "profile_sha256": "62fc3ad1a5e3e48937a21b2fe1afe926696fa3648178cc67ee8be9f5a7e9e753",
+  "profile": "ESDAMAGE1\n10.600000000000001 6.6000000000000005\n",
+  "dos_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2"
+  ],
+  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/damage/run\nc:\nCWSDPMI -s-\nDAMAGE.EXE NATIVE.CSV DAMAGE.DAT > RESULT.TXT\nexit\n",
+  "tolerance": "Absolute resource/dealt error <=1e-10; destroyed flag exact (native strict hull<0).",
+  "scope": "Public original DamageProfile::CalculateDamage plus Entity::TakeDamage on unprotected synthetic Entity; ordinary Energy Blaster direct hit. No Ship disable/event/regen/AI semantics.",
+  "sanitizers": "ASan+UBSan on portable checker/kernel; original native object build unchanged, unsanitized."
+}

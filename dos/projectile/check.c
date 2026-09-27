@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define CHECK(c) do { if(!(c)) { fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#c); exit(1); } } while(0)
 /* Headless mechanics checker does not draw; full app tests exercise rendering. */
 void video_text(unsigned char *f,int x,int y,const char *s,unsigned char color)
@@ -123,9 +124,47 @@ static void moving(const char *profile,const char *masks)
     CHECK(lead==repeat && lead>=60 && lead>direct);
     printf("moving_route_ticks=480\npostmove_witnesses=%u\nlead_hits=%u\nunled_hits=%u\nmoving_shots=80\n",witnesses,lead,direct);
 }
+static void destruction(const char *profile,const char *masks,const char *damage)
+{
+    static Practice p; Pilot pilot={0}; unsigned i,tick;
+    CHECK(practice_load(&p,profile,masks) && practice_damage_load(&p,damage));
+    p.destructible=1;practice_reset(&p);pilot.state=(MotionState){400,300,0,0,0};
+    for(i=0;i<180;++i) practice_step(&p,&pilot,1);
+    CHECK(p.destroyed && p.hits==7 && p.health.shields==0. && p.health.hull<0.);
+    CHECK(p.explosion==0);tick=p.target_ticks;
+    for(i=0;i<120;++i) practice_step(&p,&pilot,1);
+    CHECK(p.hits==7 && p.target_ticks==tick); /* Dead target no longer collides/moves. */
+    practice_reset(&p);CHECK(!p.destroyed && p.health.shields==30. && p.health.hull==26. && p.explosion==0);
+    for(i=0;i<120 && !p.destroyed;++i) practice_step(&p,&pilot,1);
+    CHECK(p.destroyed && p.hits==7 && p.explosion==48);
+    {
+        static unsigned char frame[480032]; Scene scene={0}; Sprite barge={0};
+        uint32_t rng=p.rng; unsigned n;
+        /* Only the procedural effect draws in this headless checker; sprite
+         * and text calls are stubs. Exercise every age at viewport edges. */
+        for(n=0;n<48;++n) {
+            unsigned k; memset(frame,0xcd,sizeof(frame));
+            p.explosion=48-n;scene.camera_x=(int)n*20-80;scene.camera_y=(int)n*15-80;
+            practice_draw(frame+16,&p,&scene,&barge,NULL,NULL);
+            for(k=0;k<16;++k) CHECK(frame[k]==0xcd && frame[480016+k]==0xcd);
+            CHECK(p.rng==rng);
+        }
+    }
+    practice_reset(&p);CHECK(!p.destroyed && !p.explosion && !p.hits && !p.active);
+    p.moving_target=1;practice_reset(&p);
+    for(i=0;i<7;++i) {
+        double phase=(p.target_ticks+1)*6.2831853071795864769/480.;
+        bolt_launch(&p.bolts[0],400.+120.*sin(phase),200.-60.*cos(phase),0,0,0,0,48);
+        practice_step(&p,&pilot,0);
+    }
+    CHECK(p.destroyed && p.hits==7);tick=p.target_ticks;
+    for(i=0;i<60;++i) practice_step(&p,&pilot,0);
+    CHECK(p.target_ticks==tick && !p.explosion);
+    printf("destruction_hits=7\ndead_target_excluded=pass\nreset_during_explosion=pass\n");
+}
 int main(int argc,char **argv)
 {
-    if(argc!=4) return 2;
-    native_trace(argv[1]);sweeps();trainer(argv[2],argv[3]);moving(argv[2],argv[3]);
+    if(argc!=5) return 2;
+    native_trace(argv[1]);sweeps();trainer(argv[2],argv[3]);moving(argv[2],argv[3]);destruction(argv[2],argv[3],argv[4]);
     printf("status=pass\n");return 0;
 }

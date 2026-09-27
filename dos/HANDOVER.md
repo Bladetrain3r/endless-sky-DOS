@@ -1,16 +1,16 @@
 # Endless Sky DOS handover
-Updated2026-09-28; moving firing range staged and human accepted.
+Updated2026-09-28; destructible firing range staged; human check pending.
 
 ## Current checkpoint
 - Flight: `python3 dos/flight/watch.py --pilot` (Docker/X11,120seconds).
  W/Up thrust,A/D/arrows turn,Space heldfire,Tab camera,R resetship/range,Esc exit.
  Stock Sparrow flight has no reverse; releasecoasts. CtrlF9 quitsDOSBox.
 - Defaultpilot: Barge on8secondellipse, tangentfacing; --stationary-target retainsoldrange.
- Indestructible; R resetsroute/seed/counters; HIT flash. Background traffic cosmetic.
+ Reduced30shield/26hull;7hitskill;48tickcosmeticsparkburst. R resetsall; backgroundcosmetic.
 - Training1EnergyBlaster, synthetic centreline muzzle20units forward, unlimited
  resources. Original stockSparrow has2BeamLasers; no originaldata/outfit edits.
-- No damage/shields, shipcollisions, AI, landing, missions, saves or audio yet.
- White7pixeltracers; native projectile art/stretch/impacteffects notported.
+- No shipcollisions, AI, landing, missions, saves,regen or audio yet;gun unlimited.
+ White7pixeltracers; no native projectileart/stretch/explosionlogic. --invulnerable-target keepsoldrange.
 - User Sept28 accepted corrected smaller worldscale and much smoother64headingturns.
  Prior Sept27 accepted controllableflight feels physicallyright; limitedoriginal familiarity.
 - Preserved correctedflight .work/flight/accepted-44aced341; earlierfullsize
@@ -34,27 +34,27 @@ Updated2026-09-28; moving firing range staged and human accepted.
  50hits,release/reset,expirywithouttargets,poolsaturation drops84withoutoverwrite.
 - reports/projectile-equivalence.json bindsoracle/kernel/profile/masks/config.
  `python3 dos/projectile/check.py --reuse-oracle` useshashcheckedfixtures.
-- ActualDOS600tickrange:50shots50hits0drops,25.274msavg29.985max at20kcycles.
- Heap2,897,866B counted incl50,152Btrainingstate; excludesruntime/stack+480000VRAM.
+- ActualDOS600tickdamage range:50shots7hits0drops,25.932msavg30.762max at20kcycles.
+ Heap2,897,942B counted; excludesruntime/stack+480000VRAM. Deathstopsmotion/collision.
  `pilot_draw` timing nowincludes practice target/bolts/label. Notfullcombatbudget.
 - ActualDOSBox/XTest Space+flight/reset/camera/Esc and boundedshotcountafterrelease
  pass; no discardedsimtime. reports/flight-controls.json bindsstagedEXE.
 - InputSpace=128heldlevel,nofiretaplatch. IRQprobe release/restore/reopen pass.
  Build/tests Docker; DJGPPi386/noMMX/SSE;16MiB/fixed20kcycles/CWSDPMI-s-.
 
-## Flight / rendering retained evidence
-- 900tickpilot replay afterintegration stillmatches originalnativeendstate;
- current17.777msavg becomesempty, notbusyflight performanceclaim.
-- dos/motion/:14cases12600ticks; full65536directionvectors pass.
- Healthy/suppliedregularflight only, noafterburner/status/externalforces.
-- InputIRQ1 lockedcode/data,originalvectorrestore; INPUT.md coverslatchlimits.
-- NativeDrawable::Width/Height*.5 feedsDrawList; art halvedoffline independently
- oforiginalmasks.64spriteheadings,physics65536. SourceRGBA untouched.
-- Raster1188cases+3badfiles, camera2880ticks/63frames, ASan/UBSan passSept27.
- ALIGNMENT.md:33samples,maskp95≤2px; rootinspected. Nearestangleerror≤2.8125deg.
-- Historicalcorrectedcamera21.189msavg26.339max; completegame30FPS unproven.
-- .work/flight/run currentEXE/profile/assets; run.py --practice-test --frames300
- reproducesrange; run.py --replay --frames450 checks flight endstate.
+## Damage and rendering qualification
+- dos/damage/README.md:originalDamageProfile+Entity::TakeDamage onsynthetic
+ unprotectedtarget;8cases18rows. NativeASanerror1.78e-15,DOS3.55e-15;deathflagsexact.
+- Shieldoverflow scalesremaininghulldamage; native destroyedmeans hull<0,not<=0.
+ Exactnativegetters exportedDAMAGE.DAT;DOStextparse passesgetter-basedzeroboundaries.
+- NoShipdisable/events/protections/piercing/status/regen port. Blasterdisabledamage
+ equalsnormalhull. Targethealthdeliberatelyreduced;notstockStarBarge.
+- Integrationtests:7hitskill,noafterdeathhits,freeze movingtarget,resetmidexplosion,
+ 48effectages viewportguards/RNGunchanged. Rootinspected .work/flight/explosion-early.png.
+- Current actualkeyboardtest includes7hitdestruction+healthchecks; profilehash inappreport.
+- dos/motion/:14cases12600ticks;all65536directions pass;900tickpilot retained.
+- Render:halfPNGworldscale/64headings;1188rastercases+3badfiles,63cameraframes;
+ ALIGNMENT.md33samples,maskp95≤2px. Originalart/masks untouched.
 
 ## Collision / next
 - dos/collision/: originalMask::Create3hulls123points;11772queries pass,
@@ -65,7 +65,7 @@ Updated2026-09-28; moving firing range staged and human accepted.
 - Movingtests:postmovepose witness,480tickclosedroute,lead80/80 vsunled72/80,
  resetrepeatable(nativeASan+DOS). App2laps25.421msavg29.938max,heap2,897,898B.
 - Sept28 user: static/moving fire work; leading predictable on steadyroute.
-- Next: native shield/damage/resourcecontracts and destructionfeedback; beamsseparate.
+- Next: human damage/explosionfeedback; firingresourcecosts,regen/disabledcontracts; beamsseparate.
 
 ## Retained content / boundaries
 - dos/world/active.h,c:ownedvalidatedsystemarena;all694systems qualificationpass.

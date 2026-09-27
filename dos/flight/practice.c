@@ -29,11 +29,22 @@ int practice_load(Practice *p,const char *profile,const char *masks)
     practice_reset(p);
     return 1;
 }
+int practice_damage_load(Practice *p,const char *path)
+{
+    FILE *f=fopen(path,"r"); char magic[16],extra; double shield,hull; int n;
+    if(!f) return 0;
+    n=fscanf(f,"%15s %lf %lf %c",magic,&shield,&hull,&extra); fclose(f);
+    if(n!=3 || strcmp(magic,"ESDAMAGE1") || !isfinite(shield) || !isfinite(hull) ||
+       shield<=0. || shield>1000. || hull<=0. || hull>1000.) return 0;
+    p->shield_damage=shield;p->hull_damage=hull;return 1;
+}
 void practice_reset(Practice *p)
 {
     memset(p->bolts,0,sizeof(p->bolts));
     p->shots=p->hits=p->dropped=p->active=p->peak=p->flash=p->cooldown=0;
     p->rng=17; p->target_ticks=0;
+    p->health=(DamageState){30.,26.}; /* Reduced training target, not stock Barge stats. */
+    p->destroyed=0; p->explosion=0;
     practice_target(p);
 }
 static double random_unit(Practice *p)
@@ -44,8 +55,11 @@ static double random_unit(Practice *p)
 void practice_step(Practice *p,const Pilot *pilot,int fire)
 {
     unsigned i;
-    ++p->target_ticks;
-    practice_target(p); /* Post-move pose shared by collision and rendering. */
+    if(p->explosion) --p->explosion;
+    if(!p->destroyed) {
+        ++p->target_ticks;
+        practice_target(p); /* Post-move pose shared by collision and rendering. */
+    }
     if(p->flash) --p->flash;
     if(p->cooldown) --p->cooldown;
     /* Existing shots move first. New shots join for this tick's collision pass
@@ -69,8 +83,12 @@ void practice_step(Practice *p,const Pilot *pilot,int fire)
     p->active=0;
     for(i=0;i<PRACTICE_BOLTS;++i) {
         Bolt *b=&p->bolts[i]; double fraction;
-        if(bolt_hit(b,&p->target,1,&fraction)>=0) {
+        if(!p->destroyed && bolt_hit(b,&p->target,1,&fraction)>=0) {
             b->alive=0; ++p->hits; p->flash=8;
+            if(p->destructible) {
+                damage_hit(&p->health,p->shield_damage,p->hull_damage);
+                if(p->health.hull<0.) { p->destroyed=1; p->explosion=48; }
+            }
         }
         if(b->alive) ++p->active;
     }
@@ -85,10 +103,21 @@ void practice_draw(unsigned char *frame,const Practice *p,const Scene *scene,
 {
     int tx=(int)lround(p->target.x)-scene->camera_x,ty=(int)lround(p->target.y)-scene->camera_y;
     unsigned i;
-    sprite_draw(frame,barge,((unsigned)p->target.angle*barge->frames+32768u)/65536u,tx,ty,blend,add);
+    if(!p->destroyed) sprite_draw(frame,barge,((unsigned)p->target.angle*barge->frames+32768u)/65536u,tx,ty,blend,add);
     /* Bounds also keep the fixed-width text renderer safely inside its frame. */
     if(tx>=55 && tx<745 && ty>=72 && ty<535)
-        video_text(frame,tx-48,ty-32,p->flash?"HIT!":(p->moving_target?"MOVING TARGET":"PRACTICE TARGET"),p->flash?1:2);
+        video_text(frame,tx-48,ty-32,p->destroyed?"DESTROYED - R":(p->flash?"HIT!":(p->moving_target?"MOVING TARGET":"PRACTICE TARGET")),p->flash?1:2);
+    if(p->explosion && tx>-80 && tx<880 && ty>-80 && ty<680) {
+        /* Bounded procedural sparks; no native effect timing/art claim. Render
+         * never consumes the firing RNG, so frame rate cannot alter accuracy. */
+        unsigned age=48-p->explosion;
+        for(i=0;i<24;++i) {
+            double angle=i*6.2831853071795864769/24.;
+            double radius=3.+age*(.6+(i%5)*.11),ux=sin(angle),uy=cos(angle);
+            int k; unsigned char color=age<8?1:(age<24?6:4);
+            for(k=0;k<3;++k) dot(frame,tx+(int)lround((radius-k)*ux),ty+(int)lround((radius-k)*uy),color);
+        }
+    }
     for(i=0;i<PRACTICE_BOLTS;++i) if(p->bolts[i].alive) {
         const Bolt *b=&p->bolts[i]; double ux,uy; int k;
         double x=b->x+.5*b->vx-scene->camera_x,y=b->y+.5*b->vy-scene->camera_y;

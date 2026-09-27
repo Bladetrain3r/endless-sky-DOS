@@ -16,7 +16,7 @@ RUN=ROOT/'.work/flight/run'
 IMAGE='modern-arena-tools:0.1'
 SOURCES=['dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
          'dos/flight/scene.c','dos/flight/sprite_reference.c','dos/world/active.c',
-         'dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
+         'dos/damage/damage.c','dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/flight/pilot.c','dos/flight/input.c','dos/flight/input_state.c','dos/motion/motion.c']
 FLAGS=['-std=gnu99','-O2','-march=i386','-mtune=i586','-mno-mmx','-mno-sse',
        '-mno-sse2','-Wall','-Wextra','-Werror']
@@ -41,10 +41,12 @@ def main():
     parser.add_argument('--headless-demo',action='store_true')
     parser.add_argument('--reference',action='store_true')
     parser.add_argument('--camera',action='store_true')
+    parser.add_argument('--destructible-target',action='store_true',help='damage and destruction in the firing route')
     parser.add_argument('--moving-target',action='store_true',help='moving target in the held-fire route')
     parser.add_argument('--practice-test',action='store_true',help='stationary held-fire training route')
     parser.add_argument('--replay',action='store_true',help='replay a pilot control route through native-matched motion')
     args=parser.parse_args()
+    if args.destructible_target and not args.practice_test: parser.error('destructible-target requires practice-test')
     if args.moving_target and not args.practice_test: parser.error('moving-target requires practice-test')
     if args.practice_test and (args.camera or args.replay): parser.error('practice-test is a separate controlled route')
     if args.replay and args.camera: parser.error('pilot replay follows the ship; --camera selects the scripted pan')
@@ -56,12 +58,13 @@ def main():
     subprocess.run(docker+['python3','dos/flight/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/flight/pilot_assets.py'],check=True)
     subprocess.run(docker+['python3','dos/projectile/assets.py'],check=True)
+    subprocess.run(docker+['python3','dos/damage/assets.py'],check=True)
     shutil.copyfile(ROOT/'.work/world/run/WORLD.PAK',RUN/'WORLD.PAK')
     archive=ROOT/'.work/toolchain/csdpmi7b.zip'
     assert digest(archive)=='deacda0488e1cdd7c4a9f32fab45662b34c0ed6b2d7d4d13bc07041b62004a8c'
     with zipfile.ZipFile(archive) as z:
         (RUN/'CWSDPMI.EXE').write_bytes(z.read('bin/CWSDPMI.EXE'))
-    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h']
+    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h']
     source_hashes={s:digest(ROOT/s) for s in inputs}
     subprocess.run(docker+['.work/toolchain/djgpp/bin/i586-pc-msdosdjgpp-gcc',*FLAGS,
                           *(['-DREFERENCE_RENDERER'] if args.reference else []),*SOURCES,'-lm','-o','.work/flight/run/FLIGHT.EXE'],check=True)
@@ -72,6 +75,7 @@ def main():
     if args.replay: options+=' --replay'
     if args.practice_test: options+=' --practice-test'
     if not args.moving_target: options+=' --stationary-target'
+    if not args.destructible_target: options+=' --invulnerable-target'
     if args.headless_demo: options+=' --demo --seconds 4'
     conf=base+'[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
     conf+=f'FLIGHT.EXE {options} > FLIGHT.TXT\nexit\n'
@@ -106,10 +110,12 @@ def main():
     if args.practice_test:
         ticks=int(fields['simulation_ticks'])
         assert int(fields['practice_shots'])==(ticks+11)//12,fields
-        if not args.moving_target:
+        if args.destructible_target and ticks>=(960 if args.moving_target else 120):
+            assert fields['target_destroyed']=='1' and int(fields['practice_hits'])==7,fields
+        elif not args.destructible_target and not args.moving_target:
             assert int(fields['practice_hits'])>=max(0,(ticks-24)//12),fields
         assert int(fields['target_moving'])==int(args.moving_target),fields
-        assert int(fields['target_ticks'])==ticks,fields
+        if not args.destructible_target: assert int(fields['target_ticks'])==ticks,fields
         assert fields['practice_dropped']=='0',fields
     assert not any(p.suffix.lower()=='.swp' for p in RUN.iterdir())
     assert (RUN/'FRAME.IDX').stat().st_size==480000
@@ -118,11 +124,12 @@ def main():
     report=dict(reference_renderer=args.reference,kind='bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
                 image_id=subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
                 compiler_flags=FLAGS,config=conf,source_sha256=source_hashes,
+                damage_profile_sha256=digest(RUN/'DAMAGE.DAT'),
                 practice_profile=json.loads((RUN/'blaster.json').read_text()),
                 pilot_profile=json.loads((RUN/'pilot.json').read_text()),pack_sha256=digest(RUN/'WORLD.PAK'),frame_sha256=digest(RUN/'FRAME.IDX'),
                 exe_bytes=(RUN/'FLIGHT.EXE').stat().st_size,assets=json.loads((RUN/'assets.json').read_text()),
                 scope='Explicit residency counts world store+decoded system, frame, sprites, blend tables. Excludes runtime/code/stack/stdio and VRAM.',
-                limits=['Background traffic is scripted; pilot replay uses healthy supplied stock-Sparrow motion. Only supplied one-gun practice fire against an invulnerable scripted target; no AI or damage.',
+                limits=['Background traffic is scripted; pilot replay uses healthy supplied stock-Sparrow motion. Supplied one-gun training range; reduced target health, optional invulnerability, no AI/regen/status effects.',
                         'Sol Earth/Luna fixed epoch0; scene placement selected for inspection.',
                         'Benchmark advances2simticks per render; demo60Hz accumulator/30Hz render target.',
                         'No faction recoloring or native animation interpolation yet.'])
@@ -131,6 +138,7 @@ def main():
     if args.replay: stem+='-pilot'
     if args.practice_test: stem+='-practice'
     if args.moving_target: stem+='-moving'
+    if args.destructible_target: stem+='-damage'
     if args.camera: stem+='-camera'
     else: stem+='-profile'
     shutil.copyfile(RUN/'preview.png',ROOT/'.work/flight'/f'{stem}.png')

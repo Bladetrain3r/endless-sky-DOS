@@ -61,6 +61,8 @@ def guest():
         # allowance still rejects a stuck fire bit after release.
         assert 7 <= int(fields['practice_shots']) <= 10 and int(fields['practice_hits']) >= 2, fields
         assert fields['practice_dropped'] == '0', fields
+        assert fields['target_destroyed'] == '1' and int(fields['practice_hits']) == 7, fields
+        assert float(fields['target_hull']) < 0 and float(fields['target_shields']) == 0, fields
         assert fields['pilot_follow'] == '0' and fields['pilot_angle'] == '0', fields
         assert abs(float(fields['pilot_x']) - 400.) < 1e-9 and float(fields['pilot_y']) < 300., fields
         assert float(fields['pilot_vy']) < 0. and fields['discarded_sim_ms'] == '0.000', fields

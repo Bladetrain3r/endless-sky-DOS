@@ -2,6 +2,7 @@
 #ifndef FLIGHT_PRACTICE_H
 #define FLIGHT_PRACTICE_H
 #include "pilot.h"
+#include "../damage/damage.h"
 #include "../projectile/projectile.h"
 #define PRACTICE_BOLTS 16
 /* One supplied training gun, not stock Sparrow's beam-laser armament. */
@@ -13,10 +14,15 @@ typedef struct {
     unsigned target_ticks;
     int moving_target;
     BoltTarget target;
+    DamageState health;
+    double shield_damage,hull_damage;
+    int destructible,destroyed;
+    unsigned explosion;
     double speed,inaccuracy;
     int lifetime,reload;
 } Practice;
 int practice_load(Practice *p,const char *profile,const char *masks);
+int practice_damage_load(Practice *p,const char *path);
 void practice_reset(Practice *p);
 void practice_target(Practice *p);
 void practice_step(Practice *p,const Pilot *pilot,int fire);

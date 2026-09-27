@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "systems_loaded": 694,
+  "maximum_active_bytes": 6096,
+  "store_bytes": 37558,
+  "abi": "native host; DOS struct sizes differ",
+  "field_comparisons": [
+    "Sol",
+    "Sirius"
+  ],
+  "ownership": "concurrent, repeated, survives store close",
+  "corruptions_rejected": 5,
+  "sanitizer": "ASan+UBSan; leak detection disabled",
+  "pack_sha256": "29c835a46288e69ce4fe5dd5eac594c1c653dfcce679ece70d3784356d1b091b",
+  "sources": {
+    "active.c": "d8b6d916e05f500c5770ac22d373d8264ec6381fa1dad5969dfa4e5e31ce20be",
+    "active.h": "65481859e1a5243932ba621dc448e32464cfb1e4ded802d6e52c84f56dd5b5f0",
+    "active_test.c": "c9cd31c081ab009e76aa83c4d81b3e84a2a3c1a36302e302c405da446851adde",
+    "test_active.py": "dcbeafd2f14121de886c12584dc7cbb674b668a4735e5e99ebcdb027e68aaf14"
+  }
+}

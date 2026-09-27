@@ -91,4 +91,5 @@ Limits:8,192 records,32KiB record,256KiB directory+scratch. Reuse one buffer;
 future APIs must not retain pointers into it. Check bounds, UTF8, finite doubles,
 ordered IDs, checksums, references/kinds, duplicate links and parent order.
 FNV detects accidental corruption, not authentication; SHA256 manifests identify
-artifacts. Next: decoded active-system ownership, then an indexed flight scene.
+artifacts. [Owned active-system loading](ACTIVE.md) and the
+[first DOS flight scene](../flight/README.md) are now implemented.

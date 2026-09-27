@@ -95,8 +95,9 @@ for build tools or qualified transactional saves. No writable DOS VFS exists yet
 Initial DOS graphics, C++/DPMI and content-store probes pass; the unmodified native
 reference builds/tests. The [typed world snapshot](world/README.md) now exports
 resolved map/orbit/trade data and validates it in DOS:648,042B on disk,37,510B
-explicit access-layer heap. Next: decoded active-system ownership and software
-menu/flight with actual assets, separate render/sim measurements. See
+explicit access-layer heap. The [first flight scene](flight/README.md) now loads
+owned active-system data and draws real indexed assets in DOS. Six scripted ships
+plus a stationary Falcon average26.5FPS at20kcycles;30FPS remains unmet. See
 FEASIBILITY.md and EQUIVALENCE.md. Low-level implementation choices are delegated.
 
 ## Indexed-color asset proof
@@ -107,4 +108,4 @@ real assets converted in Docker, three held out from training; comparison image
 in `.work/palette/comparison.png`. No DOS renderer or final palette claim.
 [Typed content plan](storage/TYPED-SLICE-PLAN.md) selects resolved map/orbit/trade
 data exported after native loading; snapshot/validator implemented in `world/`,
-live gameplay object ownership remains next.
+owned active-system loading now implemented; native gameplay remains ahead.

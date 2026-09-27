@@ -1,0 +1,24 @@
+{
+  "status": "automated_pass_human_pilot_feedback_pending",
+  "date": "2026-09-27",
+  "launch": "python3 dos/flight/watch.py --pilot",
+  "accepted_scripted_camera_frame_unchanged": true,
+  "exe_sha256": "6d2e4de9705f5c92d2c58df337baf82adafb12d06bf63694a23dd30975207d76",
+  "evidence_sha256": {
+    "flight-pilot-tests.json": "f5cd4a6cfdf4f53740ea538bee46f16b7c7c20a9f29ba1d7f8bc18eb7bab03b8",
+    "flight-input-tests.json": "55cdc3fa3482a941892a19aea8ffa92fe41ee30104d7af0636910755396ac04e",
+    "flight-controls.json": "ec6de3ba84f674ef8bc1f9e86e4e1041bea06423eed84aad35552d45aae149fd",
+    "flight-6-ships-pilot-profile.json": "a82597474995851068ccd7cc9c0b2607dc6d87e27b0247816c5059575130d8fe",
+    "flight-demo-pilot-profile.json": "20c51fce94fe30527bb0dcf2f2c8b316ba484c4d2e73b88ed97b400385a2d65d",
+    "flight-camera-tests.json": "a0016f4cae341e2c174130b3445364cf2b57d8e135883e0a2468845966ee387a",
+    "flight-6-ships-camera.json": "62d8347184e62dcf598b36c55e1d4317454f76d1f7eff75abfdd234f088693a4",
+    "motion-equivalence.json": "725aed6aa214d80ff818f60452e1f70ec450316d25d0f400aff1ec7d230b7a58"
+  },
+  "limits": [
+    "Healthy supplied Sparrow only; no full ship-resource simulation.",
+    "Background traffic remains scripted; no collision/combat/AI.",
+    "Sixteen rendered orientations; simulation headings stay full precision.",
+    "Near-Earth worst frames exceed30FPS budget; distant route empties out.",
+    "Physical control feel and alternate DOS implementations untested."
+  ]
+}

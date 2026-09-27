@@ -56,11 +56,11 @@ def inside():
     assert float(metrics["min_heat_margin"]) >= 0
     with csv_path.open(newline="") as stream:
         rows = list(csv.DictReader(stream))
-    assert len(rows) == 13 * 901, len(rows)
+    assert len(rows) == 14 * 901, len(rows)
     cases = {}
     for row in rows:
         cases.setdefault(row["case"], []).append(row)
-    assert len(cases) == 13
+    assert len(cases) == 14
     for name, trace in cases.items():
         assert len(trace) == 901 and [int(r["tick"]) for r in trace] == list(range(901)), name
         initial, final = trace[0], trace[-1]
@@ -102,6 +102,7 @@ def inside():
         "schedule": {"forward": "forward all ticks", "coast": "no commands all ticks",
                      "turn": "forward, turn +1 all ticks", "back": "back all ticks",
                      "stop": "forward+STOP all ticks",
+                     "pilot": "Same phase boundaries as mixed, full left/right turns; zero initial velocity and heading",
                      "mixed": "1-120 forward; 121-240 coast; 241-360 forward turn -.5; "
                               "361-480 back; 481-600 forward turn +.25; 601-720 forward+back; 721-900 coast"},
         "fields": "case,tick,cmd_forward,cmd_back,cmd_stop,cmd_turn,accel,reverse_accel,turn_rate,drag,mult,x,y,vx,vy,angle_steps",

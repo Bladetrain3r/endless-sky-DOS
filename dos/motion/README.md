@@ -2,7 +2,7 @@
 
 The stationary and moving-camera renderer passed the user's visual check on
 2026-09-27. This next slice qualifies ship movement separately before replacing
-the renderer's scripted traffic. The accepted watch executable stays intact.
+the renderer's scripted traffic. The scripted watch mode remains available alongside the controllable scene.
 
 `motion.c` implements a deliberately bounded part of upstream `Ship::DoMovement`
 and the subsequent position update: healthy, fully crewed ships with sufficient
@@ -14,7 +14,7 @@ their own contracts before this can be called a port of complete ship behavior.
 The physics clock remains 60 Hz. Angle increments round onto the same 65,536
 headings as upstream; the 16 rendered sprite headings do not constrain physics.
 The initial implementation calculates sine/cosine on demand, avoiding the native
-1 MiB unit-vector table; DOS cost must be measured before adoption.
+1 MiB unit-vector table; its measured DOS cost is recorded below.
 
 Important rules to retain: healthy ships coast without drag; BACK without reverse
 engines does not brake; acceleration-weighted drag is directional; STOP can
@@ -41,12 +41,12 @@ point. It loads the actual fitted Sparrow and Star Barge through native game dat
 then calls public `Ship::Move`. Six scenarios per ship cover forward, coasting,
 turning, absent reverse engines, STOP and mixed commands with negative/fractional
 turns across angle wrap. A thirteenth adds a native reverse-thruster outfit to a
-Sparrow using the public API. Each scenario records its initial state and 900
+Sparrow using the public API. A fourteenth replays the flight sandbox's held-key route. Each scenario records its initial state and 900
 steps (15 simulated seconds). Crew/resources are checked, and the STOP case
 explicitly verifies preserved lateral drift. The standalone harness stops before
 native off-screen forgetting can remove the actor. It does not run Engine/AI.
 
-All 11,700 cumulative steps pass. Native results are identical; DOS maximum
+All 12,600 cumulative steps pass. Native results are identical; DOS maximum
 coordinate error is 5.46e-12 world units and velocity error 1.42e-14 per tick.
 Quantized headings match exactly. Every one of the 65,536 direction vectors also
 passes; DOS maximum component error is 1.11e-16. Boundary checks cover conflicting
@@ -60,8 +60,8 @@ The64 motion states occupy2,304 stack bytes in DOS. The kernel allocates no heap
 and does not retain upstream's1MiB angle table; this is not a whole-game RAM claim.
 No MMX/SSE compiler dependency; bundled libraries are not exhaustively audited.
 
-Next: feed resolved ship parameters into a controllable flight scene, preserving
-this reference suite and the accepted camera/raster tests. Rendering16 sprite
+The [controllable flight scene](../flight/README.md) now uses these resolved
+Sparrow parameters and preserves this reference suite and camera/raster tests. Rendering16 sprite
 headings is still a separate visible limitation; real-valued movement cannot by
-itself improve those baked rotations. The watch executable remains the accepted
-scripted scene until that integration is qualified.
+itself improve those baked rotations. Scripted watch mode remains available for
+comparison. Native resource accounting, collision and AI are separate future work.

@@ -1,12 +1,41 @@
 # First DOS flight-scene prototype
 
-A real800×600,256-color DOS executable now loads Sol from the compact world
-pack and draws Earth, Luna, the Falcon, moving Sparrows/Star Barges and a small
-additive effect. **This is a scripted rendering prototype, not playable Endless
-Sky.** No native ship physics, AI, collision, combat, missions or menus yet.
-Ship sprites retain their1× source size;16 baked headings are an experimental
-rotation shortcut, not final turning fidelity. Orbital offsets follow the
-source's clockwise angle convention at epoch0; Earth anchors the selected view.
+The800×600,256-color DOS executable loads Sol from the compact world pack and
+now offers a controllable stock Sparrow using native-matched movement. Earth,
+Luna, the Falcon and scripted traffic provide reference points. This is a flight
+sandbox: no collision, combat, landing, AI, missions, resource accounting or saves.
+The player's engines are treated as fully supplied.16 baked sprite headings are
+still an experimental rotation shortcut; simulation uses all65,536 headings.
+
+## Fly
+
+```sh
+python3 dos/flight/watch.py --pilot
+```
+
+The reference Docker/DOSBox opens a two-minute flight session. Controls:
+
+| Action | Keys |
+|---|---|
+| Thrust | W / Up |
+| Turn | A/D / Left/Right |
+| Coast | Release thrust |
+| Toggle following/fixed camera | Tab |
+| Reset ship and camera near Earth | R |
+| Exit | Escape; Ctrl+F9 exits DOSBox |
+
+Turn and thrust can be held together. The stock Sparrow has no reverse thrusters,
+so S/Down does not brake. To slow down manually, turn around and thrust against
+your motion; autopilot braking is not implemented. The camera starts following
+at the ship's centre; Tab freezes its current position. R is useful after flying
+out of sight. `--seconds N` selects1–120seconds. Local DOSBox alternative:
+`dosbox -conf .work/flight/pilot.conf`.
+
+The fitted acceleration, turn rate and drag come from the qualified native
+Sparrow trace, via `pilot_assets.py`; `PILOT.DAT` is a tiny prototype profile,
+not a complete ship/outfit export. Movement remains60Hz while display targets30Hz.
+The arrows/WASD use make/break input, including simultaneous held aliases;
+reset/camera/Escape taps are retained until polled. See [input notes](INPUT.md).
 
 ## Watch
 
@@ -30,8 +59,8 @@ A local-emulator alternative:
 dosbox -conf .work/flight/demo.conf
 ```
 
-Both are scripted watch modes; there are no flight controls. Ignore ship handling
-as a design statement. Frame cadence, sprite edges, soft transparency and the
+Both watch commands above remain scripted; add `--pilot` for controls. Ignore
+background traffic handling as a design statement. Frame cadence, sprite edges, soft transparency and the
 overlapping flare are the useful things to inspect. Static preview:
 `.work/flight/flight-6-ships-camera.png`. The preview comes from the DOS framebuffer;
 VBE bank samples and all768 DAC components are also verified before exit.
@@ -57,6 +86,32 @@ camera movement, its bounds/return to origin, unchanged world ship state, and63
 complete rendered frames against the scalar rasterizer. All324 sprite clipping/
 heading comparisons still pass. `flight-camera-qualification.json` records gates;
 `flight-camera-before.json` preserves the pre-optimization baseline.
+
+## Pilot integration checks
+
+The native oracle now has14cases/12,600movement steps, including the exact
+held-key route used by the sandbox. The native sanitizer integration test compares
+all900 route ticks, control cancellation, reset and following/fixed cameras.
+Headless DOS replay reaches the same final position, velocity and heading.
+Four malformed pilot profiles are rejected without modifying the live state.
+
+The actual application also passes X11 key injection through DOSBox: simultaneous
+thrust/turn, release/coast, quick reset/camera taps and Escape. The separate input
+probe checks original IRQ-vector restoration and reopening. These checks do not
+replace human feedback on control feel. Captured view: `.work/flight/pilot-controls.png`.
+
+The450-frame route averages18.57ms/frame, max38.32ms, but most of that journey
+leaves the planet/traffic cluster: it is not an improvement claim against the
+old camera route. The near-Earth keyboard test averages33.77ms, max38.18ms.
+Player drawing averages1.49ms and two movement steps about0.07ms; the dynamic HUD
+cost is also included. Sustained30FPS for a complete game remains unproven.
+Explicit asset/world/frame allocations remain2,824,046B; player stack state and
+DPMI keyboard-wrapper/runtime allocations are outside that count. No swap used.
+
+Evidence: `flight-pilot-tests.json`, `flight-input-tests.json`,
+`flight-controls.json`, `flight-6-ships-pilot-profile.json` and the real-time pilot
+report under `dos/reports`. The original camera checks still pass, with additional
+star-wrap checks24,000units away in either direction.
 
 ## Earlier stationary-camera measurements
 
@@ -85,18 +140,22 @@ No file I/O or world-record loading occurs inside the measured frame loop.
 Benchmark mode advances exactly2 test-motion ticks per rendered frame. Demo
 mode instead accumulates a60Hz clock, targets30Hz drawing, and catches up motion
 when rendering is slower. A pause clamps pending simulation to250ms and reports
-discarded time explicitly. It is a prototype clock, not a port of native physics.
+discarded time explicitly. The controllable ship and automated pilot replay use the qualified movement
+kernel; background traffic still uses the earlier scripted test motion.
 
 ## Build and validation
 
-Requires the cached images/toolchain, typed world pack and palette proof described
-in the parent README. All actual build/test commands use Docker:
+Requires the cached images/toolchain, typed world pack, palette proof and native
+motion oracle (`python3 dos/motion/check.py`) described in the parent README. All actual build/test commands use Docker:
 
 ```sh
 python3 dos/flight/run.py
 python3 dos/flight/run.py --ships 20 --frames 60
 python3 dos/flight/run.py --camera --frames 360
 python3 dos/flight/run.py --camera --headless-demo
+python3 dos/flight/run.py --replay --frames 450
+python3 dos/flight/run.py --replay --headless-demo
+python3 dos/flight/test_controls.py
 # Optional reproduction of the slow correctness reference:
 python3 dos/flight/run.py --reference
 ```

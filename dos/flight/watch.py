@@ -15,8 +15,13 @@ RUN=ROOT/'.work/flight/run'
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--stationary',action='store_true',help='keep the camera fixed for comparison')
+    parser.add_argument('--pilot',action='store_true',help='fly the stock Sparrow with held keys')
+    parser.add_argument('--seconds',type=int,default=None,help='duration1..120seconds; default30watch/120pilot')
     args=parser.parse_args()
-    camera='' if args.stationary else ' --camera'
+    seconds=args.seconds if args.seconds is not None else (120 if args.pilot else 30)
+    if not 1<=seconds<=120: parser.error('seconds must be1..120')
+    if args.pilot and args.stationary: parser.error('use Tab during pilot mode to switch camera')
+    camera=' --pilot' if args.pilot else ('' if args.stationary else ' --camera')
     display=os.environ.get('DISPLAY','')
     if not display.startswith((':','unix:')):
         sys.exit('A local X11/XWayland DISPLAY is needed for the reference window.')
@@ -24,7 +29,7 @@ def main():
         sys.exit('Build first: python3 dos/flight/run.py')
     base=(ROOT/'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     (RUN/'watch.conf').write_text(base+'[autoexec]\nmount c /work/.work/flight/run\nc:\n'
-        f'CWSDPMI -s-\nFLIGHT.EXE --demo --seconds 30{camera} > DEMO.TXT\nexit\n')
+        f'CWSDPMI -s-\nFLIGHT.EXE --demo --seconds {seconds}{camera} > DEMO.TXT\nexit\n')
     cmd=['docker','run','--rm','--network','none','--hostname',socket.gethostname(),'--user',f'{os.getuid()}:{os.getgid()}',
          '-e','HOME=/tmp','-e',f'DISPLAY={display}',
          '--mount','type=bind,src=/tmp/.X11-unix,dst=/tmp/.X11-unix,readonly',
@@ -34,7 +39,7 @@ def main():
     if authority.is_file():
         cmd+=['--mount',f'type=bind,src={authority},dst=/tmp/flight.xauthority,readonly',
               '-e','XAUTHORITY=/tmp/flight.xauthority']
-    cmd+=['modern-arena-tools:0.1','timeout','60s','dosbox','-conf','.work/flight/run/watch.conf']
+    cmd+=['modern-arena-tools:0.1','timeout',f'{seconds+30}s','dosbox','-conf','.work/flight/run/watch.conf']
     # No xhost changes, no network, no fullscreen, no audio, bounded runtime.
     raise SystemExit(subprocess.run(cmd).returncode)
 

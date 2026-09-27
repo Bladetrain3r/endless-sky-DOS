@@ -53,13 +53,13 @@ Controls Input(const string &scenario, int tick)
 	if(scenario == "turn") return {true, false, false, 1.};
 	if(scenario == "back") return {false, true, false, 0.};
 	if(scenario == "stop") return {true, false, true, 0.};
-	if(scenario == "mixed")
+	if(scenario == "mixed" || scenario == "pilot")
 	{
 		if(tick <= 120) return {true, false, false, 0.};
 		if(tick <= 240) return {};
-		if(tick <= 360) return {true, false, false, -.5};
+		if(tick <= 360) return {true, false, false, scenario == "pilot" ? -1. : -.5};
 		if(tick <= 480) return {false, true, false, 0.};
-		if(tick <= 600) return {true, false, false, .25};
+		if(tick <= 600) return {true, false, false, scenario == "pilot" ? 1. : .25};
 		if(tick <= 720) return {true, true, false, 0.};
 		return {};
 	}
@@ -197,6 +197,7 @@ int main(int argc, char **argv)
 				Run(out, *model, system, (modelName == "Sparrow" ? "sparrow_" : "star_barge_") + scenario,
 					scenario, nullptr);
 		}
+		Run(out, *GameData::Ships().Get("Sparrow"), system, "sparrow_pilot_route", "pilot", nullptr);
 		const Outfit *reverse = GameData::Outfits().Get("X1100 Ion Reverse Thruster");
 		if(!reverse || !reverse->IsDefined()) throw runtime_error("Reverse outfit missing");
 		Run(out, *GameData::Ships().Get("Sparrow"), system, "sparrow_reverse_fixture", "back", reverse);
@@ -213,7 +214,7 @@ int main(int argc, char **argv)
 			}
 			if(!angles.good()) throw runtime_error("Angle table write failed");
 		}
-		cout << setprecision(17) << "cases=13 ticks=" << TICKS << " rows=" << 13 * (TICKS + 1)
+		cout << setprecision(17) << "cases=14 ticks=" << TICKS << " rows=" << 14 * (TICKS + 1)
 			<< " min_energy_margin=" << minimumEnergyMargin << " min_heat_margin=" << minimumHeatMargin << '\n';
 		return 0;
 	}

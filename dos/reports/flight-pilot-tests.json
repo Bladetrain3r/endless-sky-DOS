@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "native_route_ticks": "900",
+  "controls_and_camera": "pass",
+  "invalid_profile": "reject",
+  "malformed_profiles": 4,
+  "source_sha256": {
+    "dos/flight/pilot_test.c": "8d6805cc7fba6a59e0884d5dac6a7eaaf0e8ade4c93eaadee2a3e1c77459c5bb",
+    "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
+    "dos/flight/scene.c": "c2204984bf7d0c989592aa5ad77e75e41f416091fc375f173b21331de9f330f1",
+    "dos/flight/sprite.c": "b6d6eb5622fa3f3350472c266bdeecfc007c9108ac9144fe441b7b3797ebe118",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50"
+  },
+  "sanitizers": "ASan+UBSan; leak checking disabled"
+}

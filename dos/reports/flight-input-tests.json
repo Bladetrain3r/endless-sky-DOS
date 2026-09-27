@@ -1,0 +1,49 @@
+{
+  "decoder": "pass",
+  "djgpp_compile": "pass",
+  "irq_code": {
+    "handler_bytes": 48,
+    "decoder_bytes": 256,
+    "locked_bytes_per_function": 4096,
+    "handler_calls": "decoder only",
+    "decoder_calls": "none"
+  },
+  "source_sha256": {
+    "dos/flight/input.c": "e057927e9816a732241adac5c8777f62c0317402997c623d5aa8263928eae5c6",
+    "dos/flight/input.h": "9a01008c4eaf782aa25610ce1dee6e1d289cfe5d28a5dea228e0439ba6aaf1d9",
+    "dos/flight/input_state.c": "caeae05326207d88270d442381f42734e3aa1b8f0921d9c31c7c67bfb36647a3",
+    "dos/flight/input_state.h": "d555dfc40fa6d789c7e39188417d539017bae8a54c7b6f18e8ccb9524602b97d",
+    "dos/flight/input_test.c": "33504f7c56f22b29bf6e5cefd472aa09450c41dceba899b242e629fe2b4c1d7f",
+    "dos/flight/test_input.py": "ba427c386ab3fc14b7fccc14cbc9337e7e6dbca1d6affbfa96cb010a195003f1"
+  },
+  "image_ids": {
+    "modern-arena-tools:0.1": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c",
+    "endless-sky-dos-native-reference:local": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a"
+  },
+  "dosbox_irq1": {
+    "guest": "pass",
+    "changes": [
+      1,
+      5,
+      4,
+      0,
+      1,
+      3,
+      2,
+      0,
+      32,
+      0,
+      64,
+      0,
+      16,
+      0
+    ],
+    "observed": "observed=119",
+    "vector_restore": "pass",
+    "reopen": "pass"
+  },
+  "configuration": "16 MiB, 20,000 fixed DOSBox cycles, CWSDPMI -s-",
+  "limits": [
+    "XTest software key injection; physical keyboards and unusual controllers untested."
+  ]
+}

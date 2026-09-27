@@ -3,8 +3,8 @@
   "camera_ticks_checked": "2880",
   "scene_pixel_comparisons": "63",
   "sources": {
-    "dos/flight/camera_test.c": "81fe5cb27dd2ddb2a7230d6c8db051b79aafedd50136ad317865211eef93abcc",
-    "dos/flight/scene.c": "71fc55bf66828b2795ff4d529dae88a3148769cfdab27abfe97703802c2ae662",
+    "dos/flight/camera_test.c": "6404ca0c8fe64f8a2fcd2d7a305bd345ac375d0aab9b15533232bb8fee878bb3",
+    "dos/flight/scene.c": "c2204984bf7d0c989592aa5ad77e75e41f416091fc375f173b21331de9f330f1",
     "dos/flight/sprite.c": "b6d6eb5622fa3f3350472c266bdeecfc007c9108ac9144fe441b7b3797ebe118",
     "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf"
   },

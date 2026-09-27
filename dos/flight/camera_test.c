@@ -41,6 +41,19 @@ int main(void)
         }
     }
     if(moving.camera_x || moving.camera_y) return 7;
+    /* Free flight can move thousands of pixels beyond the old panning route.
+     * At these offsets all foreground objects are outside the screen. Stars
+     * must repeat exactly after800x600 pixels of parallax travel. */
+    for(i=0;i<2;++i) {
+        int sign=i?-1:1;
+        moving.camera_x=sign*24000; moving.camera_y=sign*24000;
+        scene_draw(a,&moving,sprites,blend,add,NULL);
+        reference_scene_draw(b,&moving,sprites,blend,add,NULL);
+        if(memcmp(a,b,480000)) return 8;
+        moving.camera_x+=6400; moving.camera_y+=4800;
+        scene_draw(b,&moving,sprites,blend,add,NULL);
+        if(memcmp(a,b,480000)) return 9;
+    }
     printf("status=pass\ncamera_ticks_checked=2880\nscene_pixel_comparisons=%u\n",cases);
     for(i=0;i<6;++i) sprite_free(&sprites[i]);
     free(a); free(b); free(blend); free(add); return 0;

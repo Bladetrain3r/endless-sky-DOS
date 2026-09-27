@@ -100,9 +100,9 @@ owned active-system data and draws real indexed assets in DOS. Six scripted ship
 plus a stationary Falcon now average33.1FPS on the moving-camera route at20k;
 some frames exceed33.3ms, and full-game30FPS remains unproven. See
 FEASIBILITY.md and EQUIVALENCE.md. The [regular-flight kernel](motion/README.md)
-now matches13 native movement trajectories in DOS and passes all65,536 direction
-checks. It remains separate from the scripted renderer pending control/scene
-integration. Low-level implementation choices are delegated.
+now matches14 native movement trajectories in DOS and passes all65,536 direction
+checks. A controllable stock Sparrow now uses it in the flight scene;
+`python3 dos/flight/watch.py --pilot` starts the bounded flight sandbox. Low-level implementation choices are delegated.
 
 ## Indexed-color asset proof
 

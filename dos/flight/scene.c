@@ -20,6 +20,11 @@ static double clock_ms(void)
     return t.tv_sec*1000.+t.tv_nsec/1000000.;
 #endif
 }
+static unsigned wrap(int value, int period)
+{
+    int result = value % period;
+    return (unsigned)(result < 0 ? result + period : result);
+}
 /* Prototype date=0 ephemeris; Angle convention follows System::SetDate.
    No time advancement/calendar, gameplay AI, collision or native ship physics. */
 int scene_init(Scene *scene,const ActiveSystem *system,unsigned ships)
@@ -74,8 +79,8 @@ void scene_draw(unsigned char *frame,const Scene *scene,const Sprite sprites[6],
         unsigned x,y; rng=rng*1664525u+1013904223u; x=rng%800;
         rng=rng*1664525u+1013904223u; y=rng%600;
         /* Distant stars move at one eighth of foreground camera speed. */
-        x=(unsigned)((int)x-cx/8+800)%800;
-        y=(unsigned)((int)y-cy/8+600)%600;
+        x=wrap((int)x-cx/8,800);
+        y=wrap((int)y-cy/8,600);
         frame[y*800+x]=(unsigned char)(28+i%18);
     }
     if(profile) { now=clock_ms(); profile->background_ms=now-start; start=now; }

@@ -14,7 +14,9 @@ corrected smaller scale and much smoother turning. Subsequent Sept28 playtest: f
 oddities observed while moving or firing; basic firing range accepted. Subsequent moving-range test also accepted:
 stationary/moving fire works and leading is predictable on the steady route.
 Sept28: user also confirms firing stops while overheated and resumes after cooling,
-and energy recharge limits firing in the stress preset. Propulsion coupling is newer.
+and energy recharge limits firing in the stress preset. The subsequent shared-power
+playtest also passed: stock Sparrow limits are difficult to reach, while stress
+presets visibly cut thrust and/or rotation when resources run out.
 
 World sprites now use native half-PNG dimensions at one screen pixel per world
 unit: `Drawable::Width/Height` supply the 0.5 factor to `DrawList::Push`.

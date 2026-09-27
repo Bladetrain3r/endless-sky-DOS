@@ -1,5 +1,5 @@
 # Endless Sky DOS handover
-Updated2026-09-28; night checkpoint: shared propulsion/gun budget; playtest pending.
+Updated2026-09-28; night checkpoint: shared propulsion/gun budget; human playtest accepted.
 
 ## Current build
 - Launch `python3 dos/flight/watch.py --pilot` (Docker/X11,120seconds).
@@ -17,7 +17,7 @@ Updated2026-09-28; night checkpoint: shared propulsion/gun budget; playtest pend
  releaseall torefill/cool. Normalprofile comfortablysupplies shortplaytests.
 - Useracceptedflight/scale/64headingturning,static+movingfire/leading,7hitkill/reset;
  latest Sept28 userconfirmed gunoverheat/cooling andenergy-limitedfiring.
- Newlycoupledpropulsionawaits humanfeedback;userheadingtobed;nohumanresultyet.
+ Sharedpropulsion nowhumanaccepted: stocklimitsrare; stressflags cutthrust/turn asintended.
 - NoAI,shipcollisions,landing,missions,saves,audio,shieldregen or heathulldamage.
  Fullhull/crew disablelogic,afterburner/status/fuel/activecooling unported.
 - Localcheckpoint/no push; centralHANDOVER hasID. Earliercorrectedflight
@@ -74,5 +74,5 @@ Updated2026-09-28; night checkpoint: shared propulsion/gun budget; playtest pend
  GPL3+code/perassetcopyright;no bundled-library-wideISAaudit.
 
 ## Next
-- Human shared-power playtest whenrested; shieldregeneration is the proposed
- following slice, thenincomingfire. Neitherstarted; keepfurthernightwork bounded.
+- Shared-power humanplaytest accepted Sept28; user signingoff. Shieldregeneration
+ proposednext, thenincomingfire. Neitherstarted; no further implementation tonight.

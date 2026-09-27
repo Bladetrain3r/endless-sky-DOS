@@ -1,0 +1,39 @@
+{
+  "kind": "dos-cpp-runtime-not-game-memory",
+  "compiler": "i586-pc-msdosdjgpp-g++ (GCC) 12.2.0",
+  "compiler_flags": [
+    "-std=gnu++20",
+    "-O2",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2"
+  ],
+  "inputs": {
+    "djgpp-linux64-gcc1220.tar.bz2": [
+      "https://github.com/andrewwutw/build-djgpp/releases/download/v3.4/djgpp-linux64-gcc1220.tar.bz2",
+      "8464f17017d6ab1b2bb2df4ed82357b5bf692e6e2b7fee37e315638f3d505f00"
+    ],
+    "csdpmi7b.zip": [
+      "https://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip",
+      "deacda0488e1cdd7c4a9f32fab45662b34c0ed6b2d7d4d13bc07041b62004a8c"
+    ]
+  },
+  "image_id": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c",
+  "config_sha256": "e84389f65bf3de5932105ce0d3b469cb96cf643e5434c619b69bfd6961dca890",
+  "source_sha256": "e2148c32c19dc316f8f276976efda7bebd09b3a152d9ec85455eeb2273c5f6f2",
+  "exe_bytes": 602453,
+  "swap": "CWSDPMI -s-; no swap file observed",
+  "raw": {
+    "probe": "djgpp_runtime",
+    "cpp": "202002",
+    "pointer_bytes": "4",
+    "largest_free_block_bytes": "14663680",
+    "free_physical_pages": "3716",
+    "exceptions": "pass",
+    "allocation_touch_bytes": "4194304",
+    "status": "ok"
+  },
+  "limits": "Tests span/concepts/vector/map/string/exceptions and one touched allocation. Not filesystem/threading/complete library coverage or game memory validation. Compiler flags govern our object; bundled library instruction set not exhaustively audited."
+}

@@ -1,0 +1,32 @@
+{
+  "kind": "banked-vram-fill-only-not-gameplay",
+  "upstream_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+  "image_id": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c",
+  "packages": [
+    "dosbox\t0.74-3-4+b1",
+    "nasm\t2.16.01-1",
+    "xvfb\t2:21.1.7-3+deb12u13"
+  ],
+  "source_sha256": "9e47e9bb4b8a4fc5466cb454da6d31dbde4969bc091ed83b7bbcef59840f60dc",
+  "config_sha256": "f41222c7af6ffe90dcafec13beaeafff2cea271e624a2e3ae1bc49a84a1057c9",
+  "settings": {
+    "cycles": 20000,
+    "core": "normal",
+    "cputype": "pentium_slow",
+    "memsize": 16,
+    "mode": "800x600x8",
+    "machine": "svga_s3"
+  },
+  "raw": {
+    "probe": "vbe_banked_fill",
+    "mode": "800x600x8",
+    "frames": "1200",
+    "bios_ticks_hex": "00000106",
+    "sample_check": "pass",
+    "status": "ok"
+  },
+  "elapsed_seconds_approx": 14.390455102406841,
+  "mean_fill_fps_approx": 83.38860664658874,
+  "mean_fill_ms_approx": 11.992045918672368,
+  "limits": "No game logic, sprites, RAM framebuffer copy, input, or audio. Sample checks cover bank endpoints only. No frame-time distribution. DOSBox cycles are not a hardware MHz calibration."
+}

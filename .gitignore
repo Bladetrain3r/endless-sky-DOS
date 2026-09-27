@@ -75,3 +75,8 @@ CMakeUserPresets.json
 
 # static code analysis
 /.scannerwork
+
+# DOS-port disposable build and emulator workspace
+/.work/
+
+/dos/**/__pycache__/

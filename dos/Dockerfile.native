@@ -1,0 +1,14 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    ca-certificates cmake g++ make pkg-config time \
+    libavif-dev libflac++-dev libglew-dev libjpeg-dev libmad0-dev \
+    libminizip-dev libopenal-dev libpng-dev libsdl2-dev uuid-dev zlib1g-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# The source tree is bind-mounted read-only at /src by native_reference.sh.
+# Build and run artifacts live in the separate /work bind mount.
+WORKDIR /src

@@ -58,7 +58,7 @@ int sprite_load(Sprite *s,const char *path)
     if(fread(h,1,16,f)!=16 || memcmp(h,"ESSPRT1\0",8)) goto done;
     s->width=u16(h+8); s->height=u16(h+10); s->frames=u16(h+12); s->mode=u16(h+14);
     if(!s->width || !s->height || s->width>512 || s->height>512 ||
-       !s->frames || s->frames>16 || s->mode>1) goto done;
+       !s->frames || s->frames>64 || s->mode>1) goto done;
     n=s->width*s->height;
     s->bytes=(size_t)n*s->frames*(s->mode?1:2);
     if(s->bytes>2*1024*1024 || !(s->pixels=malloc(s->bytes))) goto done;

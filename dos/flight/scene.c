@@ -90,7 +90,7 @@ void scene_draw(unsigned char *frame,const Scene *scene,const Sprite sprites[6],
     paint(frame,&sprites[2],0,170-cx,335-cy,blend,add);
     for(i=0;i<scene->count;++i) {
         const Traffic *t=&scene->ships[i];
-        paint(frame,&sprites[t->kind],t->heading,t->x-cx,t->y-cy,blend,add);
+        paint(frame,&sprites[t->kind],t->heading*sprites[t->kind].frames/16,t->x-cx,t->y-cy,blend,add);
     }
     if(profile) { now=clock_ms(); profile->traffic_ms=now-start; start=now; }
     /* Deliberately overlap an additive flare with opaque hull and empty sky. */

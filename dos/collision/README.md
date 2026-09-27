@@ -15,16 +15,13 @@ their coordinate errors are small. Source/original assets stay unchanged.
 ## Scale correction discovered here
 
 `source/image/Mask.cpp:SmoothAndCenter` produces outlines at half the PNG's pixel
-dimensions. `source/Body.cpp:Body::Unit` also multiplies by 0.5 before rendering.
-Checking Sprite::Width alone missed that second stage in the earlier renderer
-research. The current DOS prototype draws full PNG sizes while positions use
-native world units. Its flight arithmetic is qualified, but its displayed hulls
-are therefore twice native logical size at a one-pixel-per-world-unit view.
-
-Before integrating shooting, correct the world-to-screen mapping (and verify
-sprite/mask alignment at rotations). Keep physical masks in native world units;
-do not enlarge hitboxes to fit the old prototype's art. The accepted pilot build
-is retained while this separate foundation is being qualified.
+dimensions. `Drawable::Width/Height` supply that same0.5 factor to `DrawList::Push`;
+`Body::Unit` also uses0.5 for body-relative vectors. Checking Sprite::Width alone
+missed this stage. The initial DOS prototype drew full PNG sizes in native world
+units, making displayed hulls twice their physical size. The corrected flight
+assets now render at half source dimensions, keeping masks unchanged.
+See `../flight/ALIGNMENT.md` for the independent alignment check.
+The prior accepted pilot is preserved at `.work/flight/accepted-0636c12dc`.
 
 
 ## Result and reproduction
@@ -57,9 +54,9 @@ for these three masks (deliberately fixed capacity), while the packed geometry
 file is 2,060 bytes. The shapes contain 123 points in five outlines total. This is
 not yet a production all-ships cache or collision broad-phase benchmark.
 
-Current flight gameplay/executable is unchanged. Before weapons integration:
+Collision is still not integrated in the flight executable. Before weapons integration:
 
-1. Correct the body/image world-scale contract and check rendered masks visually.
+1. Preserve the qualified body/image world-scale contract while adding weapons.
 2. Compare a bounded ordinary projectile's lifetime, inherited velocity and
    swept-segment ordering against native Projectile/Engine behavior.
 3. Add target selection and a practice-fire loop, with resource/damage omissions

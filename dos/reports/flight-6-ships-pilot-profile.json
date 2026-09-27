@@ -6,15 +6,15 @@
     "mode": "benchmark",
     "frames": "450",
     "ships": "6",
-    "load_ms": "2594.899",
-    "explicit_resident_bytes": "2824046",
+    "load_ms": "2531.050",
+    "explicit_resident_bytes": "2847714",
     "free_pages_before": "3741",
-    "free_pages_resident": "3145",
+    "free_pages_resident": "3138",
     "system": "Sol",
     "objects": "19",
     "simulation_ticks": "900",
     "video_verify": "pass",
-    "wall_elapsed_ms": "8360.271",
+    "wall_elapsed_ms": "7606.177",
     "discarded_sim_ms": "0.000",
     "camera_enabled": "0",
     "camera_x": "-719",
@@ -29,35 +29,35 @@
     "pilot_input_bits": "0",
     "pilot_keyboard": "0",
     "background_avg_ms": "7.069",
-    "background_min_ms": "7.057",
+    "background_min_ms": "7.056",
     "background_max_ms": "11.282",
-    "orbital_avg_ms": "0.327",
+    "orbital_avg_ms": "0.148",
     "orbital_min_ms": "0.011",
-    "orbital_max_ms": "4.190",
-    "traffic_avg_ms": "1.235",
-    "traffic_min_ms": "0.030",
-    "traffic_max_ms": "15.740",
-    "effect_avg_ms": "0.029",
+    "orbital_max_ms": "1.778",
+    "traffic_avg_ms": "0.569",
+    "traffic_min_ms": "0.032",
+    "traffic_max_ms": "6.495",
+    "effect_avg_ms": "0.016",
     "effect_min_ms": "0.008",
-    "effect_max_ms": "0.282",
+    "effect_max_ms": "0.086",
     "hud_avg_ms": "2.020",
     "hud_min_ms": "1.983",
-    "hud_max_ms": "2.035",
-    "pilot_draw_avg_ms": "1.492",
-    "pilot_draw_min_ms": "1.183",
-    "pilot_draw_max_ms": "1.775",
+    "hud_max_ms": "2.034",
+    "pilot_draw_avg_ms": "0.673",
+    "pilot_draw_min_ms": "0.619",
+    "pilot_draw_max_ms": "0.734",
     "sim_avg_ms": "0.072",
-    "sim_min_ms": "0.060",
+    "sim_min_ms": "0.061",
     "sim_max_ms": "0.093",
-    "draw_avg_ms": "12.199",
-    "draw_min_ms": "10.340",
-    "draw_max_ms": "31.954",
+    "draw_avg_ms": "10.523",
+    "draw_min_ms": "9.772",
+    "draw_max_ms": "21.952",
     "present_avg_ms": "6.291",
     "present_min_ms": "6.288",
     "present_max_ms": "6.302",
-    "frame_avg_ms": "18.569",
-    "frame_min_ms": "16.722",
-    "frame_max_ms": "38.320"
+    "frame_avg_ms": "16.893",
+    "frame_min_ms": "16.159",
+    "frame_max_ms": "28.318"
   },
   "image_id": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c",
   "compiler_flags": [
@@ -76,8 +76,8 @@
   "source_sha256": {
     "dos/flight/main.c": "15ccbfc9dc073753db659ade0f9504569b4fc95cd32f83dcf10a67c3bf6fe5dd",
     "dos/flight/video.c": "a4d9149b40ac6a936899abe8a0468521745e2fd003111610b9286aa8056521e1",
-    "dos/flight/sprite.c": "b6d6eb5622fa3f3350472c266bdeecfc007c9108ac9144fe441b7b3797ebe118",
-    "dos/flight/scene.c": "c2204984bf7d0c989592aa5ad77e75e41f416091fc375f173b21331de9f330f1",
+    "dos/flight/sprite.c": "402be0f03bcc4e7d5213c9b6e5918f3b748b1bba090bc2af41200578fd47b84f",
+    "dos/flight/scene.c": "e4b6d91c3cb28da29bb2269c5684243270322017507af4a02704c8ce396c47a7",
     "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf",
     "dos/world/active.c": "d8b6d916e05f500c5770ac22d373d8264ec6381fa1dad5969dfa4e5e31ce20be",
     "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
@@ -88,7 +88,7 @@
     "dos/flight/input_state.h": "d555dfc40fa6d789c7e39188417d539017bae8a54c7b6f18e8ccb9524602b97d",
     "dos/flight/pilot.h": "80c5fed814002b335e32faf087b6ee95f0e72ff98343d8db4c9f805853f82149",
     "dos/flight/scene.h": "4973b395a90cfca22319105459d3dc608753fdc566132da595823c7a6a373d6d",
-    "dos/flight/sprite.h": "1073cd4a8b27ffb06c2c5c4503411fa06d2922fd7a419f914ad531625cd61fe2",
+    "dos/flight/sprite.h": "a698db3ba5bb794f45c138c6bb455a1ab5006ac346e18930695a2ecaab673fdb",
     "dos/flight/video.h": "8d2eca66af840597026c3947b6407d7650e26b50800b0ddf5d1a45cd25c1dfcd",
     "dos/world/active.h": "65481859e1a5243932ba621dc448e32464cfb1e4ded802d6e52c84f56dd5b5f0",
     "dos/motion/motion.h": "5f3db1677f424f1d3d8f5176dde5e7710781b87a24236f863d0f88f85de5cc56"
@@ -109,7 +109,7 @@
     "scope": "One native fitted stock ship; not an outfit or complete ship-data exporter."
   },
   "pack_sha256": "29c835a46288e69ce4fe5dd5eac594c1c653dfcce679ece70d3784356d1b091b",
-  "frame_sha256": "8b8afc07e17ad34978a80bd3fe1a57a92f263158f69a17cd4196ced0756f6e7d",
+  "frame_sha256": "e1d0737c532d60b6accfbe5a2748f730db1b15e34524bea06342c7f327912968",
   "exe_bytes": 289546,
   "assets": {
     "schema": 1,
@@ -124,14 +124,15 @@
           80
         ],
         "stored_size": [
-          109,
-          109
+          56,
+          56
         ],
-        "frames": 16,
+        "world_pixels_per_source_pixel": 0.5,
+        "frames": 64,
         "mode": "normal-alpha4",
-        "disk_bytes": 285168,
-        "decoded_bytes": 380192,
-        "sha256": "f936ff12ad15661819bc752fd0ca278495d4c7bf68f31de79e46b1861cb98ee9"
+        "disk_bytes": 301072,
+        "decoded_bytes": 401408,
+        "sha256": "832adcdb361320cfd6b76d1b06d1c5d1647f3f871e63476db763cf9fe5a687f0"
       },
       {
         "file": "BARGE.SPR",
@@ -142,14 +143,15 @@
           80
         ],
         "stored_size": [
-          109,
-          109
+          56,
+          56
         ],
-        "frames": 16,
+        "world_pixels_per_source_pixel": 0.5,
+        "frames": 64,
         "mode": "normal-alpha4",
-        "disk_bytes": 285168,
-        "decoded_bytes": 380192,
-        "sha256": "2a0151eb030f6d96ccee94d51d271b6c7a3102f52993cc9258bbd68171166d3f"
+        "disk_bytes": 301072,
+        "decoded_bytes": 401408,
+        "sha256": "0a20aacde510928335ec894c6e79e4d7d3a613bcf6fd9570c7b854fe9121ebaa"
       },
       {
         "file": "FALCON.SPR",
@@ -160,14 +162,15 @@
           300
         ],
         "stored_size": [
-          160,
-          300
+          80,
+          150
         ],
+        "world_pixels_per_source_pixel": 0.5,
         "frames": 1,
         "mode": "normal-alpha4",
-        "disk_bytes": 72016,
-        "decoded_bytes": 96000,
-        "sha256": "bb7cfaab9b851adda62ad889f5e3fc9fd602dd0fafc7ca53ae488f73e66681ce"
+        "disk_bytes": 18016,
+        "decoded_bytes": 24000,
+        "sha256": "a9bb7d98fc7ea2a4f8ac7c9544483bfe38bb82117c5f687b1ce1c44cfe0109ab"
       },
       {
         "file": "EARTH.SPR",
@@ -178,14 +181,15 @@
           180
         ],
         "stored_size": [
-          180,
-          180
+          90,
+          90
         ],
+        "world_pixels_per_source_pixel": 0.5,
         "frames": 1,
         "mode": "normal-alpha4",
-        "disk_bytes": 48616,
-        "decoded_bytes": 64800,
-        "sha256": "c4fd2a039359a104b31db6c681b3b3e1e9a7875c2c329ef194e707c29a6a1440"
+        "disk_bytes": 12166,
+        "decoded_bytes": 16200,
+        "sha256": "7b598a690645bf67474d4c9698bde3ee20865c645b424f472471c24d3c2293cb"
       },
       {
         "file": "LUNA.SPR",
@@ -196,14 +200,15 @@
           80
         ],
         "stored_size": [
-          80,
-          80
+          40,
+          40
         ],
+        "world_pixels_per_source_pixel": 0.5,
         "frames": 1,
         "mode": "normal-alpha4",
-        "disk_bytes": 9616,
-        "decoded_bytes": 12800,
-        "sha256": "c8f61c3471a3481246abbc2a5c697fafd756250f42a559a137f6cc9e181a5182"
+        "disk_bytes": 2416,
+        "decoded_bytes": 3200,
+        "sha256": "0192a3d15bc2e5ce1a8df82f332ec94465a4e3d32a76d6a57d099746fd967070"
       },
       {
         "file": "GLOW.SPR",
@@ -214,14 +219,15 @@
           30
         ],
         "stored_size": [
-          30,
-          30
+          16,
+          16
         ],
+        "world_pixels_per_source_pixel": 0.5,
         "frames": 1,
         "mode": "premultiplied-additive",
-        "disk_bytes": 916,
-        "decoded_bytes": 900,
-        "sha256": "597426e281a0788d253c7aeb0c167e6e5d0eac8b81b716765c7a203028c1f000"
+        "disk_bytes": 272,
+        "decoded_bytes": 256,
+        "sha256": "7ac332d8d0a6088e3898ec82b43403250f3976cfb828d6a406ba2345351f7101"
       }
     ],
     "palette_sha256": "b39f80c05ad9aa1c6edde098fc502fa9204bdbc6817c1c5b7f3bab631f85316d",
@@ -236,9 +242,9 @@
       }
     },
     "copyright_sha256": "4ec4cbf73cdc0ffe69f63c770a864524f571a50d8f882d36ffd00e4e40b607be",
-    "script_sha256": "18df7d8f22d2c0cae8655f680d21bbf32d03f8e42abec2af4bd2cfb364ca9dcc",
+    "script_sha256": "e240b8d3bff2c86b33ced8a0c5a83479f922436d17e4207c22d62862d0d803c1",
     "limitations": [
-      "16 prebaked headings, no runtime rotation qualification.",
+      "64 prebaked headings; nearest-frame angular error at most 2.8125 degrees.",
       "No collision geometry changed; prototype has no collision simulation.",
       "Only normal PNG and one straight-alpha additive frame qualified.",
       "All asset attribution remains in upstream copyright; local experiment only."

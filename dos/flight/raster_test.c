@@ -31,6 +31,7 @@ int main(void)
     }
     if(sprite_load(&s,"SHORT.SPR")) return 4;
     if(sprite_load(&s,"HUGE.SPR")) return 5;
-    printf("status=pass\nreference_pixel_cases=%u\nmalformed_sprites_rejected=2\n",cases);
+    if(sprite_load(&s,"FRAMES.SPR")) return 6;
+    printf("status=pass\nreference_pixel_cases=%u\nmalformed_sprites_rejected=3\n",cases);
     free(a); free(b); free(blend); free(add); return 0;
 }

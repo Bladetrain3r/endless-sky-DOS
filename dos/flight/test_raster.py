@@ -19,6 +19,9 @@ def main():
     bad=bytearray(raw)
     struct.pack_into('<H',bad,8,65535)
     (RUN/'HUGE.SPR').write_bytes(bad)
+    bad=bytearray(raw)
+    struct.pack_into('<H',bad,12,65)
+    (RUN/'FRAMES.SPR').write_bytes(bad)
     executable=ROOT/'.work/flight/raster-test'
     subprocess.run(['gcc','-std=gnu99','-O1','-g','-Wall','-Wextra','-Werror',
                     '-fsanitize=address,undefined','-fno-omit-frame-pointer','-no-pie',

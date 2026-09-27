@@ -1,11 +1,11 @@
 {
   "status": "pass",
-  "reference_pixel_cases": "324",
-  "malformed_sprites_rejected": "2",
+  "reference_pixel_cases": "1188",
+  "malformed_sprites_rejected": "3",
   "sanitizers": "ASan+UBSan; leak detection disabled",
   "source_sha256": {
-    "dos/flight/raster_test.c": "12482b5addf3b1b3333ab49e078c5d4677d3429cef95b395eb8d8f58409a124c",
-    "dos/flight/sprite.c": "b6d6eb5622fa3f3350472c266bdeecfc007c9108ac9144fe441b7b3797ebe118",
+    "dos/flight/raster_test.c": "b5e4a8bd491b172285bb5eb8427aa1f44ce29b5191b4902ace66818dc7ed76c5",
+    "dos/flight/sprite.c": "402be0f03bcc4e7d5213c9b6e5918f3b748b1bba090bc2af41200578fd47b84f",
     "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf"
   }
 }

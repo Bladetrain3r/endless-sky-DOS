@@ -15,9 +15,11 @@ RUN=ROOT/'.work/flight/run'
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--stationary',action='store_true',help='keep the camera fixed for comparison')
+    parser.add_argument('--accepted',action='store_true',help='compare preserved pre-scale flight build')
     parser.add_argument('--pilot',action='store_true',help='fly the stock Sparrow with held keys')
     parser.add_argument('--seconds',type=int,default=None,help='duration1..120seconds; default30watch/120pilot')
     args=parser.parse_args()
+    run=ROOT/'.work/flight/accepted-0636c12dc' if args.accepted else RUN
     seconds=args.seconds if args.seconds is not None else (120 if args.pilot else 30)
     if not 1<=seconds<=120: parser.error('seconds must be1..120')
     if args.pilot and args.stationary: parser.error('use Tab during pilot mode to switch camera')
@@ -25,16 +27,16 @@ def main():
     display=os.environ.get('DISPLAY','')
     if not display.startswith((':','unix:')):
         sys.exit('A local X11/XWayland DISPLAY is needed for the reference window.')
-    if not (RUN/'FLIGHT.EXE').is_file():
+    if not (run/'FLIGHT.EXE').is_file():
         sys.exit('Build first: python3 dos/flight/run.py')
     base=(ROOT/'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
-    (RUN/'watch.conf').write_text(base+'[autoexec]\nmount c /work/.work/flight/run\nc:\n'
+    (run/'watch.conf').write_text(base+'[autoexec]\nmount c /work/.work/flight/run\nc:\n'
         f'CWSDPMI -s-\nFLIGHT.EXE --demo --seconds {seconds}{camera} > DEMO.TXT\nexit\n')
     cmd=['docker','run','--rm','--network','none','--hostname',socket.gethostname(),'--user',f'{os.getuid()}:{os.getgid()}',
          '-e','HOME=/tmp','-e',f'DISPLAY={display}',
          '--mount','type=bind,src=/tmp/.X11-unix,dst=/tmp/.X11-unix,readonly',
          '--mount',f'type=bind,src={ROOT},dst=/work,readonly',
-         '--mount',f'type=bind,src={RUN},dst=/work/.work/flight/run', '-w','/work']
+         '--mount',f'type=bind,src={run},dst=/work/.work/flight/run', '-w','/work']
     authority=Path(os.environ.get('XAUTHORITY',str(Path.home()/'.Xauthority')))
     if authority.is_file():
         cmd+=['--mount',f'type=bind,src={authority},dst=/tmp/flight.xauthority,readonly',

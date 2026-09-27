@@ -10,8 +10,8 @@ from PIL import Image, __version__
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT/'.work/flight/run'
-SOURCES = [('SPARROW.SPR', 'ship/sparrow.png', 16, 0),
-           ('BARGE.SPR', 'ship/star barge.png', 16, 0),
+SOURCES = [('SPARROW.SPR', 'ship/sparrow.png', 64, 0),
+           ('BARGE.SPR', 'ship/star barge.png', 64, 0),
            ('FALCON.SPR', 'ship/falcon.png', 1, 0),
            ('EARTH.SPR', 'planet/earth.png', 1, 0),
            ('LUNA.SPR', 'planet/luna.png', 1, 0),
@@ -34,18 +34,24 @@ def main():
     for filename, name, frames, mode in SOURCES:
         path = ROOT/'images'/name
         source = Image.open(path).convert('RGBA')
+        # Drawable::Width/Height scale source pixels by .5 at unit zoom.
+        # Multiples of four keep the output canvas even, centred on the same
+        # integer world position as the original native collision outlines.
         if frames > 1:
-            side = math.ceil(math.hypot(*source.size)) + 2
-            base = Image.new('RGBA', (side, side))
-            base.paste(source, ((side-source.width)//2, (side-source.height)//2))
+            side = 4 * math.ceil((math.hypot(*source.size) + 4) / 4)
+            size = (side, side)
         else:
-            base = source
+            size = tuple(4 * math.ceil(n / 4) for n in source.size)
+        assert all((n - original) % 2 == 0 for n, original in zip(size, source.size))
+        base = Image.new('RGBA', size)
+        base.paste(source, ((size[0]-source.width)//2, (size[1]-source.height)//2))
         assert max(base.size) <= 512
-        w, h = base.size
+        w, h = (n // 2 for n in base.size)
         payload = bytearray(b'ESSPRT1\0' + struct.pack('<HHHH', w, h, frames, mode))
         for frame in range(frames):
             # Clockwise screen angles agree with Angle::Unit's up=0 convention.
             im = base.rotate(-frame*360/frames, resample=Image.Resampling.BICUBIC)
+            im = im.resize((w, h), resample=Image.Resampling.LANCZOS)
             if mode == 1:
                 # '+' is straight source alpha -> premultiplied additive RGB.
                 rgb = Image.new('RGB', im.size)
@@ -62,7 +68,7 @@ def main():
                                      for i in range(0, len(alpha), 2)))
         (OUT/filename).write_bytes(payload)
         rows.append(dict(file=filename, source='images/'+name, source_sha256=digest(path),
-                         original_size=source.size, stored_size=base.size, frames=frames,
+                         original_size=source.size, stored_size=(w, h), world_pixels_per_source_pixel=0.5, frames=frames,
                          mode='premultiplied-additive' if mode else 'normal-alpha4',
                          disk_bytes=len(payload), decoded_bytes=w*h*frames*(1 if mode else 2),
                          sha256=digest(OUT/filename)))
@@ -91,7 +97,7 @@ def main():
                   tables={name:dict(bytes=(OUT/name).stat().st_size, sha256=digest(OUT/name))
                           for name in ('BLEND.LUT','ADD.LUT')},
                   copyright_sha256=digest(ROOT/'copyright'), script_sha256=digest(Path(__file__)),
-                  limitations=['16 prebaked headings, no runtime rotation qualification.',
+                  limitations=['64 prebaked headings; nearest-frame angular error at most 2.8125 degrees.',
                                'No collision geometry changed; prototype has no collision simulation.',
                                'Only normal PNG and one straight-alpha additive frame qualified.',
                                'All asset attribution remains in upstream copyright; local experiment only.'])

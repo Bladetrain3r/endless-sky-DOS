@@ -1,5 +1,5 @@
 # Endless Sky DOS handover
-Updated2026-09-27; controllable Sparrow staged; user reports flight works/feels physically right.
+Updated2026-09-27; corrected native render scale +64headings staged; human check pending.
 
 ## Current checkpoint
 - dos/flight/README.md:800x600x8 DOS VBE flight sandbox. Watch remains scripted;
@@ -9,8 +9,8 @@ Updated2026-09-27; controllable Sparrow staged; user reports flight works/feels 
   --seconds1..120 supported; Ctrl+F9 quits DOSBox. No fullscreen/audio.
 - Player uses native-matched60Hz movement; background6ships/Falcon remain scripted.
   No collision, AI, combat, landing, missions, saves or resource depletion yet.
- 16baked sprite headings remain visibly coarse; physics uses65536directions.
-- .work/flight/pilot-controls.png: root-inspected captured actual keyboard-run view.
+ 64baked sprite headings (5.625deg) now; physics uses65536directions.
+- Prioraccepted fullsize build: watch.py --pilot --accepted; .work/flight/accepted-0636c12dc.
 - User accepted stationary/mobile scripted camera Sept27; pilot human accepted Sept27: movement feels physically right.
 - Source/game assets unchanged; local commits only/no push; central handover has ID.
 
@@ -24,21 +24,21 @@ Updated2026-09-27; controllable Sparrow staged; user reports flight works/feels 
  taps, reset, camera and Escape; video samples/DAC pass; no discarded simtime.
 - input.c locks IRQ1 state/code, restores vector; separate probe checks restore
  and reopen. Tap latches forR/Tab/Escape; see INPUT.md. Physicalkeyboard untested.
-- Original camera2880ticks/63scalar pixelcomparisons pass; new far-camera star-wrap
- cases pass. Raster kernels unchanged; prior324heading/clipping comparisons retained.
-- Near-Earth keyboardrun33.77ms/frame avg,max38.18ms. Notlocked30FPS.
- Long450frame pilotroute18.57msavg,max38.32ms becomes emptier, not speedup claim.
-- Playerdrawing~1.49ms/frame; two motionsteps~0.07ms. DynamicHUD~2ms included.
-- Foursecond real-time replay116frames/239ticks,4029ms,0discardedms; native endstate.
-- Counted assets/world/frame heap2,824,046B; excludes code/stack/stdio/allocator,
+- Camera2880ticks/63scalar framecomparisons pass;1188heading/edge rastercases pass.
+ Three malformed sprites reject, including65frames; ASan/UBSan no leak claim.
+- Correctedscale camera360:21.189msavg/26.339max vs30.186ms prior fullsize.
+ This is changed scene geometry, not a raster algorithm speedup/fullgame benchmark.
+- NearEarth actualkeyboardrun23.784msavg/28.173max; playerdraw~0.67ms.
+ Long450framepilotroute16.893msavg becomesempty; do not extrapolate to busyflight.
+- Foursecond realtime replay117frames/238ticks,4006.779ms,0discard; native endstate.
+- Counted assets/world/frame heap2,847,714B; excludes code/stack/stdio/allocator,
  DPMI keyboard wrapper/runtime allocations and480000BVRAM. DOS16MiB/20k/no swap.
-- reports/flight-{pilot-tests,input-tests,controls}.json and pilot-profile reports
- hold evidence; run.py --replay --frames450 or --replay --headless-demo reproduces.
+- reports/flight-controls.json binds stagedEXE; camera/pilot-profile reports bindassets.
+ run.py --replay --frames450 or --replay --headless-demo reproduces.
 - test_controls.py drives actualapplication; test_input.py isolated IRQprobe.
  All builds/tests Docker; actual input test runs headless Xvfb/XTest.
-- Watch default and --stationary retain oldscene; acceptedcamera framehash
- dc88c45658601c3a985f130d42d3b522b25441cc153ed505dfbd57498ba2df9d.
-
+- Sprite art halved offline, rotation atoriginalres thenLanczos resize; original
+ sourceassets/masks unchanged. ALIGNMENT.md:33samples pass,maskp95≤2px; rootviewed.
 ## Regular-flight equivalence
 - dos/motion/README.md/check.py: unchanged native Ship::Move oracle + portable C.
  14cases/12600ticks nativeexact; DOSposition5.46e-12,velocity1.42e-14 maxerror.
@@ -55,13 +55,13 @@ Updated2026-09-27; controllable Sparrow staged; user reports flight works/feels 
 - Texttransfer caused212boundary disagreements; binary64 transfer fixes testedset.
  DefaultDOS andPC_53 bothpass; noFPUchange needed.8badmasksreject, no swap.
 - Packedmasks2060B; fixedruntimebuffers49392B. reports/collision-equivalence.json.
-- Found scale bug: native Body::Unit*.5 andMask*.5; DOSart currentlyfullPNGsize.
- Correct renderer worldscale beforeweapons; acceptedflybuild untouched.
+- Native Drawable::Width/Height*.5 feedsDrawList; masks*.5. DOSart nowmatches.
+ Sprite64frames cap; scripted16heading route maps toeveryfourth spriteframe.
 - Trainer/demoscene soundtrack idea recorded in dos/WISHLIST.md; optional/unbuilt.
 
 ## Retained foundation and next work
-- Next: correct body/world rendering scale, then qualify ordinary projectile
- lifetime/inheritedvelocity/swept hits before practice-fire integration.
+- Next: qualify ordinary projectile lifetime/inheritedvelocity/swept hits
+ before practice-fire integration; corrected sprite-size/turning human check pending.
 - dos/world/active.h,c:owned decoded systemarena,validated immutable store. All694
  load,Sol/Siriusfieldchecks,retentionafterstoreclose,100reloads/corruptions pass.
 - World648042Bpack:694systems/619planets/10commodities,5518objects/1612links/
@@ -71,8 +71,8 @@ Updated2026-09-27; controllable Sparrow staged; user reports flight works/feels 
 - DOSstore+scratch37510B; native activeAPI store37558B,maxactive6096B (sizesdiffer).
 - SQLiteDOS viable; indexedpackselected for immutable content. Savesunqualified.
 - Palette256=16UI+32gray+208learned,6bitDAC; user9assetproof barelyseesdifference.
-- Sprite spans preserve scalar pixels. Acceptedcamera~33.1FPSavg/35.6msworst;
- 20moving~21.8FPS; completegame30FPS unproven. No fixedcamera caching assumption.
+- Sprite spans preserve scalar pixels. Historical20moving fullsize~21.8FPS;
+ correctedscale20ship budget unmeasured; completegame30FPS unproven.
 - Upstream061a9461a93898fb691504536589d1dcddc5d79b,CMake0.11.4; Git fork,notFossil.
 - RuntimeDJGPP12.2/CWSDPMI7, i386/noMMX/SSEflags; libraries notfullyISAaudited.
 - Preserve originalcollisiongeometry independentofart. EQUIVALENCE.md owns contracts.

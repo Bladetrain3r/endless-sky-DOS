@@ -13,7 +13,7 @@ typedef struct {
     unsigned char *pixels;
     size_t bytes;
     SpriteSpan *spans;
-    uint32_t first_span[17];
+    uint32_t first_span[65];
 } Sprite;
 int sprite_load(Sprite *s,const char *path);
 void sprite_free(Sprite *s);

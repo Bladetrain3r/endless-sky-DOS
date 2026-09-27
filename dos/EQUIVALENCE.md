@@ -42,7 +42,7 @@ Start with upstream60Hzsimulation/30Hzdisplay. If that misses the budget, first
 profile algorithms, lookup/data layout and rendering. A lower simulation rate
 would need a separately verified time-step conversion through all affected rules.
 
-Collision checkpoint: native body drawing includes `Body::Unit()`'s0.5factor;
+Collision checkpoint: native drawing uses `Drawable::Width/Height` with a0.5factor;
 Sprite::Width alone is not the physical-size contract. Preserve mask coordinates
 and apply one consistent world-to-screen transform. Binary64 geometry transfer
 matters at exact boundaries: see collision/README.md for the DOS decimal-transfer

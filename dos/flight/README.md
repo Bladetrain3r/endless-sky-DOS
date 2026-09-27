@@ -4,16 +4,37 @@ The800×600,256-color DOS executable loads Sol from the compact world pack and
 now offers a controllable stock Sparrow using native-matched movement. Earth,
 Luna, the Falcon and scripted traffic provide reference points. This is a flight
 sandbox: no collision, combat, landing, AI, missions, resource accounting or saves.
-The player's engines are treated as fully supplied.16 baked sprite headings are
+The player's engines are treated as fully supplied.64 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
 
 User playtest2026-09-27: flight works and movement feels physically right;
 operator notes limited familiarity with the original game.
 
-Collision research found a scale correction still to make: this prototype draws
-ships at full PNG size, while native `Body::Unit()` and collision masks use half
-that size in world coordinates. Movement math remains qualified; shooting will
-wait for that mapping to be corrected. See [collision notes](../collision/README.md).
+World sprites now use native half-PNG dimensions at one screen pixel per world
+unit: `Drawable::Width/Height` supply the 0.5 factor to `DrawList::Push`.
+Original collision masks and flight arithmetic are unchanged. The old full-size
+build is preserved locally; `watch.py --pilot --accepted` runs it for comparison.
+See [alignment qualification](ALIGNMENT.md) and [collision notes](../collision/README.md).
+
+## Corrected-scale checkpoint (2026-09-27)
+
+Rotating hulls use64 resident headings (5.625 degrees apart), selected nearest the
+simulation heading. Rotation is baked from original-resolution art before half-size
+filtering; even canvas dimensions keep image and world centres consistent.
+Scripted traffic still turns22.5 degrees once per second, now selecting every fourth
+frame. Player rotation uses all64. No runtime sprite reloading is needed.
+
+On the same360-frame moving-camera route at16MiB/fixed20,000cycles, corrected
+scale reduces average frame time from30.186ms to21.189ms; maximum26.339ms.
+This is a smaller, correctly scaled scene, **not** a faster raster algorithm or a
+complete-game FPS claim. Decoded sprites846,472B; total counted heap2,847,714B
+(including span metadata/world/frame/LUTs; excluding runtime/stack and480,000BVRAM).
+More headings add spans despite smaller sprite pixel storage, so total heap stays
+close to the prior2,824,046B. Scalar/span equality passes1,188 heading/edge cases;
+three malformed sprites reject, including65frames. Camera checks pass2,880ticks
+and63whole-frame comparisons. The900tick pilot replay still matches native motion.
+
+Earlier timing sections below retain historical full-size-art measurements.
 
 ## Fly
 
@@ -202,16 +223,16 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: native ship/motion behavior against the reference, while retaining the
-camera stress route and watching the remaining frame-time budget. Finer sprite
-rotation and heavier scenes remain unqualified.
+Next: native projectile lifetime, inherited velocity and swept-hit ordering,
+then a bounded practice-fire loop. Complete combat and heavier scenes remain
+unqualified. Native motion and the corrected64-heading graphics are checked above.
 
-## Human check — 2026-09-27
+## Historical scripted-demo human check — 2026-09-27
 
 User confirms the demo works, translational motion looks smooth and performance
 feels stable. Abrupt turning was observed and explained: the script selects the
 next of16 resident headings once per second (22.5 degrees), with no sprite reload.
-Accepted as a rendering-demo checkpoint; smoother turning remains future work.
+Accepted as a rendering-demo checkpoint; the newer pilot uses64headings.
 This feedback does not change the measured frame times or establish native
 gameplay/physics equivalence.
 

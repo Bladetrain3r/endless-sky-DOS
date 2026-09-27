@@ -4,9 +4,17 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-/* The trainer's only hittable object. Background traffic is cosmetic. */
-#define TARGET_X 400.
-#define TARGET_Y 140.
+/* An eight-second ellipse, not ship AI or a flight-dynamics model. */
+void practice_target(Practice *p)
+{
+    double phase=(p->target_ticks%480)*6.2831853071795864769/480.;
+    p->target=(BoltTarget){400.,140.,0,&p->masks[1]};
+    if(p->moving_target) {
+        p->target.x=400.+120.*sin(phase);
+        p->target.y=200.-60.*cos(phase);
+        p->target.angle=motion_angle(atan2(120.*cos(phase),-60.*sin(phase))*180./3.14159265358979323846);
+    }
+}
 int practice_load(Practice *p,const char *profile,const char *masks)
 {
     FILE *f=fopen(profile,"r"); char magic[16],extra; double speed,spread; int life,reload,n;
@@ -25,7 +33,8 @@ void practice_reset(Practice *p)
 {
     memset(p->bolts,0,sizeof(p->bolts));
     p->shots=p->hits=p->dropped=p->active=p->peak=p->flash=p->cooldown=0;
-    p->rng=17;
+    p->rng=17; p->target_ticks=0;
+    practice_target(p);
 }
 static double random_unit(Practice *p)
 {
@@ -35,7 +44,8 @@ static double random_unit(Practice *p)
 void practice_step(Practice *p,const Pilot *pilot,int fire)
 {
     unsigned i;
-    BoltTarget target={TARGET_X,TARGET_Y,0,&p->masks[1]};
+    ++p->target_ticks;
+    practice_target(p); /* Post-move pose shared by collision and rendering. */
     if(p->flash) --p->flash;
     if(p->cooldown) --p->cooldown;
     /* Existing shots move first. New shots join for this tick's collision pass
@@ -59,7 +69,7 @@ void practice_step(Practice *p,const Pilot *pilot,int fire)
     p->active=0;
     for(i=0;i<PRACTICE_BOLTS;++i) {
         Bolt *b=&p->bolts[i]; double fraction;
-        if(bolt_hit(b,&target,1,&fraction)>=0) {
+        if(bolt_hit(b,&p->target,1,&fraction)>=0) {
             b->alive=0; ++p->hits; p->flash=8;
         }
         if(b->alive) ++p->active;
@@ -73,12 +83,12 @@ static void dot(unsigned char *frame,int x,int y,unsigned char color)
 void practice_draw(unsigned char *frame,const Practice *p,const Scene *scene,
                    const Sprite *barge,const unsigned char *blend,const unsigned char *add)
 {
-    int tx=(int)TARGET_X-scene->camera_x,ty=(int)TARGET_Y-scene->camera_y;
+    int tx=(int)lround(p->target.x)-scene->camera_x,ty=(int)lround(p->target.y)-scene->camera_y;
     unsigned i;
-    sprite_draw(frame,barge,0,tx,ty,blend,add);
+    sprite_draw(frame,barge,((unsigned)p->target.angle*barge->frames+32768u)/65536u,tx,ty,blend,add);
     /* Bounds also keep the fixed-width text renderer safely inside its frame. */
     if(tx>=55 && tx<745 && ty>=72 && ty<535)
-        video_text(frame,tx-48,ty-32,p->flash?"HIT!":"PRACTICE TARGET",p->flash?1:2);
+        video_text(frame,tx-48,ty-32,p->flash?"HIT!":(p->moving_target?"MOVING TARGET":"PRACTICE TARGET"),p->flash?1:2);
     for(i=0;i<PRACTICE_BOLTS;++i) if(p->bolts[i].alive) {
         const Bolt *b=&p->bolts[i]; double ux,uy; int k;
         double x=b->x+.5*b->vx-scene->camera_x,y=b->y+.5*b->vy-scene->camera_y;

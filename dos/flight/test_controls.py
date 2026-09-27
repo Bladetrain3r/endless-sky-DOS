@@ -75,7 +75,7 @@ def main():
     if '--guest' in sys.argv: return guest()
     base = (ROOT / 'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     config = base + ('[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
-                     'FLIGHT.EXE --demo --pilot --seconds 20 > KEYS.TXT\nexit\n')
+                     'FLIGHT.EXE --demo --pilot --stationary-target --seconds 20 > KEYS.TXT\nexit\n')
     (RUN / 'keys.conf').write_text(config)
     tested_hash = hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     result = subprocess.run(['docker', 'run', '--rm', '--network', 'none', '--user',

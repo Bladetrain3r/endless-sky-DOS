@@ -77,9 +77,55 @@ static void trainer(const char *profile,const char *masks)
     CHECK(p.active==PRACTICE_BOLTS && p.shots==PRACTICE_BOLTS && p.dropped==84);
     printf("trainer_ticks=1420\ntrainer_test_hits=50\ncapacity_drop_test=84\n");
 }
+static unsigned moving_run(Practice *p,int lead)
+{
+    Pilot pilot={0}; unsigned tick;
+    pilot.state=(MotionState){400,300,0,0,0};
+    practice_reset(p);
+    for(tick=0;tick<960;++tick) {
+        double t=0.,x=0.,y=0.; unsigned j;
+        for(j=0;j<12;++j) {
+            double phase=(tick+1+t)*6.2831853071795864769/480.;
+            x=120.*sin(phase); y=-100.-60.*cos(phase);
+            t=lead?(sqrt(x*x+y*y)-20.)/p->speed:0.;
+            if(t<0.) t=0.;
+        }
+        pilot.state.angle=motion_angle(atan2(x,-y)*180./3.14159265358979323846);
+        practice_step(p,&pilot,1);
+    }
+    for(tick=0;tick<60;++tick) practice_step(p,&pilot,0);
+    CHECK(p->shots==80 && p->dropped==0 && p->active==0);
+    return p->hits;
+}
+static void moving(const char *profile,const char *masks)
+{
+    static Practice p; Pilot pilot={0}; unsigned tick,lead,direct,repeat,witnesses=0;
+    CHECK(practice_load(&p,profile,masks));p.moving_target=1;practice_reset(&p);
+    CHECK(p.target.x==400. && p.target.y==140. && p.target.angle==16384);
+    for(tick=0;tick<480;++tick) {
+        BoltTarget previous=p.target; double x,y,f0,f1;
+        /* Find and fire a zero-speed diagnostic query that distinguishes the
+         * previous pose from this tick's pose. This catches one-tick lag and
+         * accidental extra target-velocity subtraction in integration. */
+        p.target_ticks++;practice_target(&p);
+        for(x=-24;x<=24 && !witnesses;x+=.5) for(y=-24;y<=24 && !witnesses;y+=.5) {
+            Bolt b; bolt_launch(&b,p.target.x+x,p.target.y+y,0,0,0,0,48);
+            f0=1.;f1=1.;bolt_hit(&b,&previous,1,&f0);bolt_hit(&b,&p.target,1,&f1);
+            if(f0!=0. && f1==0.) {
+                p.target_ticks--;p.target=previous;p.bolts[0]=b;
+                practice_step(&p,&pilot,0);CHECK(p.hits==1 && !p.bolts[0].alive);++witnesses;
+            }
+        }
+        CHECK(p.target.x>=280. && p.target.x<=520. && p.target.y>=140. && p.target.y<=260.);
+    }
+    CHECK(witnesses==1 && p.target_ticks==480 && fabs(p.target.x-400.)<1e-12 && fabs(p.target.y-140.)<1e-12);
+    lead=moving_run(&p,1);repeat=moving_run(&p,1);direct=moving_run(&p,0);
+    CHECK(lead==repeat && lead>=60 && lead>direct);
+    printf("moving_route_ticks=480\npostmove_witnesses=%u\nlead_hits=%u\nunled_hits=%u\nmoving_shots=80\n",witnesses,lead,direct);
+}
 int main(int argc,char **argv)
 {
     if(argc!=4) return 2;
-    native_trace(argv[1]);sweeps();trainer(argv[2],argv[3]);
+    native_trace(argv[1]);sweeps();trainer(argv[2],argv[3]);moving(argv[2],argv[3]);
     printf("status=pass\n");return 0;
 }

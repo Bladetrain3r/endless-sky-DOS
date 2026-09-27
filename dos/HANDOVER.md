@@ -1,12 +1,12 @@
 # Endless Sky DOS handover
-Updated2026-09-28; one-gun firing range staged and human accepted.
+Updated2026-09-28; moving firing range staged; human check pending.
 
 ## Current checkpoint
 - Flight: `python3 dos/flight/watch.py --pilot` (Docker/X11,120seconds).
  W/Up thrust,A/D/arrows turn,Space heldfire,Tab camera,R resetship/range,Esc exit.
  Stock Sparrow flight has no reverse; releasecoasts. CtrlF9 quitsDOSBox.
-- Labelled stationary practice Barge starts straight ahead of resetplayer.
- Indestructible; HIT flashes +shots/hits/active counters. Background traffic cosmetic.
+- Defaultpilot: Barge on8secondellipse, tangentfacing; --stationary-target retainsoldrange.
+ Indestructible; R resetsroute/seed/counters; HIT flash. Background traffic cosmetic.
 - Training1EnergyBlaster, synthetic centreline muzzle20units forward, unlimited
  resources. Original stockSparrow has2BeamLasers; no originaldata/outfit edits.
 - No damage/shields, shipcollisions, AI, landing, missions, saves or audio yet.
@@ -62,8 +62,9 @@ Updated2026-09-28; one-gun firing range staged and human accepted.
 - Binary64transfer fixed212decimalboundarydifferences; defaultDOSFPUworks.
  Packedmask2060B; fixed3-maskstorage49392B. Originalimages/masksunchanged.
 - Sept28 user: firing works, target hits look correct, no oddities moving/firing.
-- Next: movingtargets and native shield/damage/
- resourcecontracts beforeordinarycombat. Realhardpoints/beams remainseparate.
+- Movingtests:postmovepose witness,480tickclosedroute,lead80/80 vsunled72/80,
+ resetrepeatable(nativeASan+DOS). App2laps25.421msavg29.938max,heap2,897,898B.
+- Next: humanmovingrange feedback +native shield/damage/resourcecontracts; beamsseparate.
 - Optionaltrainer+demoscenemusic in dos/WISHLIST.md; noaudioimplementation.
 
 ## Retained content / boundaries

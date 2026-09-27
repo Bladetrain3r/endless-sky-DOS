@@ -3,7 +3,7 @@
 The800×600,256-color DOS executable loads Sol from the compact world pack and
 now offers a controllable stock Sparrow using native-matched movement. Earth,
 Luna, the Falcon and scripted traffic provide reference points. This is a flight
-sandbox with one training blaster and a stationary invulnerable target.
+sandbox with one training blaster and an invulnerable scripted target.
 No damage, ship collisions, landing, AI, missions, resource accounting or saves.
 The player's engines are treated as fully supplied.64 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
@@ -64,7 +64,9 @@ at the ship's centre; Tab freezes its current position. R is useful after flying
 out of sight. `--seconds N` selects1–120seconds. Local DOSBox alternative:
 `dosbox -conf .work/flight/pilot.conf`.
 
-A labelled practice target starts straight ahead. Hold Space to see bolts, hit
+A labelled moving practice target starts ahead and follows an eight-second oval.
+Add `--stationary-target` to `watch.py --pilot` for the old fixed range.
+Hold Space to see bolts, hit
 flashes and counters. It cannot be destroyed; background ships/planets are not
 hittable. This is one supplied test blaster, not the stock Sparrow's beam weapons.
 See [projectile qualification and deliberate limits](../projectile/README.md).
@@ -232,7 +234,7 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: moving-target practice and native shield/damage/resource contracts.
+Next: native shield/damage/resource contracts; moving-target practice is staged.
 Ordinary bolt traces and the first firing range are qualified in ../projectile/README.md;
 complete combat and heavier scenes remain unqualified.
 

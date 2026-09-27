@@ -1,7 +1,9 @@
 # Ordinary bolts and the first firing range
 
 The flight prototype now has a supplied training Energy Blaster. Hold Space to
-fire at the stationary **PRACTICE TARGET** straight ahead of the reset position.
+fire at the **MOVING TARGET**, which starts ahead of the reset position and
+follows an eight-second oval. Add `--stationary-target` to the pilot launcher
+for the previously accepted fixed target.
 R resets flight, shots, hit count and spread seed. A HIT label flashes on contact;
 the HUD counts shots, hits and live bolts. Background traffic and planets remain
 cosmetic. The target is indestructible: no shields, damage, resources, friendly
@@ -95,5 +97,27 @@ feedback on the bounded trainer, not additional native-equivalence evidence.
 
 Evidence: `../reports/projectile-equivalence.json`,
 `../reports/flight-6-ships-practice-profile.json`, `../reports/flight-controls.json`.
-Next: moving targets and native damage/shield/resource contracts before representing
+Next: native damage/shield/resource contracts before representing
 this as ordinary combat; beams and real hardpoint/loadout export remain separate work.
+
+## Moving range — 2026-09-28
+
+The default pilot target follows x=400+120sin(phase), y=200−60cos(phase),
+with phase=2π(tick mod480)/480, at60Hz. Its facing follows the tangent.
+This is a scripted training route, not native ship dynamics or AI. Rendering
+selects the nearest of64 Barge frames; collision uses the exact quantized facing
+and original Barge mask. The post-move pose is shared by both. R resets route,
+shots, counters and spread seed while retaining moving/stationary mode.
+
+Native sanitizer and DOS checks cover route bounds/period, a crossing witness
+where old and updated poses disagree, and repeatable lead-aim shooting. An
+instant-aim test pilot with knowledge of the route lands80/80 shots when leading,
+versus72/80 when tracking the current position. That test is not a human aim
+assist and does not establish full native Engine equivalence. Reset reproduces
+its result. Prior projectile and stationary-range gates still pass.
+
+`run.py --practice-test --moving-target --frames480` covers two laps with the
+player facing straight ahead:80shots,7hits,3stilllive,0drops, target returns to
+its starting pose. Frame cost25.421ms average/29.938ms max; countedheap2,897,898B.
+See `../reports/flight-6-ships-practice-moving-profile.json`. The stationary input
+comparison also passes on the same build. Moving-range human acceptance pending.

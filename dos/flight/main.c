@@ -55,7 +55,7 @@ int main(int argc,char **argv)
     Timing sim={0},draw={0},present={0},total={0};
     Timing background={0},orbital={0},traffic={0},effect={0},hud={0},pilot_draw_time={0};
     unsigned frames=120,ships=6,i,done=0; int demo=0,ok=0,opened=0,camera=0;
-    int controlled=0,replay=0,keyboard=0,practice_test=0;
+    int controlled=0,replay=0,keyboard=0,practice_test=0,stationary_target=0;
     unsigned keys_seen=0;
     uint64_t id; size_t memory=0;
     unsigned long before=pages(),resident=0;
@@ -63,6 +63,7 @@ int main(int argc,char **argv)
     const char *error="initialization_failed";
     for(i=1;i<(unsigned)argc;++i) {
         if(!strcmp(argv[i],"--demo")) demo=1;
+        else if(!strcmp(argv[i],"--stationary-target")) stationary_target=1;
         else if(!strcmp(argv[i],"--practice-test")) controlled=replay=practice_test=1;
         else if(!strcmp(argv[i],"--pilot")) controlled=1;
         else if(!strcmp(argv[i],"--replay")) controlled=replay=1;
@@ -97,6 +98,8 @@ int main(int argc,char **argv)
         if(!practice || !practice_load(practice,"BLASTER.DAT","MASKS.BIN")) {
             error="practice_assets_failed"; goto done;
         }
+        practice->moving_target=!stationary_target;
+        practice_reset(practice);
         memory+=sizeof(*practice);
     }
     /* These opaque labels never change in this prototype. Prepare once. */
@@ -195,6 +198,8 @@ done:
     if(practice && ok) printf("practice_shots=%u\npractice_hits=%u\npractice_active=%u\n"
         "practice_peak=%u\npractice_dropped=%u\n",practice->shots,practice->hits,
         practice->active,practice->peak,practice->dropped);
+    if(practice && ok) printf("target_moving=%d\ntarget_ticks=%u\ntarget_x=%.17g\ntarget_y=%.17g\ntarget_angle=%u\n",
+        practice->moving_target,practice->target_ticks,practice->target.x,practice->target.y,(unsigned)practice->target.angle);
     report("background",&background); report("orbital",&orbital);
     report("traffic",&traffic); report("effect",&effect); report("hud",&hud);
     if(controlled) report("pilot_draw",&pilot_draw_time);

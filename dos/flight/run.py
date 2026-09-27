@@ -41,9 +41,11 @@ def main():
     parser.add_argument('--headless-demo',action='store_true')
     parser.add_argument('--reference',action='store_true')
     parser.add_argument('--camera',action='store_true')
+    parser.add_argument('--moving-target',action='store_true',help='moving target in the held-fire route')
     parser.add_argument('--practice-test',action='store_true',help='stationary held-fire training route')
     parser.add_argument('--replay',action='store_true',help='replay a pilot control route through native-matched motion')
     args=parser.parse_args()
+    if args.moving_target and not args.practice_test: parser.error('moving-target requires practice-test')
     if args.practice_test and (args.camera or args.replay): parser.error('practice-test is a separate controlled route')
     if args.replay and args.camera: parser.error('pilot replay follows the ship; --camera selects the scripted pan')
     if args.replay and args.frames>450: parser.error('pilot reference route is bounded to450frames/900ticks')
@@ -69,6 +71,7 @@ def main():
     if args.camera: options+=' --camera'
     if args.replay: options+=' --replay'
     if args.practice_test: options+=' --practice-test'
+    if not args.moving_target: options+=' --stationary-target'
     if args.headless_demo: options+=' --demo --seconds 4'
     conf=base+'[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
     conf+=f'FLIGHT.EXE {options} > FLIGHT.TXT\nexit\n'
@@ -103,7 +106,10 @@ def main():
     if args.practice_test:
         ticks=int(fields['simulation_ticks'])
         assert int(fields['practice_shots'])==(ticks+11)//12,fields
-        assert int(fields['practice_hits'])>=max(0,(ticks-24)//12),fields
+        if not args.moving_target:
+            assert int(fields['practice_hits'])>=max(0,(ticks-24)//12),fields
+        assert int(fields['target_moving'])==int(args.moving_target),fields
+        assert int(fields['target_ticks'])==ticks,fields
         assert fields['practice_dropped']=='0',fields
     assert not any(p.suffix.lower()=='.swp' for p in RUN.iterdir())
     assert (RUN/'FRAME.IDX').stat().st_size==480000
@@ -116,7 +122,7 @@ def main():
                 pilot_profile=json.loads((RUN/'pilot.json').read_text()),pack_sha256=digest(RUN/'WORLD.PAK'),frame_sha256=digest(RUN/'FRAME.IDX'),
                 exe_bytes=(RUN/'FLIGHT.EXE').stat().st_size,assets=json.loads((RUN/'assets.json').read_text()),
                 scope='Explicit residency counts world store+decoded system, frame, sprites, blend tables. Excludes runtime/code/stack/stdio and VRAM.',
-                limits=['Background traffic is scripted; pilot replay uses healthy supplied stock-Sparrow motion. Only supplied one-gun practice fire against a stationary invulnerable target; no AI or damage.',
+                limits=['Background traffic is scripted; pilot replay uses healthy supplied stock-Sparrow motion. Only supplied one-gun practice fire against an invulnerable scripted target; no AI or damage.',
                         'Sol Earth/Luna fixed epoch0; scene placement selected for inspection.',
                         'Benchmark advances2simticks per render; demo60Hz accumulator/30Hz render target.',
                         'No faction recoloring or native animation interpolation yet.'])
@@ -124,6 +130,7 @@ def main():
     if args.reference: stem+='-reference'
     if args.replay: stem+='-pilot'
     if args.practice_test: stem+='-practice'
+    if args.moving_target: stem+='-moving'
     if args.camera: stem+='-camera'
     else: stem+='-profile'
     shutil.copyfile(RUN/'preview.png',ROOT/'.work/flight'/f'{stem}.png')

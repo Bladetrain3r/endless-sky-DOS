@@ -9,6 +9,15 @@ int main(void)
     InputState s;
     input_state_clear(&s);
     assert(input_state_take(&s)==0);
+    input_state_feed(&s,0x11); input_state_feed(&s,0x39);
+    assert(input_state_take(&s)==(INPUT_FORWARD|INPUT_FIRE));
+    assert(input_state_take(&s)==(INPUT_FORWARD|INPUT_FIRE));
+    input_state_feed(&s,0xb9);
+    assert(input_state_take(&s)==INPUT_FORWARD);
+    input_state_feed(&s,0x91);
+    assert(input_state_take(&s)==0);
+    input_state_feed(&s,0x39); input_state_feed(&s,0xb9);
+    assert(input_state_take(&s)==0); /* Fire release does not latch. */
     input_state_feed(&s,0x11); input_state_feed(&s,0x11);
     input_state_feed(&s,0xe0); input_state_feed(&s,0x48);
     input_state_feed(&s,0x91);

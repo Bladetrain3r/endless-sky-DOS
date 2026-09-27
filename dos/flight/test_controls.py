@@ -47,14 +47,20 @@ def guest():
         send('keyup', 'd', .2)
         send('key', 'Tab', .2)
         send('key', 'r', .2)
+        send('keydown', 'space', .8)
         send('keydown', 'w', .5)
         send('keyup', 'w', .2)
+        send('keyup', 'space', 1.0)
         send('key', 'Tab', .2)
         send('key', 'Escape', .1)
         process.wait(timeout=20)
         fields = dict(line.split('=', 1) for line in result.read_text().splitlines() if '=' in line)
         assert fields['status'] == 'ok' and fields['video_verify'] == 'pass', fields
-        assert int(fields['pilot_input_bits']) == 121 and fields['pilot_keyboard'] == '1', fields
+        assert int(fields['pilot_input_bits']) == 249 and fields['pilot_keyboard'] == '1', fields
+        # About 1.5s held fire at5Hz, then >1s released. Broad scheduling
+        # allowance still rejects a stuck fire bit after release.
+        assert 7 <= int(fields['practice_shots']) <= 10 and int(fields['practice_hits']) >= 2, fields
+        assert fields['practice_dropped'] == '0', fields
         assert fields['pilot_follow'] == '0' and fields['pilot_angle'] == '0', fields
         assert abs(float(fields['pilot_x']) - 400.) < 1e-9 and float(fields['pilot_y']) < 300., fields
         assert float(fields['pilot_vy']) < 0. and fields['discarded_sim_ms'] == '0.000', fields
@@ -81,7 +87,7 @@ def main():
     report = {'result': fields, 'exe_sha256': tested_hash, 'dos_config': config,
               'test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'image_id': subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
-              'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape; physical feel awaits human check.'}
+              'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; physical feel awaits human check.'}
     (ROOT / 'dos/reports/flight-controls.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(fields, indent=2))
 

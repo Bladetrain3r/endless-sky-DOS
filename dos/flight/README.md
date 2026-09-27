@@ -3,12 +3,14 @@
 The800×600,256-color DOS executable loads Sol from the compact world pack and
 now offers a controllable stock Sparrow using native-matched movement. Earth,
 Luna, the Falcon and scripted traffic provide reference points. This is a flight
-sandbox: no collision, combat, landing, AI, missions, resource accounting or saves.
+sandbox with one training blaster and a stationary invulnerable target.
+No damage, ship collisions, landing, AI, missions, resource accounting or saves.
 The player's engines are treated as fully supplied.64 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
 
 User playtest2026-09-27: flight works and movement feels physically right;
-operator notes limited familiarity with the original game.
+operator notes limited familiarity with the original game. Sept28: user confirms
+corrected smaller scale and much smoother turning. Practice fire awaits playtest.
 
 World sprites now use native half-PNG dimensions at one screen pixel per world
 unit: `Drawable::Width/Height` supply the 0.5 factor to `DrawList::Push`.
@@ -48,9 +50,10 @@ The reference Docker/DOSBox opens a two-minute flight session. Controls:
 |---|---|
 | Thrust | W / Up |
 | Turn | A/D / Left/Right |
+| Fire training blaster | Hold Space |
 | Coast | Release thrust |
 | Toggle following/fixed camera | Tab |
-| Reset ship and camera near Earth | R |
+| Reset ship, camera and firing range | R |
 | Exit | Escape; Ctrl+F9 exits DOSBox |
 
 Turn and thrust can be held together. The stock Sparrow has no reverse thrusters,
@@ -59,6 +62,11 @@ your motion; autopilot braking is not implemented. The camera starts following
 at the ship's centre; Tab freezes its current position. R is useful after flying
 out of sight. `--seconds N` selects1–120seconds. Local DOSBox alternative:
 `dosbox -conf .work/flight/pilot.conf`.
+
+A labelled practice target starts straight ahead. Hold Space to see bolts, hit
+flashes and counters. It cannot be destroyed; background ships/planets are not
+hittable. This is one supplied test blaster, not the stock Sparrow's beam weapons.
+See [projectile qualification and deliberate limits](../projectile/README.md).
 
 The fitted acceleration, turn rate and drag come from the qualified native
 Sparrow trace, via `pilot_assets.py`; `PILOT.DAT` is a tiny prototype profile,
@@ -223,9 +231,9 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: native projectile lifetime, inherited velocity and swept-hit ordering,
-then a bounded practice-fire loop. Complete combat and heavier scenes remain
-unqualified. Native motion and the corrected64-heading graphics are checked above.
+Next: moving-target practice and native shield/damage/resource contracts.
+Ordinary bolt traces and the first firing range are qualified in ../projectile/README.md;
+complete combat and heavier scenes remain unqualified.
 
 ## Historical scripted-demo human check — 2026-09-27
 

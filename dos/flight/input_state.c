@@ -39,6 +39,7 @@ unsigned input_state_keys(const InputState *s)
     if(s->normal[0x01]) keys|=INPUT_EXIT;
     if(s->normal[0x13]) keys|=INPUT_RESET;
     if(s->normal[0x0f]) keys|=INPUT_CAMERA;
+    if(s->normal[0x39]) keys|=INPUT_FIRE;
     return keys|s->pending;
 }
 

@@ -54,10 +54,7 @@ for these three masks (deliberately fixed capacity), while the packed geometry
 file is 2,060 bytes. The shapes contain 123 points in five outlines total. This is
 not yet a production all-ships cache or collision broad-phase benchmark.
 
-Collision is still not integrated in the flight executable. Before weapons integration:
-
-1. Preserve the qualified body/image world-scale contract while adding weapons.
-2. Compare a bounded ordinary projectile's lifetime, inherited velocity and
-   swept-segment ordering against native Projectile/Engine behavior.
-3. Add target selection and a practice-fire loop, with resource/damage omissions
-   explicit until those systems are ported. The trainer idea is in `../WISHLIST.md`.
+Collision masks now drive the stationary invulnerable practice target in flight.
+The ordinary-bolt constructor/Move oracle and swept-hit composition tests are in
+`../projectile/README.md`. This still does not implement full Engine eligibility,
+penetration, damage, moving-target scenarios or ship-on-ship collision resolution.

@@ -41,14 +41,15 @@ def guest():
         def send(*args):
             subprocess.run(['xdotool',*args],check=True)
             time.sleep(.18)
-        send('keydown','w'); send('keydown','Left'); send('keyup','w'); send('keyup','Left')
+        send('keydown','w'); send('keydown','space'); send('keydown','Left')
+        send('keyup','space'); send('keyup','w'); send('keyup','Left')
         send('keydown','Up'); send('keydown','s'); send('keyup','Up'); send('keyup','s')
         send('key','r'); send('key','Tab'); send('key','Escape')
         proc.wait(timeout=30)
         rows=output.read_text().splitlines()
         values=[int(x.split('=',1)[1]) for x in rows if x.startswith('keys=')]
         assert rows[-2:]==['reopen=ok','closed=ok'],rows
-        expected=[1,5,4,0,1,3,2,0,32,0,64,0,16,0]
+        expected=[1,129,133,5,4,0,1,3,2,0,32,0,64,0,16,0]
         cursor=0
         for value in values:
             if cursor<len(expected) and value==expected[cursor]: cursor+=1

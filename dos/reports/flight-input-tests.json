@@ -11,10 +11,10 @@
   "source_sha256": {
     "dos/flight/input.c": "e057927e9816a732241adac5c8777f62c0317402997c623d5aa8263928eae5c6",
     "dos/flight/input.h": "9a01008c4eaf782aa25610ce1dee6e1d289cfe5d28a5dea228e0439ba6aaf1d9",
-    "dos/flight/input_state.c": "caeae05326207d88270d442381f42734e3aa1b8f0921d9c31c7c67bfb36647a3",
-    "dos/flight/input_state.h": "d555dfc40fa6d789c7e39188417d539017bae8a54c7b6f18e8ccb9524602b97d",
-    "dos/flight/input_test.c": "33504f7c56f22b29bf6e5cefd472aa09450c41dceba899b242e629fe2b4c1d7f",
-    "dos/flight/test_input.py": "ba427c386ab3fc14b7fccc14cbc9337e7e6dbca1d6affbfa96cb010a195003f1"
+    "dos/flight/input_state.c": "1d21851504bcb54aba83e62960f1d613b6152921f698d31e38dbaa0bf577fc9f",
+    "dos/flight/input_state.h": "cc5dc2c95586eb111e0ef8e66cb617413cf458b31e0de48b9a1f565c3361c07c",
+    "dos/flight/input_test.c": "5f9b892590e8e4ae752642ff7562eafd87a02a2914b9ccf027e3583a88f4cb3a",
+    "dos/flight/test_input.py": "2bd3c9f2d0070fca4b60ea6c2dbb3f4938746cd455c8195cdbb4d3e0d6e7306d"
   },
   "image_ids": {
     "modern-arena-tools:0.1": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c",
@@ -24,6 +24,8 @@
     "guest": "pass",
     "changes": [
       1,
+      129,
+      133,
       5,
       4,
       0,
@@ -38,7 +40,7 @@
       16,
       0
     ],
-    "observed": "observed=119",
+    "observed": "observed=247",
     "vector_restore": "pass",
     "reopen": "pass"
   },

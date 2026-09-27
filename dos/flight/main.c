@@ -3,6 +3,7 @@
 #include "scene.h"
 #include "pilot.h"
 #include "input.h"
+#include "practice.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -49,12 +50,12 @@ int main(int argc,char **argv)
 {
     const char *names[]={"SPARROW.SPR","BARGE.SPR","FALCON.SPR","EARTH.SPR","LUNA.SPR","GLOW.SPR"};
     Sprite sprites[6]={{0}}; ActiveSystem system={0}; Scene scene; Pilot pilot={0};
-    WorldStore *world=NULL;
+    WorldStore *world=NULL; Practice *practice=NULL;
     unsigned char palette[768],*frame=NULL,*blend=NULL,*add=NULL,*hud_pixels=NULL;
     Timing sim={0},draw={0},present={0},total={0};
     Timing background={0},orbital={0},traffic={0},effect={0},hud={0},pilot_draw_time={0};
     unsigned frames=120,ships=6,i,done=0; int demo=0,ok=0,opened=0,camera=0;
-    int controlled=0,replay=0,keyboard=0;
+    int controlled=0,replay=0,keyboard=0,practice_test=0;
     unsigned keys_seen=0;
     uint64_t id; size_t memory=0;
     unsigned long before=pages(),resident=0;
@@ -62,6 +63,7 @@ int main(int argc,char **argv)
     const char *error="initialization_failed";
     for(i=1;i<(unsigned)argc;++i) {
         if(!strcmp(argv[i],"--demo")) demo=1;
+        else if(!strcmp(argv[i],"--practice-test")) controlled=replay=practice_test=1;
         else if(!strcmp(argv[i],"--pilot")) controlled=1;
         else if(!strcmp(argv[i],"--replay")) controlled=replay=1;
         else if(!strcmp(argv[i],"--camera")) camera=1;
@@ -91,13 +93,18 @@ int main(int argc,char **argv)
     if(controlled) {
         if(!pilot_load(&pilot,"PILOT.DAT")) { error="pilot_profile_failed"; goto done; }
         pilot_reset(&pilot,&scene);
+        practice=malloc(sizeof(*practice));
+        if(!practice || !practice_load(practice,"BLASTER.DAT","MASKS.BIN")) {
+            error="practice_assets_failed"; goto done;
+        }
+        memory+=sizeof(*practice);
     }
     /* These opaque labels never change in this prototype. Prepare once. */
     memset(frame,10,800*40); memset(frame+800*570,10,800*30);
     video_text(frame,12,10,"ENDLESS SKY DOS - SOL / EARTH",1);
-    video_text(frame,12,24,controlled?"SPARROW FLIGHT TEST - NO COLLISION OR COMBAT":
+    video_text(frame,12,24,controlled?"TRAINER: ONE BLASTER - NO DAMAGE OR RESOURCE COST":
                "SCRIPTED FLIGHT PROTOTYPE - NOT GAMEPLAY",2);
-    video_text(frame,12,578,controlled?"W/UP THRUST  A/D TURN  TAB CAMERA  R RESET  ESC EXIT":
+    video_text(frame,12,578,controlled?"W/UP THRUST  A/D TURN  SPACE FIRE  TAB CAMERA  R RESET  ESC EXIT":
                "ESC EXIT    256 COLORS    60 HZ TEST MOTION",1);
     memcpy(hud_pixels,frame,32000);
     memcpy(hud_pixels+32000,frame+800*570,24000);
@@ -117,6 +124,7 @@ int main(int argc,char **argv)
             unsigned keys=input_keys();
             keys_seen|=keys;
             if(keys & INPUT_EXIT) break;
+            if((keys & ~pilot.previous_keys) & INPUT_RESET) practice_reset(practice);
             pilot_keys(&pilot,&scene,keys);
         } else if(kbhit() && getch()==27) break;
         a=ms();
@@ -128,8 +136,9 @@ int main(int argc,char **argv)
         while(accumulator>=1000./60.) {
             scene_step(&scene);
             if(controlled) {
-                if(replay) pilot_keys(&pilot,&scene,pilot_replay_keys(pilot.ticks));
+                if(replay) pilot_keys(&pilot,&scene,practice_test?INPUT_FIRE:pilot_replay_keys(pilot.ticks));
                 pilot_step(&pilot,&scene);
+                practice_step(practice,&pilot,!!(pilot.previous_keys & INPUT_FIRE));
             }
             accumulator-=1000./60.;
         }
@@ -137,6 +146,7 @@ int main(int argc,char **argv)
         scene_draw(frame,&scene,sprites,blend,add,&profile);
         if(controlled) {
             double pilot_start=ms();
+            practice_draw(frame,practice,&scene,&sprites[1],blend,add);
             pilot_draw(frame,&pilot,&scene,&sprites[0],blend,add);
             sample(&pilot_draw_time,ms()-pilot_start);
         }
@@ -151,6 +161,8 @@ int main(int argc,char **argv)
                      sqrt(pilot.state.vx*pilot.state.vx+pilot.state.vy*pilot.state.vy)*60.,
                      pilot.follow?"FOLLOW":"FIXED");
             video_text(frame,420,10,label,1);
+            snprintf(label,sizeof(label),"SHOTS %u  HITS %u  ACTIVE %u",practice->shots,practice->hits,practice->active);
+            video_text(frame,490,24,label,1);
         }
         b=ms(); sample(&hud,b-hud_start); sample(&draw,b-a); a=b;
         if(!video_present(frame)) { error=video_error(); goto done; }
@@ -180,12 +192,15 @@ done:
         pilot.ticks,pilot.state.x,pilot.state.y,pilot.state.vx,pilot.state.vy,
         (unsigned)pilot.state.angle,pilot.follow);
     if(controlled) printf("pilot_input_bits=%u\npilot_keyboard=%d\n",keys_seen,keyboard);
+    if(practice && ok) printf("practice_shots=%u\npractice_hits=%u\npractice_active=%u\n"
+        "practice_peak=%u\npractice_dropped=%u\n",practice->shots,practice->hits,
+        practice->active,practice->peak,practice->dropped);
     report("background",&background); report("orbital",&orbital);
     report("traffic",&traffic); report("effect",&effect); report("hud",&hud);
     if(controlled) report("pilot_draw",&pilot_draw_time);
     report("sim",&sim); report("draw",&draw); report("present",&present); report("frame",&total);
     for(i=0;i<6;++i) sprite_free(&sprites[i]);
-    free(hud_pixels); free(frame); free(blend); free(add);
+    free(practice); free(hud_pixels); free(frame); free(blend); free(add);
     world_release_system(&system); world_close(world);
     return ok?0:1;
 }

@@ -47,3 +47,7 @@ Sprite::Width alone is not the physical-size contract. Preserve mask coordinates
 and apply one consistent world-to-screen transform. Binary64 geometry transfer
 matters at exact boundaries: see collision/README.md for the DOS decimal-transfer
 disagreements and passing binary fixtures; do not silently relax discrete gates.
+
+Ordinary-bolt checkpoint: `projectile/README.md` separates native constructor/Move
+parity from the local firing-range composition tests. A correct Mask query alone
+does not establish full Engine eligibility, damage ordering, beams or hardpoints.

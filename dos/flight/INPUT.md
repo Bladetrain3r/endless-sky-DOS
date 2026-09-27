@@ -14,11 +14,13 @@ installing a second handler. `input_keys()` returns zero while closed.
 | `INPUT_EXIT` | Escape |
 | `INPUT_RESET` | R |
 | `INPUT_CAMERA` | Tab |
+| `INPUT_FIRE` | Space |
 
 The handler consumes scan-code set 1 make/break bytes directly. It tracks
 physical aliases separately: releasing W does not cancel a held Up key. Key
-repeat leaves the state unchanged. Escape, R and Tab make edges stay latched
-until the next `input_keys()` call, so a short tap between polls is delivered
+repeat leaves the state unchanged. Space is a held level: firing stops when
+Space is released, independently of thrust. Escape, R and Tab make edges stay
+latched until the next `input_keys()` call, so a short tap between polls is delivered
 once. Pause/E1 is ignored. The handler sends one
 PIC end-of-interrupt and does not chain the previous IRQ1 handler after
 consuming the controller byte. The previous protected-mode vector is restored

@@ -1,80 +1,78 @@
 # Endless Sky DOS handover
-Updated2026-09-27; corrected native render scale +64headings staged; human check pending.
+Updated2026-09-28; one-gun firing range staged; human check pending.
 
 ## Current checkpoint
-- dos/flight/README.md:800x600x8 DOS VBE flight sandbox. Watch remains scripted;
-  `python3 dos/flight/watch.py --pilot` flies stock Sparrow for120seconds.
-- W/Up thrust, A/D or Left/Right turn; release to coast. No reverse engines:
-  S/Down has no braking effect. Tab toggles follow/fixedcamera; R resets; Esc exits.
-  --seconds1..120 supported; Ctrl+F9 quits DOSBox. No fullscreen/audio.
-- Player uses native-matched60Hz movement; background6ships/Falcon remain scripted.
-  No collision, AI, combat, landing, missions, saves or resource depletion yet.
- 64baked sprite headings (5.625deg) now; physics uses65536directions.
-- Prioraccepted fullsize build: watch.py --pilot --accepted; .work/flight/accepted-0636c12dc.
-- User accepted stationary/mobile scripted camera Sept27; pilot human accepted Sept27: movement feels physically right.
-- Source/game assets unchanged; local commits only/no push; central handover has ID.
+- Flight: `python3 dos/flight/watch.py --pilot` (Docker/X11,120seconds).
+ W/Up thrust,A/D/arrows turn,Space heldfire,Tab camera,R resetship/range,Esc exit.
+ Stock Sparrow flight has no reverse; releasecoasts. CtrlF9 quitsDOSBox.
+- Labelled stationary practice Barge starts straight ahead of resetplayer.
+ Indestructible; HIT flashes +shots/hits/active counters. Background traffic cosmetic.
+- Training1EnergyBlaster, synthetic centreline muzzle20units forward, unlimited
+ resources. Original stockSparrow has2BeamLasers; no originaldata/outfit edits.
+- No damage/shields, shipcollisions, AI, landing, missions, saves or audio yet.
+ White7pixeltracers; native projectile art/stretch/impacteffects notported.
+- User Sept28 accepted corrected smaller worldscale and much smoother64headingturns.
+ Prior Sept27 accepted controllableflight feels physicallyright; limitedoriginal familiarity.
+- Preserved correctedflight .work/flight/accepted-44aced341; earlierfullsize
+ .work/flight/accepted-0636c12dc via watch.py --accepted. No backgroundcontainers.
+- Localcommit only/no push; centralHANDOVER has ID. Originalsource/assets untouched.
 
-## Flight validation and budget
-- Pilot profile generated from native fitted Sparrow trace by pilot_assets.py;
-  PILOT.DAT tiny validated profile, not fullship/outfit exporter. No guessed stats.
-- 900tick native integration comparison passes everytick; headless DOS900tick
- replay same finalposition/velocity/heading. Reset/camera/command cancellation pass.
-- Four invalid profiles reject without altering state. ASan/UBSan, no leak claim.
-- Actual DOSBox/XTest keyboard run passes simultaneousthrust/turn, releases, quick
- taps, reset, camera and Escape; video samples/DAC pass; no discarded simtime.
-- input.c locks IRQ1 state/code, restores vector; separate probe checks restore
- and reopen. Tap latches forR/Tab/Escape; see INPUT.md. Physicalkeyboard untested.
-- Camera2880ticks/63scalar framecomparisons pass;1188heading/edge rastercases pass.
- Three malformed sprites reject, including65frames; ASan/UBSan no leak claim.
-- Correctedscale camera360:21.189msavg/26.339max vs30.186ms prior fullsize.
- This is changed scene geometry, not a raster algorithm speedup/fullgame benchmark.
-- NearEarth actualkeyboardrun23.784msavg/28.173max; playerdraw~0.67ms.
- Long450framepilotroute16.893msavg becomesempty; do not extrapolate to busyflight.
-- Foursecond realtime replay117frames/238ticks,4006.779ms,0discard; native endstate.
-- Counted assets/world/frame heap2,847,714B; excludes code/stack/stdio/allocator,
- DPMI keyboard wrapper/runtime allocations and480000BVRAM. DOS16MiB/20k/no swap.
-- reports/flight-controls.json binds stagedEXE; camera/pilot-profile reports bindassets.
- run.py --replay --frames450 or --replay --headless-demo reproduces.
-- test_controls.py drives actualapplication; test_input.py isolated IRQprobe.
- All builds/tests Docker; actual input test runs headless Xvfb/XTest.
-- Sprite art halved offline, rotation atoriginalres thenLanczos resize; original
- sourceassets/masks unchanged. ALIGNMENT.md:33samples pass,maskp95≤2px; rootviewed.
-## Regular-flight equivalence
-- dos/motion/README.md/check.py: unchanged native Ship::Move oracle + portable C.
- 14cases/12600ticks nativeexact; DOSposition5.46e-12,velocity1.42e-14 maxerror.
-- Healthy/supplied ordinaryflight only; forward/coast/turn/back/STOP, reverseoutfit
- fixture andpilotroute. Fullresourceavailability andcrew checked in native oracle.
-- All65536direction vectors pass(error1.11e-16); quantizedheadings exact.
- On-demand trig avoids native1MiB angle table; kernel allocatesnoheap.
-- 64syntheticships600ticks ~884ms(~1.47ms/tick)at20k/16MiB/no swap; motiononly.
-- reports/motion-equivalence.json has hashes/config; .work/motion ~9MiB.
+## Projectile qualification
+- dos/projectile/README.md, native.py +oracle.cpp use unchanged nativeobjects,
+ publicProjectile constructor/Move +loadedEnergyBlaster;12cases600rows.
+- PortableC compares588reachable rows (creation..move48); nativeexact,
+ DOSmaxstateerror7.11e-15 against1e-10limit; heading/dead/removalexact.
+- Native: parentvelocity inherited; predecrementlifetime48,47positionadvances.
+ Existingboltsmove thenexpiredprune; newshotsjoincollisionpass withoutMove.
+- Queries currentposition→position+velocity againstpostmove target snapshots;
+ originalMask geometry, no targetvelocitysubtraction. No fullEngine/factionclaim.
+- Centrelineorigin uses native halfparentvelocitycorrection; rendering+.5velocity.
+ Immediatehitremoval vsnativefinalclippedrender is explicitvisualdeparture.
+- Reload12ticks/5Hz,3degree triangularspread withseededLCG, notnativeRNGsequence.
+ R clearsbolts/counters/cooldown/seed. 16fixedslots,no per-shotallocation.
+- NativeASan/UBSan +DOS tests: nearest/tunnelling/tie/inside/miss/endpoint/expiry,
+ 50hits,release/reset,expirywithouttargets,poolsaturation drops84withoutoverwrite.
+- reports/projectile-equivalence.json bindsoracle/kernel/profile/masks/config.
+ `python3 dos/projectile/check.py --reuse-oracle` useshashcheckedfixtures.
+- ActualDOS600tickrange:50shots50hits0drops,25.274msavg29.985max at20kcycles.
+ Heap2,897,866B counted incl50,152Btrainingstate; excludesruntime/stack+480000VRAM.
+ `pilot_draw` timing nowincludes practice target/bolts/label. Notfullcombatbudget.
+- ActualDOSBox/XTest Space+flight/reset/camera/Esc and boundedshotcountafterrelease
+ pass; no discardedsimtime. reports/flight-controls.json bindsstagedEXE.
+- InputSpace=128heldlevel,nofiretaplatch. IRQprobe release/restore/reopen pass.
+ Build/tests Docker; DJGPPi386/noMMX/SSE;16MiB/fixed20kcycles/CWSDPMI-s-.
 
-## Collision foundation (not yet integrated)
-- dos/collision/README.md/check.py: original Mask::Create outlines,3hulls/123points.
- 11772native/DOSqueries pass strict hit/contains; maxfractionerror4.44e-16.
-- Texttransfer caused212boundary disagreements; binary64 transfer fixes testedset.
- DefaultDOS andPC_53 bothpass; noFPUchange needed.8badmasksreject, no swap.
-- Packedmasks2060B; fixedruntimebuffers49392B. reports/collision-equivalence.json.
-- Native Drawable::Width/Height*.5 feedsDrawList; masks*.5. DOSart nowmatches.
- Sprite64frames cap; scripted16heading route maps toeveryfourth spriteframe.
-- Trainer/demoscene soundtrack idea recorded in dos/WISHLIST.md; optional/unbuilt.
+## Flight / rendering retained evidence
+- 900tickpilot replay afterintegration stillmatches originalnativeendstate;
+ current17.777msavg becomesempty, notbusyflight performanceclaim.
+- dos/motion/:14cases12600ticks; full65536directionvectors pass.
+ Healthy/suppliedregularflight only, noafterburner/status/externalforces.
+- InputIRQ1 lockedcode/data,originalvectorrestore; INPUT.md coverslatchlimits.
+- NativeDrawable::Width/Height*.5 feedsDrawList; art halvedoffline independently
+ oforiginalmasks.64spriteheadings,physics65536. SourceRGBA untouched.
+- Raster1188cases+3badfiles, camera2880ticks/63frames, ASan/UBSan passSept27.
+ ALIGNMENT.md:33samples,maskp95≤2px; rootinspected. Nearestangleerror≤2.8125deg.
+- Historicalcorrectedcamera21.189msavg26.339max; completegame30FPS unproven.
+- .work/flight/run currentEXE/profile/assets; run.py --practice-test --frames300
+ reproducesrange; run.py --replay --frames450 checks flight endstate.
 
-## Retained foundation and next work
-- Next: qualify ordinary projectile lifetime/inheritedvelocity/swept hits
- before practice-fire integration; corrected sprite-size/turning human check pending.
-- dos/world/active.h,c:owned decoded systemarena,validated immutable store. All694
- load,Sol/Siriusfieldchecks,retentionafterstoreclose,100reloads/corruptions pass.
-- World648042Bpack:694systems/619planets/10commodities,5518objects/1612links/
- 4800prices. Stable64bitIDs; native loader resolvesreference/modification semantics.
-- Nativeexporter stagedfriendaccess rebuilds47affectedTUs consistently; no original
- mutation. --orbits --all crashes; bounded native oracles documented in world/.
-- DOSstore+scratch37510B; native activeAPI store37558B,maxactive6096B (sizesdiffer).
-- SQLiteDOS viable; indexedpackselected for immutable content. Savesunqualified.
-- Palette256=16UI+32gray+208learned,6bitDAC; user9assetproof barelyseesdifference.
-- Sprite spans preserve scalar pixels. Historical20moving fullsize~21.8FPS;
- correctedscale20ship budget unmeasured; completegame30FPS unproven.
-- Upstream061a9461a93898fb691504536589d1dcddc5d79b,CMake0.11.4; Git fork,notFossil.
-- RuntimeDJGPP12.2/CWSDPMI7, i386/noMMX/SSEflags; libraries notfullyISAaudited.
-- Preserve originalcollisiongeometry independentofart. EQUIVALENCE.md owns contracts.
-- Wishlist.md unchanged:nearvanilla,16MiB,20kcycles,800x600,30FPS target. DOSBoxcycles
- are notcalibratedhardwareMHz. GPL3+source/perassetcopyright; noassetreleaseyet.
+## Collision foundation / next
+- dos/collision/: originalMask::Create3hulls123points;11772queries pass,
+ strictcontains/hit;DOSmaxfractionerror4.44e-16. UsedbypracticeBarge now.
+- Binary64transfer fixed212decimalboundarydifferences; defaultDOSFPUworks.
+ Packedmask2060B; fixed3-maskstorage49392B. Originalimages/masksunchanged.
+- Next: humanfire/movingfirefeedback, movingtargets and native shield/damage/
+ resourcecontracts beforeordinarycombat. Realhardpoints/beams remainseparate.
+- Optionaltrainer+demoscenemusic in dos/WISHLIST.md; noaudioimplementation.
+
+## Retained content / boundaries
+- dos/world/active.h,c:ownedvalidatedsystemarena;all694systems qualificationpass.
+ 648042Bpack:694systems619planets10commodities5518objects1612links4800prices.
+- Nativeexporterstagedfriend rebuild47TUs; sourceunchanged. Native --orbits --all
+ crashes; boundedSolorbitqualified. SQLiteDOSviable;indexedpackchosen,savesunqualified.
+- DOSstore+scratch37510B;nativeactiveAPIstore37558B,maxactive6096B.
+- Sharedpalette256=16UI+32gray+208learned;6bitDAC. Userassetproofaccepted.
+- OriginalWishlist.md intact;nearvanilla/16MiB/20k/800x600/30FPSaspirations.
+ CyclesnotcalibratedMHz; GPL3+code/perassetcopyright; nolibrary-wideISAaudit.
+- Upstream061a9461a93898fb691504536589d1dcddc5d79b,CMake0.11.4;GitforknotFossil.
+- Maintainmodularsoft500LOC; preservephysicsindependentofart; EQUIVALENCE.md.

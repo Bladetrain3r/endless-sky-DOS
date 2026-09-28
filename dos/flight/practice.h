@@ -2,6 +2,7 @@
 #ifndef FLIGHT_PRACTICE_H
 #define FLIGHT_PRACTICE_H
 #include "pilot.h"
+#include "target_power.h"
 #include "../damage/damage.h"
 #include "../resources/resources.h"
 #include "../shields/shields.h"
@@ -27,6 +28,7 @@ typedef struct {
     double target_vx,target_vy;
     BoltTarget target;
     DamageState health;
+    TargetPower target_power;
     double shield_damage,hull_damage;
     int destructible,destroyed;
     unsigned explosion;

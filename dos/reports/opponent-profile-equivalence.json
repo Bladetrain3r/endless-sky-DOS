@@ -1,0 +1,119 @@
+{
+  "native": {
+    "rows": 430,
+    "cases": [
+      "healthy",
+      "shield_drain",
+      "energy_starved",
+      "overheat_recovery",
+      "hull_disabled"
+    ],
+    "max_absolute_error": {
+      "shields": 0.0,
+      "energy": 0.0,
+      "heat": 0.0
+    },
+    "comparison": "native Ship::DoGeneration vs generic DOS shield_tick then resource_tick_disabled"
+  },
+  "dos": {
+    "rows": 430,
+    "dos_result": "status=pass rows=430 max_error=0",
+    "trace_sha256": "74005d21a86ade89b49a910be6374e22ac6903787c815a85391f5cc9fa883899",
+    "dos_flags": [
+      "-std=gnu99",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-march=i386",
+      "-mtune=i586",
+      "-mno-mmx",
+      "-mno-sse",
+      "-mno-sse2"
+    ],
+    "config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/opponent_profile/run\nc:\nCWSDPMI -s-\nCHECK.EXE TRACE.BIN BARGERES.DAT BARGESH.DAT BARGEHP.DAT > RESULT.TXT\nexit\n"
+  },
+  "provenance": {
+    "schema": 1,
+    "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+    "image_id": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
+    "baseline_binary_sha256": "77fcb7ff282a9b82d5fce13125bb403c9a7e65b98661f73786a4f99007654414",
+    "oracle_source_sha256": "4858e3d94bc8cc44e334cef9a9c74cdcee92ab2b425d77564734c7f68d2e7c6b",
+    "runner_source_sha256": "f76a2b88db87b787bb8b083375a52fd9adf0c859fdb529871e958e5b3f32aa10",
+    "oracle_binary_sha256": "94c0be4935a4fd2deed8e72073d25a612b50d0b37049914c761ad14de4acfcc2",
+    "csv_sha256": "b6384054ea2e6911cebabd0c683bd541c2c8cbaa1a7a946c08e8942ab94cc468",
+    "profile_sha256": {
+      "BARGERES.txt": "dca60c09c99fe87c8f68572e4ff4d5685016debc656107e0987c4fb454bd6ecc",
+      "BARGESH.txt": "12f2d55ad3d14f8ba74a6c8550956b2a557d35656b0aeb332acac190a3a67982",
+      "BARGEPRO.txt": "a7554c83126b0305ef05001c45212ca6ceac238922bb7e31906fe7c286d06ccc",
+      "BARGEHP.txt": "b716a03963879271ae75615257ca11b3b1b055258c7704a964796c302b857ef3"
+    },
+    "stock_ship_data_sha256": "434fffaf7fb44c1c6687fe8bd20efc59fce9fc875b82a12f98ce12015ebf3e96",
+    "weapon_data_sha256": "53a794f727e0650e67259fd5d599555f3fd80a7cf63cb14c9f8fd974150d47a4",
+    "stock_outfit_data_sha256": {
+      "power.txt": "c6645ef750bc208d013aaa0714d2b6bd28cce9c535a656735f214cd213df7352",
+      "engines.txt": "2a78ce13be9e2d8d9bbe2f774d5f6aa4179f11f29e7c6d90c734e9c736fea680",
+      "outfits.txt": "3172b96e33196a7c3d7ca4acf78665c5b1ebf7f64d1bc098ab6fee5f29877da4"
+    },
+    "behavior_source_sha256": {
+      "Ship.cpp": "1073d0efb023c3780b9cbbbffc3b153b57fb933f0d77c5bf39a8e6b0aca44dd9",
+      "Ship.h": "7818511cd1e7f3ab200637873e19345f5ab2e61d048b692e7fa7e4e6a15d12ba",
+      "Entity.cpp": "d39ec60a85d497e3073eb31f65501084b0fd8b451b5c41a7e8b231af198395c7",
+      "Entity.h": "31896f83d412718be6df6d389f76028be896760a5ace7749f384885019d2481d",
+      "Weapon.cpp": "8833eed1507f345c289732d1ab857d0aaf09655f1ceb5dc1ff8c4858e42213ac",
+      "Weapon.h": "0477c5d8d04db530fe1df7c3c78f1a948a6b4a4fbefc248857c30cdcd43eef22",
+      "ship/ResourceLevels.cpp": "522815c6a988b27265d85397d274057f1adb631b7a2d4206b0af448410894ebf",
+      "ship/ResourceLevels.h": "f23ac3e42194eecc700e99eb9251cb6758d6b0360ca13ed645f0d90188a81cd9",
+      "ship/ShipAttributeCache.cpp": "3fc7cb66984117422c79215251c8424a9afb703b3572ad9d85bccec0923d7408",
+      "ship/ShipAttributeCache.h": "09cf0413f1d379fd265b9c6e2458b774b624e37628eaf5b893b4b521664d8dd6"
+    },
+    "compiler_flags": [
+      "-DAVIF_DLL",
+      "-isystem",
+      "/usr/include/SDL2",
+      "-isystem",
+      "/usr/include/AL",
+      "-O3",
+      "-DNDEBUG",
+      "-std=c++20",
+      "-flto=auto",
+      "-fno-fat-lto-objects",
+      "-Wall",
+      "-pedantic-errors",
+      "-Wold-style-cast",
+      "-fno-rtti"
+    ],
+    "rows": 430,
+    "cases": [
+      "energy_starved",
+      "healthy",
+      "hull_disabled",
+      "overheat_recovery",
+      "shield_drain"
+    ],
+    "hull": {
+      "max_hull": 1000.0,
+      "minimum_hull": 366.0
+    },
+    "interface": "Unmodified stock Star Barge copied for Ship::DoGeneration traces; Energy Blaster costs are an explicit artificial training weapon reference. Stock anti-missile turret remains fitted. Private members exposed to replacement main compilation only."
+  },
+  "source_sha256": {
+    "dos/opponent_profile/native.py": "f76a2b88db87b787bb8b083375a52fd9adf0c859fdb529871e958e5b3f32aa10",
+    "dos/opponent_profile/check_dos.py": "0c26ff3f4bc59f782c24737c85c1a6ed46deefca9c9ef59c62e86d8afb2f592c",
+    "dos/opponent_profile/check.py": "9681addbff54325120967392e3175f295bee52a69fbea19d598e32c0eedace2a",
+    "dos/opponent_profile/assets.py": "412967474477d6cc83da0f217063be5fac11fb1fdeb6cd0b57ac27d43ba75b99",
+    "dos/opponent_profile/check.c": "ed5985de6633628818e09f411b2014b36db8a0afcc11587de91e87228e73ca23",
+    "dos/opponent_profile/oracle.cpp": "4858e3d94bc8cc44e334cef9a9c74cdcee92ab2b425d77564734c7f68d2e7c6b",
+    "dos/resources/resources.c": "bc74eb068617b6e236c5581fddc8a9f4923583873e822cc8b54464dde6b2a5e9",
+    "dos/resources/resources.h": "7f2eccacc6b93a4014ce7fde5c45f9206ad2325738f58e7c995057a6a46d5247",
+    "dos/shields/shields.c": "6708828685fb0ca7ab96e728c15c6c6592b4f28a69024b7e0d97c84a08c26945",
+    "dos/shields/shields.h": "a5675639605b00676da72aea191bd92ac2348c092fc09b68a8d9b199f79523a5"
+  },
+  "profile_sha256": {
+    "BARGERES.DAT": "71dee63a4d147f13b4b8c15e257f88da575877ab2551bced1f850da983e6b15d",
+    "BARGEPRO.DAT": "7a4a5796e4e3ba9832b5f6e8a7663bc255cfe4695784e83eba5bdb9c22bed93e",
+    "BARGEHP.DAT": "8d68a1a048474031d414018d952706256e4a74f7a789ee03fe9a8c55831b49a1",
+    "BARGESH.DAT": "0b2ddf5ff769fa7dba385d61c168415bf34ce8bf538445c0ccfadb82abddaf1f"
+  },
+  "scope": "Native Ship::DoGeneration vs shared resource/shield kernels; 5 fitted Star Barge cases. Flight integration and sanitizer tests are separate."
+}

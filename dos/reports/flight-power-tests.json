@@ -22,10 +22,11 @@
     }
   },
   "source_sha256": {
+    "dos/flight/target_power.c": "0758a0ff29fd080276701d61280bdfcc615db631bc991aa85dd8da5f87344545",
     "dos/flight/power_test.c": "87b2a7c5fbb8b06e8c838104889c08bdd5dcf22198caa1c0e44bb40a1e07073a",
     "dos/flight/power.c": "e7bcba87d457dbc13544e4886a50e81e1317b3080fc0f738211bd59ae79a5776",
     "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
-    "dos/flight/practice.c": "7b535782d9ca6bbdc6598fdc03319082a17cd6c3d639c2cf9fedff5ca0d8a326",
+    "dos/flight/practice.c": "13661fafe7d9a2868f1e8a373fa078f3131d14b34abe820448c3b2d1b507fa0b",
     "dos/propulsion/propulsion.c": "0288c5eda365de84b44682c17e32704f739afdf3b84bd78a10a72aa223c58d6c",
     "dos/shields/shields.c": "6708828685fb0ca7ab96e728c15c6c6592b4f28a69024b7e0d97c84a08c26945",
     "dos/resources/resources.c": "bc74eb068617b6e236c5581fddc8a9f4923583873e822cc8b54464dde6b2a5e9",
@@ -33,9 +34,10 @@
     "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
     "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
     "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/flight/target_power.h": "02100cec5d3ee615e7990004833649e737a14f0a7f3bf56ec78ca3af0e1b4d73",
     "dos/flight/power.h": "c1e9c7147d3db6affd1c6e28d572eed9522412ea9100aae6264bb319b0a555a3",
     "dos/flight/pilot.h": "80c5fed814002b335e32faf087b6ee95f0e72ff98343d8db4c9f805853f82149",
-    "dos/flight/practice.h": "9a730c7df532c629b7f8dc07c7024903b477c4b1ddec9a68a8d148e78be7ef89",
+    "dos/flight/practice.h": "60094ae32c39eb77648fa2c5eccc268acc3976d8d1d0970e9667652a4e703597",
     "dos/propulsion/propulsion.h": "edc6b87151a43c079776694f90c1d3d8fdf68e54044ba18dfe7f8abd0c462bac",
     "dos/shields/shields.h": "a5675639605b00676da72aea191bd92ac2348c092fc09b68a8d9b199f79523a5",
     "dos/resources/resources.h": "7f2eccacc6b93a4014ce7fde5c45f9206ad2325738f58e7c995057a6a46d5247",
@@ -43,7 +45,7 @@
     "dos/projectile/projectile.h": "7b37dcda30f678302d967c62a7660178642d65e89d93d20e33f63a08a2cea536",
     "dos/collision/mask.h": "4bc3166c00f7b99654bd248d67977e666dfb8f846a7deb05bf7081b415e91440",
     "dos/damage/damage.h": "89d622acf18301568b941aa793dbbbaade66f1d07057346997e6fdebb119eb29",
-    "dos/flight/test_power.py": "ace00a8e117b0cae677fb97286b35972321ff555ecc9afdad3b30fdd5a66a728"
+    "dos/flight/test_power.py": "912b8296feb8467eccfc71c2afa6e049d94c083d92ec8fd7c5e035c077f14921"
   },
   "profile_sha256": {
     "PILOT.DAT": "3be0027be676f407148d71af018af753b2ff7596a2bfacca57afb0a42cfc43a8",

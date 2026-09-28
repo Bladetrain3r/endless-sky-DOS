@@ -76,7 +76,8 @@ void threat_step(Threat *threat,Practice *practice,const Pilot *pilot)
         if(can_reach) { aim_x+=time*vx; aim_y+=time*vy; }
     }
     if(!practice->destroyed && !threat->destroyed && can_reach &&
-       threat->ticks>=THREAT_GRACE_TICKS && !threat->cooldown) {
+       threat->ticks>=THREAT_GRACE_TICKS && !threat->cooldown &&
+       target_power_can_fire(&practice->target_power)) {
         for(i=0;i<THREAT_BOLTS && threat->bolts[i].alive;++i) {}
         if(i<THREAT_BOLTS) {
             double ux,uy;
@@ -87,6 +88,7 @@ void threat_step(Threat *threat,Practice *practice,const Pilot *pilot)
                         practice->target.y+20.*uy-.5*source_vy,
                         source_vx,source_vy,angle,practice->speed,practice->lifetime);
             ++threat->shots;
+            target_power_fire(&practice->target_power);
         } else ++threat->dropped;
         threat->cooldown=(unsigned)practice->reload;
     }

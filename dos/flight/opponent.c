@@ -11,9 +11,10 @@ static void publish(const Opponent *opponent,Practice *practice)
 int opponent_load(Opponent *opponent,const char *path)
 {
     MotionParameters parameters;
-    if(!pursuit_load(&parameters,path)) return 0;
+    PropulsionProfile drive;
+    if(!pursuit_load(&parameters,path) || !propulsion_load(&drive,"BARGEPRO.DAT")) return 0;
     memset(opponent,0,sizeof(*opponent));
-    opponent->parameters=parameters;
+    opponent->parameters=parameters;opponent->drive=drive;
     return 1;
 }
 void opponent_reset(Opponent *opponent,Practice *practice)
@@ -29,9 +30,16 @@ void opponent_step(Opponent *opponent,Practice *practice,const Pilot *pilot,int 
     MotionCommand command;
     if(!opponent->enabled || practice->destroyed || player_destroyed) return;
     command=pursuit_command(&opponent->state,&opponent->parameters,pilot->state.x,pilot->state.y);
-    /* Fully supplied Star Barge movement; enemy resources are still a trainer
-     * abstraction, distinct from the player's shared resource simulation. */
-    motion_step(&opponent->state,&opponent->parameters,&command);
+    target_power_tick(&practice->target_power,&practice->health);
+    if(practice->target_power.enabled && practice->target_power.disabled) {
+        opponent->state.vx*=1.-opponent->parameters.drag;
+        opponent->state.vy*=1.-opponent->parameters.drag;
+        opponent->state.x+=opponent->state.vx;opponent->state.y+=opponent->state.vy;
+        command=(MotionCommand){0};
+    } else if(practice->target_power.enabled) {
+        propulsion_step(&opponent->state,&opponent->parameters,&command,
+            &practice->target_power.resources,&practice->target_power.budget,&opponent->drive);
+    } else motion_step(&opponent->state,&opponent->parameters,&command);
     ++opponent->ticks;
     opponent->thrust_ticks+=!!command.forward;
     opponent->turn_ticks+=command.turn!=0.;

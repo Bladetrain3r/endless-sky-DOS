@@ -10,11 +10,11 @@ import subprocess
 
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/threat/run'
-SOURCES=['dos/pursuit/pursuit.c','dos/flight/threat_test.c','dos/flight/threat.c','dos/flight/practice.c',
+SOURCES=['dos/flight/target_power.c','dos/pursuit/pursuit.c','dos/flight/threat_test.c','dos/flight/threat.c','dos/flight/practice.c',
          'dos/flight/pilot.c','dos/shields/shields.c','dos/resources/resources.c',
          'dos/motion/motion.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/damage/damage.c']
-HEADERS=['dos/pursuit/pursuit.h','dos/flight/threat.h','dos/flight/practice.h','dos/flight/pilot.h',
+HEADERS=['dos/flight/target_power.h','dos/pursuit/pursuit.h','dos/flight/threat.h','dos/flight/practice.h','dos/flight/pilot.h',
          'dos/shields/shields.h','dos/resources/resources.h','dos/motion/motion.h',
          'dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h']
 PROFILES=['PILOT.DAT','BLASTER.DAT','DAMAGE.DAT','MASKS.BIN','SHIELD.DAT',

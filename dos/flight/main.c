@@ -60,6 +60,7 @@ int main(int argc,char **argv)
     unsigned frames=120,ships=6,i,done=0; int demo=0,ok=0,opened=0,camera=0;
     int controlled=0,replay=0,keyboard=0,practice_test=0,stationary_target=0,invulnerable_target=0;
     int resource_stress=0,incoming_fire=0,incoming_test=0,pursuit=0;
+    int opponent_stock=0,opponent_stress=0;
     unsigned keys_seen=0;
     uint64_t id; size_t memory=0;
     unsigned long before=pages(),resident=0;
@@ -69,6 +70,13 @@ int main(int argc,char **argv)
         if(!strcmp(argv[i],"--demo")) demo=1;
         else if(!strcmp(argv[i],"--incoming-fire")) incoming_fire=1;
         else if(!strcmp(argv[i],"--pursuit")) pursuit=incoming_fire=1;
+        else if(!strcmp(argv[i],"--opponent-stock")) opponent_stock=1;
+        else if(!strcmp(argv[i],"--opponent-stress") && i+1<(unsigned)argc) {
+            ++i;
+            if(!strcmp(argv[i],"energy")) opponent_stress=1;
+            else if(!strcmp(argv[i],"heat")) opponent_stress=2;
+            else { error="opponent_stress_argument";goto done; }
+        }
         else if(!strcmp(argv[i],"--incoming-test")) controlled=replay=incoming_fire=incoming_test=1;
         else if(!strcmp(argv[i],"--invulnerable-target")) invulnerable_target=1;
         else if(!strcmp(argv[i],"--stationary-target")) stationary_target=1;
@@ -91,6 +99,7 @@ int main(int argc,char **argv)
         error="argument_range"; goto done;
     }
     if(pursuit && (!controlled || stationary_target)) { error="pursuit_requires_pilot_moving_target"; goto done; }
+    if((opponent_stock || opponent_stress) && !pursuit) { error="opponent_options_require_pursuit";goto done; }
     world=world_open("WORLD.PAK"); if(!world) { error="world_open_failed"; goto done; }
     if(!world_find_system(world,"Sol",&id) || !world_load_system(world,id,&system)) {
         error=world_error(world); goto done;
@@ -122,6 +131,9 @@ int main(int argc,char **argv)
         threat->enabled=incoming_fire;
         practice->moving_target=!stationary_target;
         practice->destructible=!invulnerable_target;
+        if(pursuit && !target_power_load(&practice->target_power,opponent_stock,opponent_stress)) {
+            error="opponent_profile";goto done;
+        }
         practice_reset(practice);
         opponent->enabled=pursuit;opponent_reset(opponent,practice);
         if(incoming_test) for(i=0;i<4;++i) practice_shield_test(practice);
@@ -212,13 +224,23 @@ int main(int argc,char **argv)
             video_text(frame,12,590,label,practice->resources.overheated?4:2);
             if(practice->destructible)
                 snprintf(label,sizeof(label),"TARGET SH %.1f  HULL %.1f%s",practice->health.shields,
-                    practice->health.hull>0.?practice->health.hull:0.,practice->destroyed?"  DESTROYED":"");
+                    practice->health.hull>0.?practice->health.hull:0.,practice->destroyed?"  DESTROYED":practice->target_power.disabled?" DISABLED":"");
             else snprintf(label,sizeof(label),"TARGET INVULNERABLE");
             video_text(frame,490,590,label,1);
             snprintf(label,sizeof(label),"SHIELD %.1f/%.0f  HULL %.1f/%.0f  H: DRAIN 25%% (TRAINER)",
                      practice->shield.shields,practice->shield_profile.capacity,
                      threat->hull>0.?threat->hull:0.,threat->max_hull);
             video_text(frame,12,44,label,threat->flash?4:2);
+            if(practice->target_power.enabled) {
+                const TargetPower *tp=&practice->target_power;
+                snprintf(label,sizeof(label),"ENEMY %s  E %.0f/%.0f  HEAT %.0f%%  %s",
+                    tp->stock?"STOCK HP":"TRAINING HP",tp->resources.energy,tp->budget.capacity,
+                    100.*tp->resources.heat/tp->budget.max_heat,
+                    practice->destroyed?"DESTROYED":tp->disabled?"DISABLED":
+                    tp->resources.overheated?"OVERHEATED":
+                    tp->resources.energy<tp->budget.shot_energy?"LOW ENERGY":"READY");
+                video_text(frame,12,56,label,2);
+            }
             if(threat->destroyed) video_text(frame,250,280,"SHIP DESTROYED - R TO RESET",4);
             else if(threat->disabled) video_text(frame,250,280,"HULL DISABLED - R TO RESET",4);
         }
@@ -271,6 +293,14 @@ done:
         "opponent_x=%.17g\nopponent_y=%.17g\nopponent_vx=%.17g\nopponent_vy=%.17g\nopponent_angle=%u\n",
         opponent->enabled,opponent->ticks,opponent->thrust_ticks,opponent->turn_ticks,
         opponent->state.x,opponent->state.y,opponent->state.vx,opponent->state.vy,(unsigned)opponent->state.angle);
+    if(practice && ok && practice->target_power.enabled) {
+        const TargetPower *tp=&practice->target_power;
+        printf("opponent_stock=%d\nopponent_stress=%d\nopponent_energy=%.17g\nopponent_heat=%.17g\n"
+            "opponent_overheated=%d\nopponent_disabled=%d\nopponent_minimum_hull=%.17g\n"
+            "opponent_blocked_energy=%u\nopponent_blocked_heat=%u\n",
+            tp->stock,tp->stress,tp->resources.energy,tp->resources.heat,tp->resources.overheated,
+            tp->disabled,tp->minimum_hull,tp->blocked_energy,tp->blocked_heat);
+    }
     report("background",&background); report("orbital",&orbital);
     report("traffic",&traffic); report("effect",&effect); report("hud",&hud);
     if(controlled) report("pilot_draw",&pilot_draw_time);

@@ -3,9 +3,11 @@
 #define FLIGHT_OPPONENT_H
 #include "practice.h"
 #include "../pursuit/pursuit.h"
+#include "../propulsion/propulsion.h"
 typedef struct {
     MotionState state;
     MotionParameters parameters;
+    PropulsionProfile drive;
     unsigned ticks,thrust_ticks,turn_ticks;
     int enabled;
 } Opponent;

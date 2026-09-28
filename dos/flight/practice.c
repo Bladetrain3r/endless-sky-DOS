@@ -73,6 +73,7 @@ void practice_reset(Practice *p)
     if(p->resource_enabled) resource_reset(&p->resources,&p->resource_profile);
     p->rng=17; p->target_ticks=0;
     p->health=(DamageState){30.,26.}; /* Reduced training target, not stock Barge stats. */
+    target_power_reset(&p->target_power,&p->health);
     p->destroyed=0; p->explosion=0;
     practice_target(p);
 }
@@ -139,7 +140,7 @@ void practice_finish_tick(Practice *p,const Pilot *pilot,int fire)
         if(!p->destroyed && bolt_hit(b,&p->target,1,&fraction)>=0) {
             b->alive=0; ++p->hits; p->flash=8;
             if(p->destructible) {
-                damage_hit(&p->health,p->shield_damage,p->hull_damage);
+                target_power_hit(&p->target_power,&p->health,p->shield_damage,p->hull_damage);
                 if(p->health.hull<0.) { p->destroyed=1; p->explosion=48; }
             }
         }
@@ -159,7 +160,7 @@ void practice_draw(unsigned char *frame,const Practice *p,const Scene *scene,
     if(!p->destroyed) sprite_draw(frame,barge,((unsigned)p->target.angle*barge->frames+32768u)/65536u,tx,ty,blend,add);
     /* Bounds also keep the fixed-width text renderer safely inside its frame. */
     if(tx>=55 && tx<745 && ty>=72 && ty<535)
-        video_text(frame,tx-48,ty-32,p->destroyed?"DESTROYED - R":(p->flash?"HIT!":(p->pursuit_target?"PURSUIT TARGET":(p->moving_target?"MOVING TARGET":"PRACTICE TARGET"))),p->flash?1:2);
+        video_text(frame,tx-48,ty-32,p->destroyed?"DESTROYED - R":(p->target_power.disabled?"DISABLED":(p->flash?"HIT!":(p->pursuit_target?"PURSUIT TARGET":(p->moving_target?"MOVING TARGET":"PRACTICE TARGET")))),p->flash?1:2);
     if(p->explosion && tx>-80 && tx<880 && ty>-80 && ty<680) {
         /* Bounded procedural sparks; no native effect timing/art claim. Render
          * never consumes the firing RNG, so frame rate cannot alter accuracy. */

@@ -10,15 +10,15 @@ import subprocess
 
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/opponent/run'
-SOURCES=['dos/pursuit/pursuit.c','dos/flight/opponent_test.c','dos/flight/opponent.c','dos/flight/threat.c','dos/flight/practice.c',
+SOURCES=['dos/flight/target_power_test.c','dos/propulsion/propulsion.c','dos/flight/target_power.c','dos/pursuit/pursuit.c','dos/flight/opponent_test.c','dos/flight/opponent.c','dos/flight/threat.c','dos/flight/practice.c',
          'dos/flight/pilot.c','dos/shields/shields.c','dos/resources/resources.c',
          'dos/motion/motion.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/damage/damage.c']
-HEADERS=['dos/flight/opponent.h','dos/pursuit/pursuit.h','dos/flight/threat.h','dos/flight/practice.h','dos/flight/pilot.h',
+HEADERS=['dos/propulsion/propulsion.h','dos/flight/target_power.h','dos/flight/opponent.h','dos/pursuit/pursuit.h','dos/flight/threat.h','dos/flight/practice.h','dos/flight/pilot.h',
          'dos/shields/shields.h','dos/resources/resources.h','dos/motion/motion.h',
          'dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h']
 PROFILES=['PILOT.DAT','BLASTER.DAT','DAMAGE.DAT','MASKS.BIN','SHIELD.DAT',
-          'PLAYER.DAT','PURSUIT.DAT','CWSDPMI.EXE']
+          'BARGERES.DAT','BARGESH.DAT','BARGEPRO.DAT','BARGEHP.DAT','PLAYER.DAT','PURSUIT.DAT','CWSDPMI.EXE']
 NATIVE='endless-sky-dos-native-reference:local'
 TOOLS='modern-arena-tools:0.1'
 def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -58,7 +58,7 @@ report={'results':results,
     'source_sha256':{p:digest(ROOT/p) for p in SOURCES+HEADERS+['dos/flight/test_opponent.py']},
     'profile_sha256':{p:digest(RUN/p) for p in PROFILES},
     'dos_flags':dosflags,'dos_config':conf,
-    'scope':'Pursuit integration: physical approach/turn, collision pose publication, death/reset, predictive aim and finite lifetime range gate. Native AI helper oracle is separate.',
+    'scope':'Pursuit and lifecycle integration: budgets, repair ordering, thermal drift, same-tick disable, health presets, physical approach/turn, collision pose publication, death/reset, predictive aim and finite lifetime range gate. Native AI helper oracle is separate.',
     'native_hull_evidence':'Stock Sparrow data/human/ships.txt hull 300; source/Ship.cpp CacheAttributes floors default threshold to 134. PLAYER.DAT is exported by the native Ship getter oracle.',
     'sanitizers':'Portable native ASan/UBSan; leak checking disabled'}
 (ROOT/'dos/reports/flight-opponent-tests.json').write_text(json.dumps(report,indent=2)+'\n')

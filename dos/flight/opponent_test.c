@@ -9,6 +9,7 @@ void video_text(unsigned char *f,int x,int y,const char *s,unsigned char color)
 { (void)f;(void)x;(void)y;(void)s;(void)color; }
 void sprite_draw(unsigned char *f,const Sprite *s,unsigned h,int x,int y,const unsigned char *b,const unsigned char *a)
 { (void)f;(void)s;(void)h;(void)x;(void)y;(void)b;(void)a; }
+void target_power_tests(Practice *,Opponent *,Threat *,Pilot *);
 int main(void)
 {
     static Practice p;
@@ -60,6 +61,7 @@ int main(void)
     threat_step(&threat,&p,&pilot);CHECK(!threat.shots && !threat.cooldown);
     threat_reset(&threat);threat.ticks=119;pilot.state=(MotionState){0.,-150.,0.,-20.,0};
     threat_step(&threat,&p,&pilot);CHECK(!threat.shots && !threat.cooldown);
+    target_power_tests(&p,&enemy,&threat,&pilot);
     puts("status=pass\nphysical_approach=pass\nbounded_turn=pass\npostmove_target_pose=pass\ndeath_and_reset=pass\nlead_and_range_gate=pass");
     return 0;
 }

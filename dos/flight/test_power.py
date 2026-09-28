@@ -9,10 +9,10 @@ import shutil
 import subprocess
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/power/run'
-SOURCES=['dos/flight/power_test.c','dos/flight/power.c','dos/flight/pilot.c',
+SOURCES=['dos/flight/target_power.c','dos/flight/power_test.c','dos/flight/power.c','dos/flight/pilot.c',
          'dos/flight/practice.c','dos/propulsion/propulsion.c','dos/shields/shields.c','dos/resources/resources.c',
          'dos/motion/motion.c','dos/projectile/projectile.c','dos/collision/mask.c','dos/damage/damage.c']
-HEADERS=['dos/flight/power.h','dos/flight/pilot.h','dos/flight/practice.h','dos/propulsion/propulsion.h',
+HEADERS=['dos/flight/target_power.h','dos/flight/power.h','dos/flight/pilot.h','dos/flight/practice.h','dos/propulsion/propulsion.h',
          'dos/shields/shields.h','dos/resources/resources.h','dos/motion/motion.h','dos/projectile/projectile.h',
          'dos/collision/mask.h','dos/damage/damage.h']
 NATIVE='endless-sky-dos-native-reference:local';TOOLS='modern-arena-tools:0.1'

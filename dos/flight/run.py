@@ -14,7 +14,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/run'
 IMAGE='modern-arena-tools:0.1'
-SOURCES=['dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
+SOURCES=['dos/flight/target_power.c','dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
          'dos/flight/scene.c','dos/flight/power.c','dos/propulsion/propulsion.c','dos/flight/sprite_reference.c','dos/world/active.c',
          'dos/shields/shields.c','dos/resources/resources.c','dos/damage/damage.c','dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/flight/pilot.c','dos/flight/input.c','dos/flight/input_state.c','dos/motion/motion.c']
@@ -36,6 +36,8 @@ def convert():
 
 def main():
     parser=argparse.ArgumentParser()
+    parser.add_argument('--opponent-stock',action='store_true')
+    parser.add_argument('--opponent-stress',choices=('energy','heat'))
     parser.add_argument('--pursuit-test',action='store_true',help='pilot route with pursuing target and predictive fire')
     parser.add_argument('--incoming-test',action='store_true',help='stationary player, shields drained, no friendly fire')
     parser.add_argument('--resource-stress',choices=('energy','heat'),help='deliberately constrained trainer resources')
@@ -49,6 +51,7 @@ def main():
     parser.add_argument('--practice-test',action='store_true',help='stationary held-fire training route')
     parser.add_argument('--replay',action='store_true',help='replay a pilot control route through native-matched motion')
     args=parser.parse_args()
+    if (args.opponent_stock or args.opponent_stress) and not args.pursuit_test: parser.error('opponent options require pursuit-test')
     if args.pursuit_test and (args.incoming_test or args.practice_test or args.replay or args.camera or args.resource_stress or args.moving_target): parser.error('pursuit-test is a separate pilot route')
     if args.incoming_test and (args.practice_test or args.replay or args.camera or args.resource_stress): parser.error('incoming-test is a separate route')
     if args.resource_stress and not args.practice_test: parser.error("resource-stress requires practice-test")
@@ -69,6 +72,7 @@ def main():
     subprocess.run(docker+['python3','dos/propulsion/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/shields/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/pursuit/assets.py'],check=True)
+    subprocess.run(docker+['python3','dos/opponent_profile/assets.py'],check=True)
     shutil.copyfile(ROOT/'.work/world/run/WORLD.PAK',RUN/'WORLD.PAK')
     archive=ROOT/'.work/toolchain/csdpmi7b.zip'
     assert digest(archive)=='deacda0488e1cdd7c4a9f32fab45662b34c0ed6b2d7d4d13bc07041b62004a8c'
@@ -85,6 +89,8 @@ def main():
     if args.replay: options+=' --replay'
     if args.incoming_test: options+=' --incoming-test'
     if args.pursuit_test: options+=' --replay --pursuit'
+    if args.opponent_stock: options+=' --opponent-stock'
+    if args.opponent_stress: options+=' --opponent-stress '+args.opponent_stress
     if args.practice_test: options+=' --practice-test'
     if args.resource_stress: options+=' --resource-stress '+args.resource_stress
     if not args.moving_target and not args.pursuit_test: options+=' --stationary-target'
@@ -152,6 +158,7 @@ def main():
     report=dict(reference_renderer=args.reference,kind='bounded-pursuit-pilot' if args.pursuit_test else 'bounded-incoming-fire' if args.incoming_test else 'bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
                 image_id=subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
                 compiler_flags=FLAGS,config=conf,source_sha256=source_hashes,
+                opponent_profile_sha256={name:digest(RUN/name) for name in ('BARGERES.DAT','BARGESH.DAT','BARGEPRO.DAT','BARGEHP.DAT')},
                 pursuit_profile_sha256=digest(RUN/'PURSUIT.DAT'),
                 player_profile_sha256=digest(RUN/'PLAYER.DAT'),
                 shield_profile_sha256=digest(RUN/'SHIELD.DAT'),
@@ -163,7 +170,7 @@ def main():
                 pilot_profile=json.loads((RUN/'pilot.json').read_text()),pack_sha256=digest(RUN/'WORLD.PAK'),frame_sha256=digest(RUN/'FRAME.IDX'),
                 exe_bytes=(RUN/'FLIGHT.EXE').stat().st_size,assets=json.loads((RUN/'assets.json').read_text()),
                 scope='Explicit residency counts world store+decoded system, frame, sprites, blend tables. Excludes runtime/code/stack/stdio and VRAM.',
-                limits=['Background traffic is scripted; pilot replay uses stock-Sparrow motion. Shared propulsion/gun energy/heat; native overheat drift; reduced target health, optional invulnerability, player shield recharge; no AI/target regen/status effects.',
+                limits=['Background traffic is scripted; pilot replay uses stock-Sparrow motion. Shared propulsion/gun energy/heat; native overheat drift; reduced target health, optional invulnerability, player shield recharge; optional native-derived Barge pursuit and resource lifecycle; no full AI/status effects.',
                         'Sol Earth/Luna fixed epoch0; scene placement selected for inspection.',
                         'Benchmark advances2simticks per render; demo60Hz accumulator/30Hz render target.',
                         'No faction recoloring or native animation interpolation yet.'])
@@ -172,6 +179,8 @@ def main():
     if args.replay: stem+='-pilot'
     if args.incoming_test: stem+='-incoming'
     if args.pursuit_test: stem+='-pursuit'
+    if args.opponent_stock: stem+='-stock'
+    if args.opponent_stress: stem+='-enemy-'+args.opponent_stress
     if args.practice_test: stem+='-practice'
     if args.moving_target: stem+='-moving'
     if args.destructible_target: stem+='-damage'

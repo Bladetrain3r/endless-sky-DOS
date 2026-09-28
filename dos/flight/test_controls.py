@@ -135,7 +135,8 @@ def main():
     fields = json.loads(result.stdout)
     assert tested_hash == hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     report = {'result': fields, 'exe_sha256': tested_hash, 'resource_stress': args.resource_stress,
-              'pursuit_profile_sha256': hashlib.sha256((RUN/'PURSUIT.DAT').read_bytes()).hexdigest(),
+              'opponent_profile_sha256':{name:hashlib.sha256((RUN/name).read_bytes()).hexdigest() for name in ('BARGERES.DAT','BARGESH.DAT','BARGEPRO.DAT','BARGEHP.DAT')},
+            'pursuit_profile_sha256': hashlib.sha256((RUN/'PURSUIT.DAT').read_bytes()).hexdigest(),
               'player_profile_sha256': hashlib.sha256((RUN/'PLAYER.DAT').read_bytes()).hexdigest(),
               'resource_profile_sha256': hashlib.sha256((RUN/'RESOURCE.DAT').read_bytes()).hexdigest(),
               'shield_profile_sha256': hashlib.sha256((RUN/'SHIELD.DAT').read_bytes()).hexdigest(),

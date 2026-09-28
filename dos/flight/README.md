@@ -99,8 +99,8 @@ pursuit commands after either ship is destroyed.
 
 The hull/sprite now turns with its simulated heading. Gun aiming is still an
 artificial freely aiming training turret: the stock Barge's anti-missile turret
-is not being portrayed as a blaster. Enemy power remains unlimited and target
-health stays at the deliberately reduced 30 shields/26 hull. No target selection,
+is not being portrayed as a blaster. Enemy power now uses its fitted Barge budget;
+health defaults to the deliberately reduced 30 shields/26 hull. No target selection,
 retreat, obstacle avoidance, personality or complete vanilla AI claim is made.
 The native movement helper uses current target position; projectile leading is
 a separate trainer rule using native interception math from the ship centres.
@@ -111,7 +111,45 @@ The native helper cases and exact binary64 fitted Barge profile are documented
 in [pursuit qualification](../pursuit/README.md). `test_opponent.py` checks physical
 approach, bounded turns, shared collision/render pose, lead/range limits and reset.
 `run.py --pursuit-test --frames 450` also compares the player against the accepted
-900-tick flight route while the Barge pursues. Human pursuit playtest pending.
+900-tick flight route while the Barge pursues. Human playtest accepted: target destroyed twice; incoming aim reported accurate.
+
+## Opponent resource lifecycle (2026-09-28)
+
+Pursuit now gives the opponent its own energy, heat, shield recharge and hull
+threshold. The same portable kernels serve both ships: recharge spends remaining
+energy before generation, then turning/thrust spend their share, then the gun
+attempts to fire. Overheating blocks control/fire and drifts under native drag;
+low power limits steering/thrust and can deny a shot. A hull-disabled opponent
+stops controlling, firing, generating and recharging, but still drifts. Bolts it
+already fired survive its disable/destruction. No boarding or repairs yet.
+
+The native fitted Barge exports 4000 energy capacity, 1.9 energy/tick generation,
+600 shields, 1000 hull and a 366 hull-disable threshold. The default quick trainer
+uses 30 shields/26 hull with the threshold scaled proportionally (9.516); native
+shield recharge rate/cost, engine costs and thermal parameters remain unchanged.
+This is a health preset, not a stock combat balance claim. The artificial blaster
+uses native Energy Blaster shot costs; the Barge's real anti-missile weapon is
+not simulated. Profile source/provenance: [opponent profiles](../opponent_profile/README.md).
+
+```sh
+# Default quick fight; same launch as the accepted pursuit checkpoint:
+python3 dos/flight/watch.py --pilot --pursuit
+# Full native health, still the artificial blaster:
+python3 dos/flight/watch.py --pilot --pursuit --opponent-stock
+# Deliberately constrained enemy budgets to reveal cutoffs/recovery:
+python3 dos/flight/watch.py --pilot --pursuit --opponent-stress energy
+python3 dos/flight/watch.py --pilot --pursuit --opponent-stress heat
+```
+
+Benchmark thrust/turn counters count AI requests, including requests blocked by
+overheat or limited by energy; position and velocity record applied motion.
+The enemy status line shows the health preset, power, heat and disable/overheat
+state. R resets both ships and their budgets. Legacy `--incoming-fire` without
+pursuit keeps the old unlimited-power scripted comparison target. Opponent
+energy stress is capacity40/generation.25 per tick; heat stress is max450 with
+zero passive heat generation. Both are explicit trainer overrides. Neither
+changes the player's resource profile. New lifecycle human playtest pending;
+the preceding unrestricted pursuit build was accepted with two target kills.
 
 ## Corrected-scale checkpoint (2026-09-27)
 

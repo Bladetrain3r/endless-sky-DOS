@@ -23,6 +23,8 @@ typedef struct {
     uint32_t rng;
     unsigned target_ticks;
     int moving_target;
+    int pursuit_target;
+    double target_vx,target_vy;
     BoltTarget target;
     DamageState health;
     double shield_damage,hull_damage;

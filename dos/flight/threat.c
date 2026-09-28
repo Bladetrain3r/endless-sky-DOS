@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 #include "threat.h"
+#include "../pursuit/pursuit.h"
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -45,6 +46,8 @@ void threat_step(Threat *threat,Practice *practice,const Pilot *pilot)
 {
     double source_vx=0.,source_vy=0.;
     unsigned i;
+    double aim_x,aim_y;
+    int can_reach=1;
     BoltTarget player;
     if(!threat || !threat->enabled || !practice || !pilot) return;
     ++threat->ticks;
@@ -56,17 +59,28 @@ void threat_step(Threat *threat,Practice *practice,const Pilot *pilot)
         source_vx=practice->target.x-threat->previous_target_x;
         source_vy=practice->target.y-threat->previous_target_y;
     }
+    if(practice->pursuit_target) {
+        source_vx=practice->target_vx;
+        source_vy=practice->target_vy;
+    }
     threat->previous_target_x=practice->target.x;
     threat->previous_target_y=practice->target.y;
     threat->have_previous_target=1;
     for(i=0;i<THREAT_BOLTS;++i) bolt_move(&threat->bolts[i]);
-    if(!practice->destroyed && !threat->destroyed &&
+    aim_x=pilot->state.x-practice->target.x;
+    aim_y=pilot->state.y-practice->target.y;
+    if(practice->pursuit_target) {
+        double vx=pilot->state.vx-source_vx,vy=pilot->state.vy-source_vy;
+        double time=pursuit_intercept(aim_x,aim_y,vx,vy,practice->speed);
+        can_reach=isfinite(time) && time>=0. && time<=practice->lifetime;
+        if(can_reach) { aim_x+=time*vx; aim_y+=time*vy; }
+    }
+    if(!practice->destroyed && !threat->destroyed && can_reach &&
        threat->ticks>=THREAT_GRACE_TICKS && !threat->cooldown) {
         for(i=0;i<THREAT_BOLTS && threat->bolts[i].alive;++i) {}
         if(i<THREAT_BOLTS) {
             double ux,uy;
-            uint16_t angle=motion_angle(atan2(pilot->state.x-practice->target.x,
-                                             practice->target.y-pilot->state.y)*
+            uint16_t angle=motion_angle(atan2(aim_x,-aim_y)*
                                          (180./3.14159265358979323846));
             motion_unit(angle,&ux,&uy);
             bolt_launch(&threat->bolts[i],practice->target.x+20.*ux-.5*source_vx,

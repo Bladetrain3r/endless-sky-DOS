@@ -15,7 +15,7 @@ RUN = ROOT / '.work/flight/run'
 IMAGE = 'modern-arena-tools:0.1'
 
 
-def guest(stress=None,incoming=False):
+def guest(stress=None,incoming=False,pursuit=False):
     result = RUN / 'KEYS.TXT'
     result.unlink(missing_ok=True)
     process = subprocess.Popen(['dosbox', '-conf', '.work/flight/run/keys.conf'],
@@ -42,7 +42,7 @@ def guest(stress=None,incoming=False):
             subprocess.run(['xdotool', action, key], check=True)
             time.sleep(pause)
 
-        if incoming:
+        if incoming or pursuit:
             send('keydown', 'h', .8)
             send('keyup', 'h', 4.0)
             send('key', 'Escape', .1)
@@ -70,11 +70,15 @@ def guest(stress=None,incoming=False):
         process.wait(timeout=20)
         fields = dict(line.split('=', 1) for line in result.read_text().splitlines() if '=' in line)
         assert fields['status'] == 'ok' and fields['video_verify'] == 'pass', fields
-        if incoming:
+        if incoming or pursuit:
             assert fields['incoming_fire']=='1' and int(fields['enemy_hits'])>0,fields
             assert fields['shield_test_pulses']=='1' and fields['practice_shots']=='0',fields
             assert float(fields['player_shields'])<1050. and float(fields['player_hull'])==300.,fields
             assert fields['enemy_dropped']=='0' and fields['discarded_sim_ms']=='0.000',fields
+            if pursuit:
+                assert fields['pursuit']=='1' and int(fields['opponent_turn_ticks'])>0,fields
+                assert int(fields['opponent_thrust_ticks'])>0,fields
+                assert float(fields['opponent_x'])!=650. or float(fields['opponent_y'])!=140.,fields
             print(json.dumps(fields))
             return
         assert int(fields['pilot_input_bits']) == 505 and fields['pilot_keyboard'] == '1', fields
@@ -108,25 +112,30 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--guest',action='store_true')
     parser.add_argument('--incoming-fire',action='store_true')
+    parser.add_argument('--pursuit',action='store_true')
     parser.add_argument('--resource-stress',choices=('energy','heat'))
     args = parser.parse_args()
-    if args.guest: return guest(args.resource_stress,args.incoming_fire)
+    if args.guest: return guest(args.resource_stress,args.incoming_fire,args.pursuit)
     stress_option = ' --resource-stress '+args.resource_stress if args.resource_stress else ''
     if args.incoming_fire: stress_option+=' --incoming-fire'
+    if args.pursuit: stress_option+=' --pursuit'
+    target_option='' if args.pursuit else ' --stationary-target'
     base = (ROOT / 'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     config = base + ('[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
-                     f'FLIGHT.EXE --demo --pilot --stationary-target --seconds 25{stress_option} > KEYS.TXT\nexit\n')
+                     f'FLIGHT.EXE --demo --pilot{target_option} --seconds 25{stress_option} > KEYS.TXT\nexit\n')
     (RUN / 'keys.conf').write_text(config)
     tested_hash = hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     result = subprocess.run(['docker', 'run', '--rm', '--network', 'none', '--user',
         f'{os.getuid()}:{os.getgid()}', '-e', 'HOME=/tmp', '-v', f'{ROOT}:/work', '-w', '/work',
         IMAGE, 'timeout', '55s', 'xvfb-run', '-a', 'python3', 'dos/flight/test_controls.py', '--guest',
         *(['--resource-stress',args.resource_stress] if args.resource_stress else []),
-        *(['--incoming-fire'] if args.incoming_fire else [])],
+        *(['--incoming-fire'] if args.incoming_fire else []),
+        *(['--pursuit'] if args.pursuit else [])],
         check=True, capture_output=True, text=True, timeout=65)
     fields = json.loads(result.stdout)
     assert tested_hash == hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     report = {'result': fields, 'exe_sha256': tested_hash, 'resource_stress': args.resource_stress,
+              'pursuit_profile_sha256': hashlib.sha256((RUN/'PURSUIT.DAT').read_bytes()).hexdigest(),
               'player_profile_sha256': hashlib.sha256((RUN/'PLAYER.DAT').read_bytes()).hexdigest(),
               'resource_profile_sha256': hashlib.sha256((RUN/'RESOURCE.DAT').read_bytes()).hexdigest(),
               'shield_profile_sha256': hashlib.sha256((RUN/'SHIELD.DAT').read_bytes()).hexdigest(),
@@ -134,7 +143,7 @@ def main():
               'test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'image_id': subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
               'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; held H single shield drain and recharge; physical feel awaits human check.'}
-    (ROOT / ('dos/reports/flight-controls'+('-incoming' if args.incoming_fire else '')+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
+    (ROOT / ('dos/reports/flight-controls'+('-pursuit' if args.pursuit else '-incoming' if args.incoming_fire else '')+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(fields, indent=2))
 
 

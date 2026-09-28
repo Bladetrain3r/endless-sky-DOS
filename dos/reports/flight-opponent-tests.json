@@ -2,30 +2,25 @@
   "results": {
     "native": {
       "status": "pass",
-      "profile": "300_134",
-      "graced_direct_hit": "pass",
-      "shield_overflow_delay": "pass",
-      "dodge_and_no_ai": "pass",
-      "source_velocity": "pass",
-      "source_death_retains_shot": "pass",
-      "death_ignores_later_hits": "pass",
-      "disable_threshold_and_reset": "pass"
+      "physical_approach": "pass",
+      "bounded_turn": "pass",
+      "postmove_target_pose": "pass",
+      "death_and_reset": "pass",
+      "lead_and_range_gate": "pass"
     },
     "dos": {
       "status": "pass",
-      "profile": "300_134",
-      "graced_direct_hit": "pass",
-      "shield_overflow_delay": "pass",
-      "dodge_and_no_ai": "pass",
-      "source_velocity": "pass",
-      "source_death_retains_shot": "pass",
-      "death_ignores_later_hits": "pass",
-      "disable_threshold_and_reset": "pass"
+      "physical_approach": "pass",
+      "bounded_turn": "pass",
+      "postmove_target_pose": "pass",
+      "death_and_reset": "pass",
+      "lead_and_range_gate": "pass"
     }
   },
   "source_sha256": {
     "dos/pursuit/pursuit.c": "118d8214f130c2584a012079f13e5bd14f363ea42a922dca025bcb1b08ccd121",
-    "dos/flight/threat_test.c": "4262ce0fc63e0cf9536640052797dc445ecb9a092b9f6fd7821afe064947eeff",
+    "dos/flight/opponent_test.c": "cae26ca1a3a010a39237c33fce7f299fe29f2d969773c816d7d3e9341766a518",
+    "dos/flight/opponent.c": "ce875507ef86ac2250b2519fc251250471c3ba06b3e003f4b1839d91ef77da39",
     "dos/flight/threat.c": "7c7ed0b05c09e68f0fb14670f0e128692927884bc8bff47b5c00424a982ade96",
     "dos/flight/practice.c": "0c6718c65bdc70f6d5224abc782ab73f77c792bbe1758f44bd708891ce864eb9",
     "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
@@ -35,6 +30,7 @@
     "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
     "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
     "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/flight/opponent.h": "1d470cfb9e059c692362ff423727a31d2aa690f12e5d85432d4b08b5f809f01f",
     "dos/pursuit/pursuit.h": "48a306e43b7b2d7675ba48a927b840b795770335ba17644a9c77e8d7fd472bd9",
     "dos/flight/threat.h": "a9774efad40605e678554641ceb7aa2fbae179ea8c9a3a6a3bad7adab31576b2",
     "dos/flight/practice.h": "322b8803bf3e62fe8d85e2e77d38f97d89e890c142dc72eac16f0b2ffe8a6d8b",
@@ -45,7 +41,7 @@
     "dos/projectile/projectile.h": "7b37dcda30f678302d967c62a7660178642d65e89d93d20e33f63a08a2cea536",
     "dos/collision/mask.h": "4bc3166c00f7b99654bd248d67977e666dfb8f846a7deb05bf7081b415e91440",
     "dos/damage/damage.h": "89d622acf18301568b941aa793dbbbaade66f1d07057346997e6fdebb119eb29",
-    "dos/flight/test_threat.py": "9312b7b5a14e5bdaf623b494c77818575ed8a01b3e2c28d788f64dc63ab619d4"
+    "dos/flight/test_opponent.py": "a83929b5314a065adff24b9cdc0107fbf7f959700c92a21a6c71f0a0f7a9f193"
   },
   "profile_sha256": {
     "PILOT.DAT": "3be0027be676f407148d71af018af753b2ff7596a2bfacca57afb0a42cfc43a8",
@@ -54,6 +50,7 @@
     "MASKS.BIN": "26d8dab40eec8a444685abdaead340f49a5cd4c743c5bada463d31cd6e5c09af",
     "SHIELD.DAT": "7896f0c48a131f68b3c6cd1a8850a46bca2f9f4d79237562eda4eccdff245b44",
     "PLAYER.DAT": "130a2411bba5a02bad0c0abe6141073d801a413057e8e093116af8f8309d24f3",
+    "PURSUIT.DAT": "c912f0379ab4e7cd41826386a472dbfc2a2c307cde1450c76c71ec3cbc1819b2",
     "CWSDPMI.EXE": "2de899fecaa90632b8b9bdfc0305cb0375e59ae252c37e32d06c1ed3f98a8f44"
   },
   "dos_flags": [
@@ -68,8 +65,8 @@
     "-mno-sse",
     "-mno-sse2"
   ],
-  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/flight/threat/run\nc:\nCWSDPMI -s-\nTHREAT.EXE > RESULT.TXT\nexit\n",
-  "scope": "Scripted target turret, fixed hostile pool, post-move Sparrow collision, shield overflow and hull flags; no native AI/turret tracking claim.",
+  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/flight/opponent/run\nc:\nCWSDPMI -s-\nOPPONENT.EXE > RESULT.TXT\nexit\n",
+  "scope": "Pursuit integration: physical approach/turn, collision pose publication, death/reset, predictive aim and finite lifetime range gate. Native AI helper oracle is separate.",
   "native_hull_evidence": "Stock Sparrow data/human/ships.txt hull 300; source/Ship.cpp CacheAttributes floors default threshold to 134. PLAYER.DAT is exported by the native Ship getter oracle.",
   "sanitizers": "Portable native ASan/UBSan; leak checking disabled"
 }

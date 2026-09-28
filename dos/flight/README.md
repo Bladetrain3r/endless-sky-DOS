@@ -80,7 +80,38 @@ Tests: `test_threat.py` (portable sanitizers + DOS); `test_power.py` (disabled
 resource/repair/drift); `test_controls.py --incoming-fire` (actual keyboard);
 `run.py --incoming-test --frames 600` (drained-shield stationary death route).
 Evidence lives in `dos/reports/flight-threat-tests.json`, `flight-controls-incoming.json`
-and `flight-6-ships-incoming-profile.json`. Human incoming-fire feedback pending.
+and `flight-6-ships-incoming-profile.json`. User accepted incoming fire through disable and destruction.
+
+## Pursuit opponent (2026-09-28)
+
+```sh
+python3 dos/flight/watch.py --pilot --pursuit
+```
+
+This mode implies incoming fire and replaces the ellipse with a physically moving
+Star Barge, initially at (650,140). It turns toward you and applies thrust using
+the original `AI::MoveToAttack`/`TurnToward` rules for that fitted ship, through
+the existing movement kernel. Its gun predicts your movement using the native
+`AI::RendezvousTime` helper and fires only at finite intercepts within bolt lifetime.
+Keep moving, change direction, and try flying past it; **R** resets the opponent,
+player, shots and two-second grace period together. The opponent stops receiving
+pursuit commands after either ship is destroyed.
+
+The hull/sprite now turns with its simulated heading. Gun aiming is still an
+artificial freely aiming training turret: the stock Barge's anti-missile turret
+is not being portrayed as a blaster. Enemy power remains unlimited and target
+health stays at the deliberately reduced 30 shields/26 hull. No target selection,
+retreat, obstacle avoidance, personality or complete vanilla AI claim is made.
+The native movement helper uses current target position; projectile leading is
+a separate trainer rule using native interception math from the ship centres.
+
+`--incoming-fire` alone retains the scripted turret/ellipse comparison; omitting
+both flags retains the quiet range. `--stationary-target` conflicts with pursuit.
+The native helper cases and exact binary64 fitted Barge profile are documented
+in [pursuit qualification](../pursuit/README.md). `test_opponent.py` checks physical
+approach, bounded turns, shared collision/render pose, lead/range limits and reset.
+`run.py --pursuit-test --frames 450` also compares the player against the accepted
+900-tick flight route while the Barge pursues. Human pursuit playtest pending.
 
 ## Corrected-scale checkpoint (2026-09-27)
 

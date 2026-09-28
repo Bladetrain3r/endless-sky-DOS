@@ -104,7 +104,7 @@ void practice_finish_tick(Practice *p,const Pilot *pilot,int fire)
     if(p->explosion) --p->explosion;
     if(!p->destroyed) {
         ++p->target_ticks;
-        practice_target(p); /* Post-move pose shared by collision and rendering. */
+        if(!p->pursuit_target) practice_target(p); /* Post-move collision/render pose. */
     }
     if(p->flash) --p->flash;
     if(p->cooldown) --p->cooldown;
@@ -159,7 +159,7 @@ void practice_draw(unsigned char *frame,const Practice *p,const Scene *scene,
     if(!p->destroyed) sprite_draw(frame,barge,((unsigned)p->target.angle*barge->frames+32768u)/65536u,tx,ty,blend,add);
     /* Bounds also keep the fixed-width text renderer safely inside its frame. */
     if(tx>=55 && tx<745 && ty>=72 && ty<535)
-        video_text(frame,tx-48,ty-32,p->destroyed?"DESTROYED - R":(p->flash?"HIT!":(p->moving_target?"MOVING TARGET":"PRACTICE TARGET")),p->flash?1:2);
+        video_text(frame,tx-48,ty-32,p->destroyed?"DESTROYED - R":(p->flash?"HIT!":(p->pursuit_target?"PURSUIT TARGET":(p->moving_target?"MOVING TARGET":"PRACTICE TARGET"))),p->flash?1:2);
     if(p->explosion && tx>-80 && tx<880 && ty>-80 && ty<680) {
         /* Bounded procedural sparks; no native effect timing/art claim. Render
          * never consumes the firing RNG, so frame rate cannot alter accuracy. */

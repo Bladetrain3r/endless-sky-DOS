@@ -14,7 +14,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/run'
 IMAGE='modern-arena-tools:0.1'
-SOURCES=['dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
+SOURCES=['dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
          'dos/flight/scene.c','dos/flight/power.c','dos/propulsion/propulsion.c','dos/flight/sprite_reference.c','dos/world/active.c',
          'dos/shields/shields.c','dos/resources/resources.c','dos/damage/damage.c','dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/flight/pilot.c','dos/flight/input.c','dos/flight/input_state.c','dos/motion/motion.c']
@@ -36,6 +36,7 @@ def convert():
 
 def main():
     parser=argparse.ArgumentParser()
+    parser.add_argument('--pursuit-test',action='store_true',help='pilot route with pursuing target and predictive fire')
     parser.add_argument('--incoming-test',action='store_true',help='stationary player, shields drained, no friendly fire')
     parser.add_argument('--resource-stress',choices=('energy','heat'),help='deliberately constrained trainer resources')
     parser.add_argument('--ships',type=int,default=6,choices=range(1,65))
@@ -48,13 +49,14 @@ def main():
     parser.add_argument('--practice-test',action='store_true',help='stationary held-fire training route')
     parser.add_argument('--replay',action='store_true',help='replay a pilot control route through native-matched motion')
     args=parser.parse_args()
+    if args.pursuit_test and (args.incoming_test or args.practice_test or args.replay or args.camera or args.resource_stress or args.moving_target): parser.error('pursuit-test is a separate pilot route')
     if args.incoming_test and (args.practice_test or args.replay or args.camera or args.resource_stress): parser.error('incoming-test is a separate route')
     if args.resource_stress and not args.practice_test: parser.error("resource-stress requires practice-test")
     if args.destructible_target and not args.practice_test: parser.error('destructible-target requires practice-test')
     if args.moving_target and not args.practice_test: parser.error('moving-target requires practice-test')
     if args.practice_test and (args.camera or args.replay): parser.error('practice-test is a separate controlled route')
     if args.replay and args.camera: parser.error('pilot replay follows the ship; --camera selects the scripted pan')
-    if args.replay and args.frames>450: parser.error('pilot reference route is bounded to450frames/900ticks')
+    if (args.replay or args.pursuit_test) and args.frames>450: parser.error('pilot reference route is bounded to450frames/900ticks')
     if not 1<=args.frames<=3600: parser.error('frames must be1..3600')
     RUN.mkdir(parents=True,exist_ok=True)
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
@@ -66,12 +68,13 @@ def main():
     subprocess.run(docker+['python3','dos/resources/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/propulsion/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/shields/assets.py'],check=True)
+    subprocess.run(docker+['python3','dos/pursuit/assets.py'],check=True)
     shutil.copyfile(ROOT/'.work/world/run/WORLD.PAK',RUN/'WORLD.PAK')
     archive=ROOT/'.work/toolchain/csdpmi7b.zip'
     assert digest(archive)=='deacda0488e1cdd7c4a9f32fab45662b34c0ed6b2d7d4d13bc07041b62004a8c'
     with zipfile.ZipFile(archive) as z:
         (RUN/'CWSDPMI.EXE').write_bytes(z.read('bin/CWSDPMI.EXE'))
-    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h','dos/shields/shields.h','dos/resources/resources.h','dos/propulsion/propulsion.h']
+    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h','dos/shields/shields.h','dos/resources/resources.h','dos/propulsion/propulsion.h','dos/pursuit/pursuit.h']
     source_hashes={s:digest(ROOT/s) for s in inputs}
     subprocess.run(docker+['.work/toolchain/djgpp/bin/i586-pc-msdosdjgpp-gcc',*FLAGS,
                           *(['-DREFERENCE_RENDERER'] if args.reference else []),*SOURCES,'-lm','-o','.work/flight/run/FLIGHT.EXE'],check=True)
@@ -81,9 +84,10 @@ def main():
     if args.camera: options+=' --camera'
     if args.replay: options+=' --replay'
     if args.incoming_test: options+=' --incoming-test'
+    if args.pursuit_test: options+=' --replay --pursuit'
     if args.practice_test: options+=' --practice-test'
     if args.resource_stress: options+=' --resource-stress '+args.resource_stress
-    if not args.moving_target: options+=' --stationary-target'
+    if not args.moving_target and not args.pursuit_test: options+=' --stationary-target'
     if not args.destructible_target: options+=' --invulnerable-target'
     if args.headless_demo: options+=' --demo --seconds 4'
     conf=base+'[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
@@ -108,7 +112,7 @@ def main():
         expected=float(fields['wall_elapsed_ms'])*60/1000
         allowance=float(fields['frame_max_ms'])*60/1000+3
         assert abs(int(fields['simulation_ticks'])-expected)<=allowance,fields
-    if args.replay:
+    if args.replay or args.pursuit_test:
         ticks=int(fields['simulation_ticks'])
         assert int(fields['pilot_ticks'])==ticks
         with (ROOT/'.work/motion/native.csv').open() as f:
@@ -116,6 +120,12 @@ def main():
         for key,offset in [('x',275.),('y',373.),('vx',0.),('vy',0.)]:
             assert abs(float(fields['pilot_'+key])-float(expected[key])-offset)<1e-7,(key,fields,expected)
         assert int(fields['pilot_angle'])==int(expected['angle_steps'])
+    if args.pursuit_test:
+        assert fields['pursuit']=='1' and fields['incoming_fire']=='1',fields
+        assert int(fields['opponent_thrust_ticks'])>0 and int(fields['opponent_turn_ticks'])>0,fields
+        assert fields['enemy_dropped']=='0' and fields['player_destroyed']=='0',fields
+        assert abs(float(fields['target_x'])-float(fields['opponent_x']))<1e-9,fields
+        assert abs(float(fields['target_y'])-float(fields['opponent_y']))<1e-9,fields
     if args.incoming_test:
         assert fields['incoming_fire']=='1' and fields['practice_shots']=='0',fields
         assert fields['shield_test_pulses']=='4' and fields['enemy_dropped']=='0',fields
@@ -139,9 +149,10 @@ def main():
     assert (RUN/'FRAME.IDX').stat().st_size==480000
     subprocess.run(docker+['python3','-c',
         'import sys; sys.path.insert(0,"dos/flight"); from run import convert; convert()'],check=True)
-    report=dict(reference_renderer=args.reference,kind='bounded-incoming-fire' if args.incoming_test else 'bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
+    report=dict(reference_renderer=args.reference,kind='bounded-pursuit-pilot' if args.pursuit_test else 'bounded-incoming-fire' if args.incoming_test else 'bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
                 image_id=subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
                 compiler_flags=FLAGS,config=conf,source_sha256=source_hashes,
+                pursuit_profile_sha256=digest(RUN/'PURSUIT.DAT'),
                 player_profile_sha256=digest(RUN/'PLAYER.DAT'),
                 shield_profile_sha256=digest(RUN/'SHIELD.DAT'),
                 propulsion_profile_sha256=digest(RUN/'PROPULSE.DAT'),
@@ -160,6 +171,7 @@ def main():
     if args.reference: stem+='-reference'
     if args.replay: stem+='-pilot'
     if args.incoming_test: stem+='-incoming'
+    if args.pursuit_test: stem+='-pursuit'
     if args.practice_test: stem+='-practice'
     if args.moving_target: stem+='-moving'
     if args.destructible_target: stem+='-damage'

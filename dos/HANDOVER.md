@@ -1,24 +1,29 @@
 # Endless Sky DOS handover
-Updated 2026-09-28. Incoming-fire checkpoint; human playtest pending.
+Updated 2026-09-28. Pursuit checkpoint ready for playtest; incoming fire human accepted.
 
 ## Current build
-- Launch `python3 dos/flight/watch.py --pilot --incoming-fire`.
-  Docker/X11, default 120 seconds. Omit --incoming-fire for the quiet range.
+- Launch `python3 dos/flight/watch.py --pilot --pursuit`.
+  Docker/X11,120seconds. --incoming-fire alone keeps ellipse; omit both flags for quiet range.
   W/Up thrust, A/D/arrows turn, Space fire, Tab camera, R reset, Esc/CtrlF9 exit.
   H drains 25% player shields once per press (explicit trainer input).
 - Sparrow has native movement, no reverse; healthy release coasts without drag.
   Shared energy/heat, fractional steering/thrust, overheat/recovery are human accepted.
-  Shield recharge/overheat suspension now human accepted too (Sept28).
+  Shield recharge and incoming shield→hull→disable→destruction human accepted.
 - Stock shield1400, hull300, hull-disable threshold134, all native getter-derived.
   Recharge .2 shield and .2 energy/tick, prior energy BEFORE generation/movement/fire.
   Generator1.9/tick > recharge .2: normal recharge does not visibly drain battery.
   --resource-stress energy: capacity40/generation.25; heat: max450/passiveheat0.
   Both are deliberate test presets, not stock loadouts.
-- Incoming-fire target: scripted 8-second ellipse, artificial unlimited-power turret.
+- --incoming-fire target: scripted 8-second ellipse, artificial unlimited-power turret.
   Two-second grace, current-position aim (no lead), blaster speed/life/reload/damage.
   Orange/red enemy bolts; separate fixed16-shot hostile pool; native Sparrow mask.
-  Target death stops new fire; shots already flying survive. No real AI/turret tracking.
+  Target death stops new fire; shots already flying survive. No native turret tracking.
   Friendly hits resolve before turret firing; same-tick kill suppresses new shot.
+- --pursuit: native Star Barge motion with AI::MoveToAttack/TurnToward helper.
+  Starts650,140; current-position navigation; actual heading and physical movement.
+  Turret uses native RendezvousTime lead, only finite intercepts within bolt lifetime.
+  No tactics/target selection/avoidance/resources for opponent; reduced health retained.
+  R restores enemy motion/pools/grace too. Dies or stops pursuit after player death.
 - Hull <134 disables controls/fire/generation/recharge and applies native drift.
   Hull <0 destroys; trainer hides/freezes player and displays reset prompt.
   R restores both ships, resources, pools and grace. H four taps shortens hull test.
@@ -33,18 +38,21 @@ Updated 2026-09-28. Incoming-fire checkpoint; human playtest pending.
 - dos/shields/README.md: unchanged Ship::DoGeneration,10cases423ticks,
   zero observed shield/energy/heat error native ASan/UBSan and DOS; root reproduced.
   Native assertions verify hull-disable generation/repair and strict threshold.
-  PLAYER.DAT is ESPLAYER1 +2 LE binary64 values (MaxHull, minimumHull).
 - flight/test_threat.py: native ASan/UBSan +DOS direct/overflow/dodge/grace,
   inherited velocity, source-death shot, strict hull thresholds, reset, bad profile.
   Root independently reproduced; reports/flight-threat-tests.json.
 - flight/test_power.py: recharge/generation/steering/thrust/fire order, heat recovery,
   persistent hull disable, drift, camera/reset. Native ASan/UBSan and DOS pass.
-- Final incoming benchmark:1200ticks,56hostilehits, player destroyed,0pooldrops.
-  reports/flight-6-ships-incoming-profile.json; root inspected death HUD capture.
-  Counted heap2,898,906B (+792 vs shield build),28.920ms mean/33.286max frame.
-  Excludes runtime/code/stack/stdio/DPMI and480000VRAM; not full-battle FPS.
-- Actual DOSBox keyboard incoming hit/H-once test passed,0discarded sim time.
-  Final quiet +incoming key reruns passed and bind current executable/profiles.
+- Pursuit helper:16commands/11intercepts, zero observed error native ASan/UBSan
+  and DOS; root reran. NaN/infinity classifications and malformed profiles checked.
+- Opponent integration native ASan/UBSan +DOS: physical approach, bounded turns,
+  postmove collision pose, death/reset, predictive aim/range gates all pass.
+- Pursuit900tick route preserves accepted player motion;26shots22hits,0pooldrops.
+  reports/flight-6-ships-pursuit-profile.json; root inspected capture.
+  Counted heap2,899,018B (+112 vs incoming); excludes code/stack/runtime/VRAM.
+  21.696ms mean frame on route leaving Sol backdrop; not full-battle FPS.
+- Final quiet/incoming/pursuit actual keyboard tests pass;0discarded sim time.
+  Reports bind current executable/profiles; human pursuit feel check pending.
 - Resources9cases927rows zeroerror native/DOS after hull gate; shield423rows pass.
   Original damage8cases18rows and projectile588reachable rows remain prior evidence.
   All tests/builds Docker, i386/noMMX/SSE,16MiB/20k/no swap; cycles are not MHz.
@@ -68,5 +76,5 @@ Updated 2026-09-28. Incoming-fire checkpoint; human playtest pending.
 - Earlier preserved flight .work/flight/accepted-44aced341; --accepted uses0636c12dc.
 
 ## Next
-- Human incoming-fire playtest: dodge, shield/hull loss, target kill, disabled/dead R.
+- Human pursuit playtest pending: fly past/away, dodge predictive shots, kill/reset.
   Then choose the next bounded combat or navigation slice; none started yet.

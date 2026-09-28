@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "oracle": {
+    "schema": 1,
+    "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+    "image_id": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
+    "baseline_binary_sha256": "77fcb7ff282a9b82d5fce13125bb403c9a7e65b98661f73786a4f99007654414",
+    "oracle_source_sha256": "09bfebb583bda237e69daa2739be587f76a68be414208eb75c5413655c6b81d4",
+    "runner_source_sha256": "47c024ea0f5815c90cda613276916a94e065f44ba9f154946531718aaf08035d",
+    "oracle_binary_sha256": "fb55c42d0bef44d2796e47707cbcd6a16b7a8f8dfa60b40049f5d72c6bc2db92",
+    "commands_sha256": "08638aaad4dbbc85b7372b61b73774202a341a96bac877adecf284e05ac65055",
+    "intercepts_sha256": "65a0d0ea785d69c21d9e5a7571949e48a9e82328a72e36e497a115154ff7f2f2",
+    "profile_sha256": "c912f0379ab4e7cd41826386a472dbfc2a2c307cde1450c76c71ec3cbc1819b2",
+    "stock_ship_data_sha256": "434fffaf7fb44c1c6687fe8bd20efc59fce9fc875b82a12f98ce12015ebf3e96",
+    "stock_outfit_data_sha256": {
+      "engines.txt": "2a78ce13be9e2d8d9bbe2f774d5f6aa4179f11f29e7c6d90c734e9c736fea680",
+      "power.txt": "c6645ef750bc208d013aaa0714d2b6bd28cce9c535a656735f214cd213df7352",
+      "outfits.txt": "3172b96e33196a7c3d7ca4acf78665c5b1ebf7f64d1bc098ab6fee5f29877da4"
+    },
+    "behavior_source_sha256": {
+      "AI.cpp": "7dacc4c86028ff8f2dfebf8f082e111cd2cb086de9d6a373fc38a19e2b1c7401",
+      "AI.h": "7a6684dd686d538999c1c53b4f9d0b49f382deb7bdcab4ca61acf486e3471ee7",
+      "Ship.cpp": "1073d0efb023c3780b9cbbbffc3b153b57fb933f0d77c5bf39a8e6b0aca44dd9",
+      "Ship.h": "7818511cd1e7f3ab200637873e19345f5ab2e61d048b692e7fa7e4e6a15d12ba"
+    },
+    "profile_values": {
+      "accel": 0.06806532663316583,
+      "reverse": 0.0,
+      "turn": 1.4472361809045227,
+      "drag": 0.011055276381909548,
+      "mult": 1.0
+    },
+    "commands": 16,
+    "intercepts": 11,
+    "compiler_flags": [
+      "-DAVIF_DLL",
+      "-isystem",
+      "/usr/include/SDL2",
+      "-isystem",
+      "/usr/include/AL",
+      "-O3",
+      "-DNDEBUG",
+      "-std=c++20",
+      "-flto=auto",
+      "-fno-fat-lto-objects",
+      "-Wall",
+      "-pedantic-errors",
+      "-Wold-style-cast",
+      "-fno-rtti"
+    ],
+    "interface": "Oracle exposes private AI static methods only while compiling replacement main; original game objects are unchanged."
+  },
+  "results": {
+    "native_asan_ubsan": {
+      "commands": "16",
+      "intercepts": "11",
+      "turn_max_error": "0",
+      "time_max_error": "0",
+      "status": "pass"
+    },
+    "dosbox_16mib_20k": {
+      "commands": "16",
+      "intercepts": "11",
+      "turn_max_error": "0",
+      "time_max_error": "0",
+      "status": "pass"
+    }
+  },
+  "source_sha256": {
+    "dos/pursuit/pursuit.c": "118d8214f130c2584a012079f13e5bd14f363ea42a922dca025bcb1b08ccd121",
+    "dos/pursuit/check.c": "6041c19ea57b27055a96c6cc4eaf29164cac8f9821f58309bb18a5429aa9e2a1",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/pursuit/pursuit.h": "48a306e43b7b2d7675ba48a927b840b795770335ba17644a9c77e8d7fd472bd9",
+    "dos/pursuit/check.py": "8743524353562eb2713669cb726de9b79424c80af40e896b9ef32c8b2bc0d4a1",
+    "dos/pursuit/assets.py": "b8a35fe2816d58a9165ee00fd2060e13aa18ec8810e123080d850ce5c49a7ab7",
+    "dos/motion/motion.h": "5f3db1677f424f1d3d8f5176dde5e7710781b87a24236f863d0f88f85de5cc56"
+  },
+  "profile_sha256": "c912f0379ab4e7cd41826386a472dbfc2a2c307cde1450c76c71ec3cbc1819b2",
+  "trace_sha256": "0f7441ba12253a07552299fc45ce6f5d04fd68cf285709013cea75a1a3e65662",
+  "dos_exe_sha256": "8accbae3befaa50a8d2431c9d7eda150288ca4eddf78b55ba435b63838540e3c",
+  "dos_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "profile_format": "ESPURS1 NUL + five LE binary64 values",
+  "tolerance": "Turn <=1e-12 absolute, finite intercept <=1e-8 absolute; command flags and NaN/infinity classifications exact.",
+  "scope": "Stock loaded Star Barge AI::MoveToAttack, TurnToward default precision, and RendezvousTime only. No target selection, tactics, fire, retreat, avoidance, factions, or full AI.",
+  "sanitizers": "ASan+UBSan for C kernel; native game objects unchanged and unsanitized."
+}

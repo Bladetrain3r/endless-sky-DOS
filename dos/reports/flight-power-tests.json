@@ -1,6 +1,7 @@
 {
   "results": {
     "native": {
+      "hull_disabled_generation_and_drift": "pass",
       "shield_composition": "pass",
       "shield_reset_and_drain": "pass",
       "status": "pass",
@@ -10,6 +11,7 @@
       "reset_and_camera": "pass"
     },
     "dos": {
+      "hull_disabled_generation_and_drift": "pass",
       "shield_composition": "pass",
       "shield_reset_and_drain": "pass",
       "status": "pass",
@@ -20,23 +22,23 @@
     }
   },
   "source_sha256": {
-    "dos/flight/power_test.c": "b545c96bcb5fedcb62f9adc4fd6467f3f9fb9f887050543b4d3f6b77e6b6219f",
-    "dos/flight/power.c": "e38b7b93a9dcdadc6f508ff8cf29cb9febf54438a6261401f3a985015b990ff3",
+    "dos/flight/power_test.c": "87b2a7c5fbb8b06e8c838104889c08bdd5dcf22198caa1c0e44bb40a1e07073a",
+    "dos/flight/power.c": "e7bcba87d457dbc13544e4886a50e81e1317b3080fc0f738211bd59ae79a5776",
     "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
-    "dos/flight/practice.c": "be3bca70eaf8fa81bf3400ed63cde8bf57cbfafec5ad0dd567926b6fbd2726f4",
+    "dos/flight/practice.c": "7b535782d9ca6bbdc6598fdc03319082a17cd6c3d639c2cf9fedff5ca0d8a326",
     "dos/propulsion/propulsion.c": "0288c5eda365de84b44682c17e32704f739afdf3b84bd78a10a72aa223c58d6c",
     "dos/shields/shields.c": "6708828685fb0ca7ab96e728c15c6c6592b4f28a69024b7e0d97c84a08c26945",
-    "dos/resources/resources.c": "b7d884b4933290413f897c27d2c00081c763fb0ccd7175bd088917a386b2272a",
+    "dos/resources/resources.c": "bc74eb068617b6e236c5581fddc8a9f4923583873e822cc8b54464dde6b2a5e9",
     "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
     "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
     "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
     "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
-    "dos/flight/power.h": "2cd17d55727af0054348a1ec82771d376807107fddda3b4b87f0321a0909fd4b",
+    "dos/flight/power.h": "c1e9c7147d3db6affd1c6e28d572eed9522412ea9100aae6264bb319b0a555a3",
     "dos/flight/pilot.h": "80c5fed814002b335e32faf087b6ee95f0e72ff98343d8db4c9f805853f82149",
-    "dos/flight/practice.h": "60b2fa9d08a24295d158d6a97f2767ac388178c04c3da21148607791791c1bef",
+    "dos/flight/practice.h": "9a730c7df532c629b7f8dc07c7024903b477c4b1ddec9a68a8d148e78be7ef89",
     "dos/propulsion/propulsion.h": "edc6b87151a43c079776694f90c1d3d8fdf68e54044ba18dfe7f8abd0c462bac",
     "dos/shields/shields.h": "a5675639605b00676da72aea191bd92ac2348c092fc09b68a8d9b199f79523a5",
-    "dos/resources/resources.h": "1ac3b936bf92909e38068274f0293bfa00f171a50e940e02199d8cd9db12846e",
+    "dos/resources/resources.h": "7f2eccacc6b93a4014ce7fde5c45f9206ad2325738f58e7c995057a6a46d5247",
     "dos/motion/motion.h": "5f3db1677f424f1d3d8f5176dde5e7710781b87a24236f863d0f88f85de5cc56",
     "dos/projectile/projectile.h": "7b37dcda30f678302d967c62a7660178642d65e89d93d20e33f63a08a2cea536",
     "dos/collision/mask.h": "4bc3166c00f7b99654bd248d67977e666dfb8f846a7deb05bf7081b415e91440",

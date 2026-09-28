@@ -5,4 +5,5 @@
 #include "../propulsion/propulsion.h"
 void pilot_powered_step(Pilot *pilot,Scene *scene,ResourceState *resources,
                         const ResourceProfile *budget,const PropulsionProfile *drive);
+void pilot_disabled_step(Pilot *pilot,Scene *scene);
 #endif

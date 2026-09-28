@@ -38,11 +38,49 @@ is applied. The new shield readout shows recovery; one pulse takes roughly
 29 seconds to refill with normal resources. **R** restores shields and resources
 along with the rest of the trainer. Try the existing `--resource-stress energy`
 and `--resource-stress heat` presets to observe competition and suspension.
-The target retains its reduced, non-regenerating training health; incoming fire
-and player hull damage are still a separate future slice.
+The target retains its reduced, non-regenerating training health.
 
 See [shield qualification](../shields/README.md) for native oracle coverage and
-supported profile limits. This checkpoint awaits human playtest feedback.
+supported profile limits. User accepted shield recharge and overheat suspension. Normal generation exceeds
+shield demand: 114 energy/second generated versus 12 spent at full recharge.
+Even the energy stress preset supplies 15/second; movement/fire create competition.
+
+## Optional incoming-fire trainer (2026-09-28)
+
+```sh
+python3 dos/flight/watch.py --pilot --incoming-fire
+```
+
+The training target fires orange/red bolts after a two-second grace period.
+It aims at your current position; sustained movement lets you dodge. Destroying
+it stops new shots, but shots already in flight remain live. Friendly and hostile
+bolts use separate fixed 16-shot pools and collide with their respective target.
+Add `--stationary-target` for an easier fixed comparison. Omit `--incoming-fire`
+for the accepted quiet range. No extra health nerfs are applied to the player.
+
+The loaded Sparrow has **1,400 shields and 300 hull**. Shields absorb shots and
+recharge from the shared energy supply. Hull below the native **134** threshold
+disables movement controls, firing, generation and recharge; momentum decays.
+Hull strictly below zero destroys the ship. The trainer then hides/freezes the
+player and displays a reset prompt. **R** restores both ships, shields, resources,
+projectile pools and the grace timer. **H** remains the explicit shield-drain
+control; four separate taps let you reach the hull test much sooner.
+
+This is an artificial turret attached to the scripted target, with unlimited
+ammunition/power, unrestricted aim and no native AI or turret-turn-rate claim.
+It uses the loaded blaster speed, lifetime, reload and damage, but no inaccuracy;
+the target's observed motion contributes inherited projectile velocity. Damage
+uses the existing native-qualified shield/hull kernel and the player's post-move
+Sparrow mask. Friendly shots resolve before the turret's firing decision: a
+same-tick target kill prevents a new hostile shot. That ordering is a trainer
+choice, not a claim of full native Engine combat parity. No boarding, repairs,
+loot, explosion damage, player death persistence or enemy resource model yet.
+
+Tests: `test_threat.py` (portable sanitizers + DOS); `test_power.py` (disabled
+resource/repair/drift); `test_controls.py --incoming-fire` (actual keyboard);
+`run.py --incoming-test --frames 600` (drained-shield stationary death route).
+Evidence lives in `dos/reports/flight-threat-tests.json`, `flight-controls-incoming.json`
+and `flight-6-ships-incoming-profile.json`. Human incoming-fire feedback pending.
 
 ## Corrected-scale checkpoint (2026-09-27)
 

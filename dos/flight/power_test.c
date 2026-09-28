@@ -111,6 +111,22 @@ int main(void)
     CHECK(p.shield.shields==0.);
     practice_reset(&p);
     CHECK(p.shield.shields==p.shield_profile.capacity && !p.shield.delay && !p.shield_test_pulses);
+    /* Persistent hull disable is distinct from temporary overheating: even
+     * cool hull-disabled ships get no recharge, power generation or controls. */
+    practice_reset(&p);practice_shield_test(&p);pilot_reset(&pilot,&scene);
+    p.resources.energy=10.;pilot.state.vx=2.;pilot.state.vy=-3.;
+    {
+        double before=p.shield.shields;
+        unsigned ticks_before=pilot.ticks;
+        practice_begin_tick_disabled(&p,1);
+        pilot_disabled_step(&pilot,&scene);
+        practice_finish_tick(&p,&pilot,0);
+        CHECK(p.shield.shields==before && p.resources.energy==10. && !p.resources.overheated);
+        CHECK(fabs(pilot.state.vx-2.*(1.-pilot.parameters.drag))<1e-12);
+        CHECK(fabs(pilot.state.vy+3.*(1.-pilot.parameters.drag))<1e-12);
+        CHECK(!p.shots && pilot.ticks==ticks_before+1);
+    }
+    puts("hull_disabled_generation_and_drift=pass");
     puts("shield_composition=pass\nshield_reset_and_drain=pass");
     puts("status=pass\ngeneration_movement_gun_order=pass\npartial_turn_before_thrust=pass\nshared_overheat_recovery=pass\nreset_and_camera=pass");
     return 0;

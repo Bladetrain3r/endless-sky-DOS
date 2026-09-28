@@ -83,11 +83,15 @@ static double random_unit(Practice *p)
 }
 void practice_begin_tick(Practice *p)
 {
+    practice_begin_tick_disabled(p,0);
+}
+void practice_begin_tick_disabled(Practice *p,int hull_disabled)
+{
     /* Native repair spends last tick's remainder before generation. Full-health
      * Sparrow has no other disabled cause here; NeedsEnergy only gates movement. */
     if(p->shield_enabled && p->resource_enabled)
-        shield_tick(&p->shield,&p->shield_profile,&p->resources,p->resources.overheated);
-    if(p->resource_enabled) resource_tick(&p->resources,&p->resource_profile);
+        shield_tick(&p->shield,&p->shield_profile,&p->resources,p->resources.overheated || hull_disabled);
+    if(p->resource_enabled) resource_tick_disabled(&p->resources,&p->resource_profile,hull_disabled);
 }
 void practice_step(Practice *p,const Pilot *pilot,int fire)
 {

@@ -6,7 +6,8 @@ from the previous tick. The native `Ship::DoGeneration` repairs shields before i
 clamps energy, dissipates heat, updates overheat, and produces new energy. A ship
 that recovers from overheat this tick cannot recharge shields until the next tick.
 For the bounded full-hull, staffed Sparrow, prior `ResourceState.overheated` is
-the corresponding disabled flag. `shield_reset` restores full shields and zero
+the corresponding disabled flag. With hull damage enabled, the caller also
+passes the hull-disabled flag. `shield_reset` restores full shields and zero
 delay. `shield_damage` implements a positive shield-only drain and the native
 shield-delay choice; the trainer's H key can call it with 25% of capacity.
 
@@ -35,6 +36,9 @@ The native getter export is `.work/shields/SHIELD.DAT` (`ESSHIELD1` text).
 `SHIELD.DAT` as `ESSHLD2\0`, seven little-endian binary64 values and two
 little-endian unsigned delays. `shield_load` rejects malformed/nonfinite/out of
 range values without changing its destination. This exact binary64 staging
+also emits `PLAYER.DAT` (`ESPLAYER1` + two binary64 values) for loaded maximum
+hull and minimum operating hull. Native assertions check no generation/repair
+below that threshold and the strict equality boundary. Exact binary64 transfer
 avoids DJGPP decimal-reader drift that previously changed propulsion behavior.
 
 This is a stock Sparrow slice. The oracle rejects stock hull repair, fuel/hull

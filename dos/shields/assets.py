@@ -29,5 +29,7 @@ def stage(out):
     out.mkdir(parents=True, exist_ok=True)
     target = out / 'SHIELD.DAT'
     target.write_bytes(b'ESSHLD2\0' + struct.pack('<7d2I', *values, *delays))
+    stock = provenance['stock_profile']
+    (out / 'PLAYER.DAT').write_bytes(b'ESPLAYER1' + struct.pack('<2d', stock['max_hull'], stock['minimum_hull']))
     return target
 if __name__ == '__main__': stage(ROOT / '.work/flight/run')

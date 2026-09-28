@@ -15,7 +15,7 @@ RUN = ROOT / '.work/flight/run'
 IMAGE = 'modern-arena-tools:0.1'
 
 
-def guest(stress=None):
+def guest(stress=None,incoming=False):
     result = RUN / 'KEYS.TXT'
     result.unlink(missing_ok=True)
     process = subprocess.Popen(['dosbox', '-conf', '.work/flight/run/keys.conf'],
@@ -42,29 +42,41 @@ def guest(stress=None):
             subprocess.run(['xdotool', action, key], check=True)
             time.sleep(pause)
 
-        send('keydown', 'w', .3)
-        send('keydown', 'd', .5)
-        send('keyup', 'w', .2)
-        send('keyup', 'd', .2)
-        send('key', 'Tab', .2)
-        send('key', 'r', .2)
-        send('keydown', 'space', 8. if stress else .8)
-        send('keydown', 'w', .5)
-        send('keyup', 'w', .2)
-        send('keyup', 'space', 3.2 if stress else 1.0)
-        if stress:
-            # Engines must work again after cooling/recharge. Then allow the
-            # small stress battery to refill before checking recovery below.
+        if incoming:
+            send('keydown', 'h', .8)
+            send('keyup', 'h', 4.0)
+            send('key', 'Escape', .1)
+        else:
             send('keydown', 'w', .3)
-            send('keyup', 'w', 3.2)
-        send('key', 'Tab', .2)
-        # One held trainer key is one drain, not one drain per frame/repeat.
-        send('keydown', 'h', .8)
-        send('keyup', 'h', .8)
-        send('key', 'Escape', .1)
+            send('keydown', 'd', .5)
+            send('keyup', 'w', .2)
+            send('keyup', 'd', .2)
+            send('key', 'Tab', .2)
+            send('key', 'r', .2)
+            send('keydown', 'space', 8. if stress else .8)
+            send('keydown', 'w', .5)
+            send('keyup', 'w', .2)
+            send('keyup', 'space', 3.2 if stress else 1.0)
+            if stress:
+                # Engines must work again after cooling/recharge. Then allow the
+                # small stress battery to refill before checking recovery below.
+                send('keydown', 'w', .3)
+                send('keyup', 'w', 3.2)
+            send('key', 'Tab', .2)
+            # One held trainer key is one drain, not one drain per frame/repeat.
+            send('keydown', 'h', .8)
+            send('keyup', 'h', .8)
+            send('key', 'Escape', .1)
         process.wait(timeout=20)
         fields = dict(line.split('=', 1) for line in result.read_text().splitlines() if '=' in line)
         assert fields['status'] == 'ok' and fields['video_verify'] == 'pass', fields
+        if incoming:
+            assert fields['incoming_fire']=='1' and int(fields['enemy_hits'])>0,fields
+            assert fields['shield_test_pulses']=='1' and fields['practice_shots']=='0',fields
+            assert float(fields['player_shields'])<1050. and float(fields['player_hull'])==300.,fields
+            assert fields['enemy_dropped']=='0' and fields['discarded_sim_ms']=='0.000',fields
+            print(json.dumps(fields))
+            return
         assert int(fields['pilot_input_bits']) == 505 and fields['pilot_keyboard'] == '1', fields
         # About 1.5s held fire at5Hz, then >1s released. Broad scheduling
         # allowance still rejects a stuck fire bit after release.
@@ -95,10 +107,12 @@ def guest(stress=None):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--guest',action='store_true')
+    parser.add_argument('--incoming-fire',action='store_true')
     parser.add_argument('--resource-stress',choices=('energy','heat'))
     args = parser.parse_args()
-    if args.guest: return guest(args.resource_stress)
+    if args.guest: return guest(args.resource_stress,args.incoming_fire)
     stress_option = ' --resource-stress '+args.resource_stress if args.resource_stress else ''
+    if args.incoming_fire: stress_option+=' --incoming-fire'
     base = (ROOT / 'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     config = base + ('[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
                      f'FLIGHT.EXE --demo --pilot --stationary-target --seconds 25{stress_option} > KEYS.TXT\nexit\n')
@@ -107,18 +121,20 @@ def main():
     result = subprocess.run(['docker', 'run', '--rm', '--network', 'none', '--user',
         f'{os.getuid()}:{os.getgid()}', '-e', 'HOME=/tmp', '-v', f'{ROOT}:/work', '-w', '/work',
         IMAGE, 'timeout', '55s', 'xvfb-run', '-a', 'python3', 'dos/flight/test_controls.py', '--guest',
-        *(['--resource-stress',args.resource_stress] if args.resource_stress else [])],
+        *(['--resource-stress',args.resource_stress] if args.resource_stress else []),
+        *(['--incoming-fire'] if args.incoming_fire else [])],
         check=True, capture_output=True, text=True, timeout=65)
     fields = json.loads(result.stdout)
     assert tested_hash == hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     report = {'result': fields, 'exe_sha256': tested_hash, 'resource_stress': args.resource_stress,
+              'player_profile_sha256': hashlib.sha256((RUN/'PLAYER.DAT').read_bytes()).hexdigest(),
               'resource_profile_sha256': hashlib.sha256((RUN/'RESOURCE.DAT').read_bytes()).hexdigest(),
               'shield_profile_sha256': hashlib.sha256((RUN/'SHIELD.DAT').read_bytes()).hexdigest(),
               'propulsion_profile_sha256': hashlib.sha256((RUN/'PROPULSE.DAT').read_bytes()).hexdigest(), 'dos_config': config,
               'test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'image_id': subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
               'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; held H single shield drain and recharge; physical feel awaits human check.'}
-    (ROOT / ('dos/reports/flight-controls'+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
+    (ROOT / ('dos/reports/flight-controls'+('-incoming' if args.incoming_fire else '')+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(fields, indent=2))
 
 

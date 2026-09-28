@@ -5,9 +5,9 @@
     "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
     "image_id": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
     "baseline_binary_sha256": "77fcb7ff282a9b82d5fce13125bb403c9a7e65b98661f73786a4f99007654414",
-    "oracle_source_sha256": "7e6247b7a074b4f0be86cc8feff0c9b068fce9712707d4a5c3ba91f61656329a",
+    "oracle_source_sha256": "05c49c659dc55a4bd3d8211187a636d72b8e4ab1d23175897a804c26550521c1",
     "runner_source_sha256": "6858793e727be262f34d7fed9bc7cea2ac2cad40327ce5772409e67fc5091f51",
-    "oracle_binary_sha256": "a6f57fd76dbbdd852a801d93998165efc97a1eb8c489917d5178e44c500ae9dc",
+    "oracle_binary_sha256": "b8a295240d4df92dfaa136359cd91761d7e7037f9c94a4688b6a4b2ebe3551d5",
     "csv_sha256": "90cf4e67be4d4bb3c188f7ceb51b5f3de7316b658452a170d7017afed7dca5c9",
     "profile_sha256": "2d0f41c2a6dc4238163a7b1b97692faf195f1b298b0cb10d3b4f5fd846a83cad",
     "stock_ship_data_sha256": "434fffaf7fb44c1c6687fe8bd20efc59fce9fc875b82a12f98ce12015ebf3e96",
@@ -62,6 +62,8 @@
       "delayed_energy_cost": 0.2,
       "delayed_heat_cost": 0.0,
       "delay": 0.0,
+      "max_hull": 300.0,
+      "minimum_hull": 134.0,
       "depleted_delay": 0.0
     },
     "fields": [
@@ -108,11 +110,11 @@
   "source_sha256": {
     "dos/shields/check.c": "dcc287a1a6d5258058ddb2eab882c29b079b3e0bfc25a014253210b487f13a41",
     "dos/shields/shields.c": "6708828685fb0ca7ab96e728c15c6c6592b4f28a69024b7e0d97c84a08c26945",
-    "dos/resources/resources.c": "b7d884b4933290413f897c27d2c00081c763fb0ccd7175bd088917a386b2272a",
+    "dos/resources/resources.c": "bc74eb068617b6e236c5581fddc8a9f4923583873e822cc8b54464dde6b2a5e9",
     "dos/shields/shields.h": "a5675639605b00676da72aea191bd92ac2348c092fc09b68a8d9b199f79523a5",
-    "dos/resources/resources.h": "1ac3b936bf92909e38068274f0293bfa00f171a50e940e02199d8cd9db12846e",
+    "dos/resources/resources.h": "7f2eccacc6b93a4014ce7fde5c45f9206ad2325738f58e7c995057a6a46d5247",
     "dos/shields/check.py": "96b6528306c5ed25ff84253cf740feb786dc12d422ae52aa638c49bc2912d189",
-    "dos/shields/assets.py": "77c3a4f37a3674077f704c79197e0d82db7e70c2632e5e3f23ff0923de35b345"
+    "dos/shields/assets.py": "6030633aa35e2d6a2d4153c9faac3d45039aebdaccc142ce6f8e494d88ea30c7"
   },
   "trace_sha256": "5f4894530262c437782e02d5b79a4fb63930c455448f3440b999599f71bb31c2",
   "profile_sha256": "7896f0c48a131f68b3c6cd1a8850a46bca2f9f4d79237562eda4eccdff245b44",
@@ -126,6 +128,8 @@
     "delayed_energy_cost": 0.2,
     "delayed_heat_cost": 0.0,
     "delay": 0.0,
+    "max_hull": 300.0,
+    "minimum_hull": 134.0,
     "depleted_delay": 0.0
   },
   "dos_flags": [

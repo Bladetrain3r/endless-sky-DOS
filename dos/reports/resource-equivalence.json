@@ -105,8 +105,8 @@
   },
   "source_sha256": {
     "dos/resources/check.c": "52fef7e382a12e774be4d381617aaaaf913ab95d28120ccd82503458263f7f68",
-    "dos/resources/resources.c": "b7d884b4933290413f897c27d2c00081c763fb0ccd7175bd088917a386b2272a",
-    "dos/resources/resources.h": "1ac3b936bf92909e38068274f0293bfa00f171a50e940e02199d8cd9db12846e",
+    "dos/resources/resources.c": "bc74eb068617b6e236c5581fddc8a9f4923583873e822cc8b54464dde6b2a5e9",
+    "dos/resources/resources.h": "7f2eccacc6b93a4014ce7fde5c45f9206ad2325738f58e7c995057a6a46d5247",
     "dos/resources/check.py": "e1daa47f88b6790cb43f6577b1be4b8a5a9bf6335874368686b47f3bde0d5c12",
     "dos/resources/assets.py": "0cfd53304ecdccabfa06f79d9fc8f6fa10e7a19a81ca246df81c12c53ff72f3d"
   },

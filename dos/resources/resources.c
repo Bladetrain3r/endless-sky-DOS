@@ -45,12 +45,16 @@ void resource_reset(ResourceState *state, const ResourceProfile *profile)
 
 void resource_tick(ResourceState *state, const ResourceProfile *profile)
 {
+    resource_tick_disabled(state,profile,0);
+}
+void resource_tick_disabled(ResourceState *state, const ResourceProfile *profile, int hull_disabled)
+{
     /* Ship::DoGeneration clamps before production, allowing temporary overflow. */
     if(state->energy > profile->capacity) state->energy = profile->capacity;
     state->heat -= state->heat * profile->dissipation;
     if(state->heat > profile->max_heat) state->overheated = 1;
     else if(state->heat < .9 * profile->max_heat) state->overheated = 0;
-    if(!state->overheated) {
+    if(!state->overheated && !hull_disabled) {
         state->energy += profile->generation;
         state->heat += profile->heat_generation;
     }

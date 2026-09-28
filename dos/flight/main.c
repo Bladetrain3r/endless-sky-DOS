@@ -5,6 +5,7 @@
 #include "input.h"
 #include "practice.h"
 #include "power.h"
+#include "threat.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -51,13 +52,13 @@ int main(int argc,char **argv)
 {
     const char *names[]={"SPARROW.SPR","BARGE.SPR","FALCON.SPR","EARTH.SPR","LUNA.SPR","GLOW.SPR"};
     Sprite sprites[6]={{0}}; ActiveSystem system={0}; Scene scene; Pilot pilot={0};
-    WorldStore *world=NULL; Practice *practice=NULL; PropulsionProfile drive={0};
+    WorldStore *world=NULL; Practice *practice=NULL; Threat *threat=NULL; PropulsionProfile drive={0};
     unsigned char palette[768],*frame=NULL,*blend=NULL,*add=NULL,*hud_pixels=NULL;
     Timing sim={0},draw={0},present={0},total={0};
     Timing background={0},orbital={0},traffic={0},effect={0},hud={0},pilot_draw_time={0};
     unsigned frames=120,ships=6,i,done=0; int demo=0,ok=0,opened=0,camera=0;
     int controlled=0,replay=0,keyboard=0,practice_test=0,stationary_target=0,invulnerable_target=0;
-    int resource_stress=0;
+    int resource_stress=0,incoming_fire=0,incoming_test=0;
     unsigned keys_seen=0;
     uint64_t id; size_t memory=0;
     unsigned long before=pages(),resident=0;
@@ -65,6 +66,8 @@ int main(int argc,char **argv)
     const char *error="initialization_failed";
     for(i=1;i<(unsigned)argc;++i) {
         if(!strcmp(argv[i],"--demo")) demo=1;
+        else if(!strcmp(argv[i],"--incoming-fire")) incoming_fire=1;
+        else if(!strcmp(argv[i],"--incoming-test")) controlled=replay=incoming_fire=incoming_test=1;
         else if(!strcmp(argv[i],"--invulnerable-target")) invulnerable_target=1;
         else if(!strcmp(argv[i],"--stationary-target")) stationary_target=1;
         else if(!strcmp(argv[i],"--resource-stress") && i+1<(unsigned)argc) {
@@ -104,24 +107,27 @@ int main(int argc,char **argv)
         if(!pilot_load(&pilot,"PILOT.DAT")) { error="pilot_profile_failed"; goto done; }
         pilot_reset(&pilot,&scene);
         practice=malloc(sizeof(*practice));
-        if(!practice || !practice_load(practice,"BLASTER.DAT","MASKS.BIN") ||
+        threat=malloc(sizeof(*threat));
+        if(!threat || !threat_load(threat,"PLAYER.DAT") || !practice || !practice_load(practice,"BLASTER.DAT","MASKS.BIN") ||
            !practice_damage_load(practice,"DAMAGE.DAT") ||
            !practice_resources_load(practice,"RESOURCE.DAT",resource_stress) ||
            !practice_shields_load(practice,"SHIELD.DAT") ||
            !propulsion_load(&drive,"PROPULSE.DAT")) {
             error="practice_assets_failed"; goto done;
         }
+        threat->enabled=incoming_fire;
         practice->moving_target=!stationary_target;
         practice->destructible=!invulnerable_target;
         practice_reset(practice);
-        memory+=sizeof(*practice);
+        if(incoming_test) for(i=0;i<4;++i) practice_shield_test(practice);
+        memory+=sizeof(*practice)+sizeof(*threat);
     }
     /* These opaque labels never change in this prototype. Prepare once. */
     memset(frame,10,800*40); memset(frame+800*570,10,800*30);
     video_text(frame,12,10,"ENDLESS SKY DOS - SOL / EARTH",1);
     video_text(frame,12,24,controlled?(resource_stress==1?"TRAINER: ENERGY STRESS - SHARED POWER":
                 resource_stress==2?"TRAINER: HEAT STRESS - SHARED POWER":
-                "TRAINER: SHARED ENERGY / HEAT"):
+                (incoming_fire?"TRAINER: INCOMING FIRE":"TRAINER: SHARED ENERGY / HEAT")):
                "SCRIPTED FLIGHT PROTOTYPE - NOT GAMEPLAY",2);
     video_text(frame,12,578,controlled?"W/UP THRUST  A/D TURN  SPACE FIRE  TAB CAMERA  R RESET  H SHIELD TEST  ESC EXIT":
                "ESC EXIT    256 COLORS    60 HZ TEST MOTION",1);
@@ -143,8 +149,10 @@ int main(int argc,char **argv)
             unsigned keys=input_keys();
             keys_seen|=keys;
             if(keys & INPUT_EXIT) break;
-            if((keys & ~pilot.previous_keys) & INPUT_RESET) practice_reset(practice);
-            if((keys & ~pilot.previous_keys) & INPUT_SHIELD_TEST) practice_shield_test(practice);
+            if((keys & ~pilot.previous_keys) & INPUT_RESET) {
+                practice_reset(practice);threat_reset(threat);
+            }
+            if(!threat->destroyed && ((keys & ~pilot.previous_keys) & INPUT_SHIELD_TEST)) practice_shield_test(practice);
             pilot_keys(&pilot,&scene,keys);
         } else if(kbhit() && getch()==27) break;
         a=ms();
@@ -156,10 +164,13 @@ int main(int argc,char **argv)
         while(accumulator>=1000./60.) {
             scene_step(&scene);
             if(controlled) {
-                if(replay) pilot_keys(&pilot,&scene,practice_test?INPUT_FIRE:pilot_replay_keys(pilot.ticks));
-                practice_begin_tick(practice);
-                pilot_powered_step(&pilot,&scene,&practice->resources,&practice->resource_profile,&drive);
-                practice_finish_tick(practice,&pilot,!!(pilot.previous_keys & INPUT_FIRE));
+                if(replay) pilot_keys(&pilot,&scene,incoming_test?0:(practice_test?INPUT_FIRE:pilot_replay_keys(pilot.ticks)));
+                practice_begin_tick_disabled(practice,threat->disabled);
+                if(threat->destroyed) ++pilot.ticks; /* Trainer death freezes position until R. */
+                else if(threat->disabled) pilot_disabled_step(&pilot,&scene);
+                else pilot_powered_step(&pilot,&scene,&practice->resources,&practice->resource_profile,&drive);
+                practice_finish_tick(practice,&pilot,!threat->disabled && !!(pilot.previous_keys & INPUT_FIRE));
+                threat_step(threat,practice,&pilot);
             }
             accumulator-=1000./60.;
         }
@@ -168,7 +179,8 @@ int main(int argc,char **argv)
         if(controlled) {
             double pilot_start=ms();
             practice_draw(frame,practice,&scene,&sprites[1],blend,add);
-            pilot_draw(frame,&pilot,&scene,&sprites[0],blend,add);
+            threat_draw(frame,threat,&scene);
+            if(!threat->destroyed) pilot_draw(frame,&pilot,&scene,&sprites[0],blend,add);
             sample(&pilot_draw_time,ms()-pilot_start);
         }
         sample(&background,profile.background_ms); sample(&orbital,profile.orbital_ms);
@@ -187,6 +199,7 @@ int main(int argc,char **argv)
             snprintf(label,sizeof(label),"ENERGY %.0f/%.0f  HEAT %.0f%%  %s",
                      practice->resources.energy,practice->resource_profile.capacity,
                      100.*practice->resources.heat/practice->resource_profile.max_heat,
+                     threat->destroyed?"DESTROYED":threat->disabled?"HULL DISABLED":
                      practice->resources.overheated?"OVERHEATED":
                      practice->resources.energy<practice->resource_profile.shot_energy?"GUN LOW ENERGY":
                      practice->cooldown?"RELOADING":"READY");
@@ -196,9 +209,12 @@ int main(int argc,char **argv)
                     practice->health.hull>0.?practice->health.hull:0.,practice->destroyed?"  DESTROYED":"");
             else snprintf(label,sizeof(label),"TARGET INVULNERABLE");
             video_text(frame,490,590,label,1);
-            snprintf(label,sizeof(label),"SHIELD %.1f/%.0f  H: DRAIN 25%% (TRAINER)",
-                     practice->shield.shields,practice->shield_profile.capacity);
-            video_text(frame,12,44,label,2);
+            snprintf(label,sizeof(label),"SHIELD %.1f/%.0f  HULL %.1f/%.0f  H: DRAIN 25%% (TRAINER)",
+                     practice->shield.shields,practice->shield_profile.capacity,
+                     threat->hull>0.?threat->hull:0.,threat->max_hull);
+            video_text(frame,12,44,label,threat->flash?4:2);
+            if(threat->destroyed) video_text(frame,250,280,"SHIP DESTROYED - R TO RESET",4);
+            else if(threat->disabled) video_text(frame,250,280,"HULL DISABLED - R TO RESET",4);
         }
         b=ms(); sample(&hud,b-hud_start); sample(&draw,b-a); a=b;
         if(!video_present(frame)) { error=video_error(); goto done; }
@@ -241,12 +257,16 @@ done:
         practice->blocked_energy,practice->blocked_heat);
     if(practice && ok) printf("player_shields=%.17g\nplayer_shield_capacity=%.17g\nshield_test_pulses=%u\n",
         practice->shield.shields,practice->shield_profile.capacity,practice->shield_test_pulses);
+    if(threat && ok) printf("incoming_fire=%d\nenemy_shots=%u\nenemy_hits=%u\nenemy_active=%u\nenemy_dropped=%u\n"
+        "player_hull=%.17g\nplayer_minimum_hull=%.17g\nplayer_disabled=%d\nplayer_destroyed=%d\n",
+        threat->enabled,threat->shots,threat->hits,threat->active,threat->dropped,
+        threat->hull,threat->minimum_hull,threat->disabled,threat->destroyed);
     report("background",&background); report("orbital",&orbital);
     report("traffic",&traffic); report("effect",&effect); report("hud",&hud);
     if(controlled) report("pilot_draw",&pilot_draw_time);
     report("sim",&sim); report("draw",&draw); report("present",&present); report("frame",&total);
     for(i=0;i<6;++i) sprite_free(&sprites[i]);
-    free(practice); free(hud_pixels); free(frame); free(blend); free(add);
+    free(threat); free(practice); free(hud_pixels); free(frame); free(blend); free(add);
     world_release_system(&system); world_close(world);
     return ok?0:1;
 }

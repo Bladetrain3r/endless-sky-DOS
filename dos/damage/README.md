@@ -55,7 +55,9 @@ no firing RNG, allocates no particles and clips to the world viewport. Tests
 cover all48 effect ages at screen edges, unchanged RNG and buffer guards, reset
 during the explosion, no subsequent target hits, and frozen moving-target state.
 The old range is available with `watch.py --pilot --invulnerable-target`; add
-`--stationary-target` for the fixed version. The gun still has unlimited resources.
+`--stationary-target` for the fixed version. The player gun now shares the propulsion energy/heat budget. The optional
+incoming-fire trainer uses an explicitly unlimited-power artificial enemy turret;
+see `../flight/README.md` for player shield, hull and disable behavior.
 
 ```sh
 python3 dos/flight/watch.py --pilot

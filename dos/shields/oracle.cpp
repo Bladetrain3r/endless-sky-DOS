@@ -55,6 +55,18 @@ int main(int argc, char **argv)
            c.activeCooling || c.fuelConsumption || c.fuelEnergy || c.fuelHeat ||
            c.recoveryTime || c.overheatDamageRate || !stock.bays.empty())
             throw runtime_error("Unsupported stock repair/generation attribute");
+        // Verify disable threshold and generation against unchanged Ship code.
+        Ship disabled = stock;
+        disabled.levels.hull = stock.minimumHull - 1.;
+        disabled.levels.shields = 700.; disabled.levels.energy = 100.;
+        disabled.levels.heat = 0.; disabled.isOverheated = false; disabled.isDisabled = true;
+        disabled.DoGeneration();
+        if(!disabled.isDisabled || disabled.levels.energy != 100. || disabled.levels.shields != 700.)
+            throw runtime_error("Unexpected hull-disabled generation/repair");
+        disabled.levels.hull = stock.minimumHull;
+        disabled.DoGeneration();
+        if(disabled.isDisabled || disabled.levels.energy <= 100. || disabled.levels.shields != 700.)
+            throw runtime_error("Unexpected hull threshold equality semantics");
         ofstream profile(argv[2]); if(!profile) throw runtime_error("Profile open failed");
         profile << setprecision(17) << "ESSHIELD1\n" << stock.MaxShields() << ' '
             << c.shieldRegenRate << ' ' << c.shieldRegenCost.energy << ' '
@@ -120,6 +132,7 @@ int main(int argc, char **argv)
             << " delayed_rate=" << c.shieldRegenRateWithDelay << " delayed_energy_cost="
             << c.shieldRegenWithDelayCost.energy << " delayed_heat_cost="
             << c.shieldRegenWithDelayCost.heat << " delay=" << c.shieldDelay
+            << " max_hull=" << stock.MaxHull() << " minimum_hull=" << stock.minimumHull
             << " depleted_delay=" << c.depletedShieldDelay << '\n';
         return 0;
     } catch(const exception &e) { cerr << "Shield oracle failed: " << e.what() << '\n'; return 1; }

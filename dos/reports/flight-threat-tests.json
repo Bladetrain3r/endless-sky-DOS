@@ -1,0 +1,73 @@
+{
+  "results": {
+    "native": {
+      "status": "pass",
+      "profile": "300_134",
+      "graced_direct_hit": "pass",
+      "shield_overflow_delay": "pass",
+      "dodge_and_no_ai": "pass",
+      "source_velocity": "pass",
+      "source_death_retains_shot": "pass",
+      "death_ignores_later_hits": "pass",
+      "disable_threshold_and_reset": "pass"
+    },
+    "dos": {
+      "status": "pass",
+      "profile": "300_134",
+      "graced_direct_hit": "pass",
+      "shield_overflow_delay": "pass",
+      "dodge_and_no_ai": "pass",
+      "source_velocity": "pass",
+      "source_death_retains_shot": "pass",
+      "death_ignores_later_hits": "pass",
+      "disable_threshold_and_reset": "pass"
+    }
+  },
+  "source_sha256": {
+    "dos/flight/threat_test.c": "4262ce0fc63e0cf9536640052797dc445ecb9a092b9f6fd7821afe064947eeff",
+    "dos/flight/threat.c": "f699146171950da423920495ade51ffa87e43f1405791fc7826b912c2770f40c",
+    "dos/flight/practice.c": "7b535782d9ca6bbdc6598fdc03319082a17cd6c3d639c2cf9fedff5ca0d8a326",
+    "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
+    "dos/shields/shields.c": "6708828685fb0ca7ab96e728c15c6c6592b4f28a69024b7e0d97c84a08c26945",
+    "dos/resources/resources.c": "bc74eb068617b6e236c5581fddc8a9f4923583873e822cc8b54464dde6b2a5e9",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
+    "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
+    "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/flight/threat.h": "a9774efad40605e678554641ceb7aa2fbae179ea8c9a3a6a3bad7adab31576b2",
+    "dos/flight/practice.h": "9a730c7df532c629b7f8dc07c7024903b477c4b1ddec9a68a8d148e78be7ef89",
+    "dos/flight/pilot.h": "80c5fed814002b335e32faf087b6ee95f0e72ff98343d8db4c9f805853f82149",
+    "dos/shields/shields.h": "a5675639605b00676da72aea191bd92ac2348c092fc09b68a8d9b199f79523a5",
+    "dos/resources/resources.h": "7f2eccacc6b93a4014ce7fde5c45f9206ad2325738f58e7c995057a6a46d5247",
+    "dos/motion/motion.h": "5f3db1677f424f1d3d8f5176dde5e7710781b87a24236f863d0f88f85de5cc56",
+    "dos/projectile/projectile.h": "7b37dcda30f678302d967c62a7660178642d65e89d93d20e33f63a08a2cea536",
+    "dos/collision/mask.h": "4bc3166c00f7b99654bd248d67977e666dfb8f846a7deb05bf7081b415e91440",
+    "dos/damage/damage.h": "89d622acf18301568b941aa793dbbbaade66f1d07057346997e6fdebb119eb29",
+    "dos/flight/test_threat.py": "83e124f18ef57471676032e9c2459aaea773548e51113765cfda2d4a45b9a0a6"
+  },
+  "profile_sha256": {
+    "PILOT.DAT": "3be0027be676f407148d71af018af753b2ff7596a2bfacca57afb0a42cfc43a8",
+    "BLASTER.DAT": "5e94657ca5666e69b4faf8f1cb1d4ab6dd5051e0d22b1b8937343b0801bf2fe2",
+    "DAMAGE.DAT": "62fc3ad1a5e3e48937a21b2fe1afe926696fa3648178cc67ee8be9f5a7e9e753",
+    "MASKS.BIN": "26d8dab40eec8a444685abdaead340f49a5cd4c743c5bada463d31cd6e5c09af",
+    "SHIELD.DAT": "7896f0c48a131f68b3c6cd1a8850a46bca2f9f4d79237562eda4eccdff245b44",
+    "PLAYER.DAT": "130a2411bba5a02bad0c0abe6141073d801a413057e8e093116af8f8309d24f3",
+    "CWSDPMI.EXE": "2de899fecaa90632b8b9bdfc0305cb0375e59ae252c37e32d06c1ed3f98a8f44"
+  },
+  "dos_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2"
+  ],
+  "dos_config": "[sdl]\nfullscreen=false\noutput=surface\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[render]\nframeskip=0\nscaler=none\n[cpu]\ncore=normal\ncputype=pentium_slow\ncycles=fixed 20000\n[mixer]\nnosound=true\n[midi]\nmpu401=none\n[sblaster]\nsbtype=none\n[autoexec]\nmount c /work/.work/flight/threat/run\nc:\nCWSDPMI -s-\nTHREAT.EXE > RESULT.TXT\nexit\n",
+  "scope": "Scripted target turret, fixed hostile pool, post-move Sparrow collision, shield overflow and hull flags; no native AI/turret tracking claim.",
+  "native_hull_evidence": "Stock Sparrow data/human/ships.txt hull 300; source/Ship.cpp CacheAttributes floors default threshold to 134. PLAYER.DAT is exported by the native Ship getter oracle.",
+  "sanitizers": "Portable native ASan/UBSan; leak checking disabled"
+}

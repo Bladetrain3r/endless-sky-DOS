@@ -19,6 +19,7 @@ typedef struct ResourceState {
 int resource_load(ResourceProfile *profile, const char *path);
 void resource_reset(ResourceState *state, const ResourceProfile *profile);
 void resource_tick(ResourceState *state, const ResourceProfile *profile);
+void resource_tick_disabled(ResourceState *state, const ResourceProfile *profile, int hull_disabled);
 int resource_can_fire(const ResourceState *state, const ResourceProfile *profile);
 int resource_fire(ResourceState *state, const ResourceProfile *profile);
 #endif

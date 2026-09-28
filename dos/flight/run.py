@@ -14,7 +14,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/run'
 IMAGE='modern-arena-tools:0.1'
-SOURCES=['dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
+SOURCES=['dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
          'dos/flight/scene.c','dos/flight/power.c','dos/propulsion/propulsion.c','dos/flight/sprite_reference.c','dos/world/active.c',
          'dos/shields/shields.c','dos/resources/resources.c','dos/damage/damage.c','dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/flight/pilot.c','dos/flight/input.c','dos/flight/input_state.c','dos/motion/motion.c']
@@ -36,6 +36,7 @@ def convert():
 
 def main():
     parser=argparse.ArgumentParser()
+    parser.add_argument('--incoming-test',action='store_true',help='stationary player, shields drained, no friendly fire')
     parser.add_argument('--resource-stress',choices=('energy','heat'),help='deliberately constrained trainer resources')
     parser.add_argument('--ships',type=int,default=6,choices=range(1,65))
     parser.add_argument('--frames',type=int,default=120)
@@ -47,6 +48,7 @@ def main():
     parser.add_argument('--practice-test',action='store_true',help='stationary held-fire training route')
     parser.add_argument('--replay',action='store_true',help='replay a pilot control route through native-matched motion')
     args=parser.parse_args()
+    if args.incoming_test and (args.practice_test or args.replay or args.camera or args.resource_stress): parser.error('incoming-test is a separate route')
     if args.resource_stress and not args.practice_test: parser.error("resource-stress requires practice-test")
     if args.destructible_target and not args.practice_test: parser.error('destructible-target requires practice-test')
     if args.moving_target and not args.practice_test: parser.error('moving-target requires practice-test')
@@ -78,6 +80,7 @@ def main():
     options=f'--ships {args.ships} --frames {args.frames}'
     if args.camera: options+=' --camera'
     if args.replay: options+=' --replay'
+    if args.incoming_test: options+=' --incoming-test'
     if args.practice_test: options+=' --practice-test'
     if args.resource_stress: options+=' --resource-stress '+args.resource_stress
     if not args.moving_target: options+=' --stationary-target'
@@ -113,6 +116,12 @@ def main():
         for key,offset in [('x',275.),('y',373.),('vx',0.),('vy',0.)]:
             assert abs(float(fields['pilot_'+key])-float(expected[key])-offset)<1e-7,(key,fields,expected)
         assert int(fields['pilot_angle'])==int(expected['angle_steps'])
+    if args.incoming_test:
+        assert fields['incoming_fire']=='1' and fields['practice_shots']=='0',fields
+        assert fields['shield_test_pulses']=='4' and fields['enemy_dropped']=='0',fields
+        if args.frames>=600:
+            assert fields['player_destroyed']=='1' and fields['player_disabled']=='1',fields
+            assert float(fields['player_hull'])<0. and int(fields['enemy_hits'])>40,fields
     if args.practice_test:
         ticks=int(fields['simulation_ticks'])
         if not args.resource_stress: assert int(fields['practice_shots'])==(ticks+11)//12,fields
@@ -130,9 +139,10 @@ def main():
     assert (RUN/'FRAME.IDX').stat().st_size==480000
     subprocess.run(docker+['python3','-c',
         'import sys; sys.path.insert(0,"dos/flight"); from run import convert; convert()'],check=True)
-    report=dict(reference_renderer=args.reference,kind='bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
+    report=dict(reference_renderer=args.reference,kind='bounded-incoming-fire' if args.incoming_test else 'bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
                 image_id=subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
                 compiler_flags=FLAGS,config=conf,source_sha256=source_hashes,
+                player_profile_sha256=digest(RUN/'PLAYER.DAT'),
                 shield_profile_sha256=digest(RUN/'SHIELD.DAT'),
                 propulsion_profile_sha256=digest(RUN/'PROPULSE.DAT'),
                 resource_profile_sha256=digest(RUN/'RESOURCE.DAT'),
@@ -149,6 +159,7 @@ def main():
     stem='flight-demo' if args.headless_demo else f'flight-{args.ships}-ships'
     if args.reference: stem+='-reference'
     if args.replay: stem+='-pilot'
+    if args.incoming_test: stem+='-incoming'
     if args.practice_test: stem+='-practice'
     if args.moving_target: stem+='-moving'
     if args.destructible_target: stem+='-damage'

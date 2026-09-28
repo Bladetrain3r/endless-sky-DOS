@@ -107,6 +107,7 @@ int main(int argc,char **argv)
         if(!practice || !practice_load(practice,"BLASTER.DAT","MASKS.BIN") ||
            !practice_damage_load(practice,"DAMAGE.DAT") ||
            !practice_resources_load(practice,"RESOURCE.DAT",resource_stress) ||
+           !practice_shields_load(practice,"SHIELD.DAT") ||
            !propulsion_load(&drive,"PROPULSE.DAT")) {
             error="practice_assets_failed"; goto done;
         }
@@ -122,7 +123,7 @@ int main(int argc,char **argv)
                 resource_stress==2?"TRAINER: HEAT STRESS - SHARED POWER":
                 "TRAINER: SHARED ENERGY / HEAT"):
                "SCRIPTED FLIGHT PROTOTYPE - NOT GAMEPLAY",2);
-    video_text(frame,12,578,controlled?"W/UP THRUST  A/D TURN  SPACE FIRE  TAB CAMERA  R RESET  ESC EXIT":
+    video_text(frame,12,578,controlled?"W/UP THRUST  A/D TURN  SPACE FIRE  TAB CAMERA  R RESET  H SHIELD TEST  ESC EXIT":
                "ESC EXIT    256 COLORS    60 HZ TEST MOTION",1);
     memcpy(hud_pixels,frame,32000);
     memcpy(hud_pixels+32000,frame+800*570,24000);
@@ -143,6 +144,7 @@ int main(int argc,char **argv)
             keys_seen|=keys;
             if(keys & INPUT_EXIT) break;
             if((keys & ~pilot.previous_keys) & INPUT_RESET) practice_reset(practice);
+            if((keys & ~pilot.previous_keys) & INPUT_SHIELD_TEST) practice_shield_test(practice);
             pilot_keys(&pilot,&scene,keys);
         } else if(kbhit() && getch()==27) break;
         a=ms();
@@ -194,6 +196,9 @@ int main(int argc,char **argv)
                     practice->health.hull>0.?practice->health.hull:0.,practice->destroyed?"  DESTROYED":"");
             else snprintf(label,sizeof(label),"TARGET INVULNERABLE");
             video_text(frame,490,590,label,1);
+            snprintf(label,sizeof(label),"SHIELD %.1f/%.0f  H: DRAIN 25%% (TRAINER)",
+                     practice->shield.shields,practice->shield_profile.capacity);
+            video_text(frame,12,44,label,2);
         }
         b=ms(); sample(&hud,b-hud_start); sample(&draw,b-a); a=b;
         if(!video_present(frame)) { error=video_error(); goto done; }
@@ -234,6 +239,8 @@ done:
         "blocked_energy_ticks=%u\nblocked_heat_ticks=%u\n",
         resource_stress,practice->resources.energy,practice->resources.heat,practice->resources.overheated,
         practice->blocked_energy,practice->blocked_heat);
+    if(practice && ok) printf("player_shields=%.17g\nplayer_shield_capacity=%.17g\nshield_test_pulses=%u\n",
+        practice->shield.shields,practice->shield_profile.capacity,practice->shield_test_pulses);
     report("background",&background); report("orbital",&orbital);
     report("traffic",&traffic); report("effect",&effect); report("hud",&hud);
     if(controlled) report("pilot_draw",&pilot_draw_time);

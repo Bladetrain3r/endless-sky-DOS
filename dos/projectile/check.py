@@ -19,7 +19,7 @@ resource_assets=importlib.util.module_from_spec(spec);spec.loader.exec_module(re
 ROOT=Path(__file__).resolve().parents[2]
 WORK=ROOT/'.work/projectile'
 SOURCES=['dos/projectile/check.c','dos/projectile/projectile.c','dos/flight/practice.c',
-         'dos/collision/mask.c','dos/motion/motion.c','dos/damage/damage.c','dos/resources/resources.c']
+         'dos/collision/mask.c','dos/motion/motion.c','dos/damage/damage.c','dos/shields/shields.c','dos/resources/resources.c']
 NATIVE='endless-sky-dos-native-reference:local'
 TOOLS='modern-arena-tools:0.1'
 def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -57,7 +57,7 @@ def main():
     out=docker(TOOLS,['timeout','60s','xvfb-run','-a','dosbox','-conf','.work/projectile/run/check.conf'])
     (run/'dosbox.log').write_text(out.stdout+out.stderr)
     results={'native':fields(native.stdout),'dos':fields((run/'RESULT.TXT').read_text())}
-    report={**results,'oracle':provenance,'source_sha256':{p:digest(ROOT/p) for p in SOURCES+['dos/projectile/projectile.h','dos/flight/practice.h','dos/damage/damage.h','dos/resources/resources.h','dos/projectile/check.py','dos/projectile/assets.py']},
+    report={**results,'oracle':provenance,'source_sha256':{p:digest(ROOT/p) for p in SOURCES+['dos/projectile/projectile.h','dos/flight/practice.h','dos/damage/damage.h','dos/shields/shields.h','dos/resources/resources.h','dos/projectile/check.py','dos/projectile/assets.py']},
         'trace_sha256':digest(run/'TRACE.BIN'),'profile':json.loads((run/'blaster.json').read_text()),
         'dos_flags':dos_flags,'dos_config':config,'sanitizers':'ASan+UBSan; no leak claim',
         'tolerance':'Position/velocity <=1e-10; exact heading, dead/removal flags through native frame48.',

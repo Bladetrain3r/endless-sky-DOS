@@ -10,6 +10,7 @@
 #define INPUT_RESET 32u
 #define INPUT_CAMERA 64u
 #define INPUT_FIRE 128u
+#define INPUT_SHIELD_TEST 256u
 
 typedef struct {
     volatile unsigned char normal[128];

@@ -69,6 +69,49 @@ int main(void)
     practice_reset(&p);pilot_keys(&pilot,&scene,INPUT_RESET);
     CHECK(!p.resources.overheated && !p.resources.heat && p.resources.energy==p.resource_profile.capacity);
     CHECK(!pilot.state.vx && !pilot.state.vy && pilot.state.x==400. && pilot.state.y==300.);
+    /* Regeneration consumes the previous tick's energy, not this tick's
+     * production. Exercise the real Practice composition with a loaded profile. */
+    CHECK(practice_resources_load(&p,"RESOURCE.DAT",0));
+    CHECK(practice_shields_load(&p,"SHIELD.DAT"));
+    practice_reset(&p);pilot_reset(&pilot,&scene);
+    CHECK(p.shield.shields==p.shield_profile.capacity);
+    practice_shield_test(&p);
+    CHECK(p.shield.shields==.75*p.shield_profile.capacity && p.shield_test_pulses==1);
+    p.resources.energy=0.;
+    {
+        double before=p.shield.shields;
+        tick(&p,&pilot,&scene,&drive,0);
+        CHECK(p.shield.shields==before && p.resources.energy==p.resource_profile.generation);
+        tick(&p,&pilot,&scene,&drive,0);
+        CHECK(p.shield.shields>before && p.resources.energy>=p.resource_profile.generation);
+    }
+    /* Same low-budget fixture as powered motion: repair uses old energy,
+     * then steering takes newly generated power, leaving no thrust or gun. */
+    CHECK(practice_resources_load(&p,"RESOURCE.DAT",1));
+    practice_reset(&p);practice_shield_test(&p);pilot_reset(&pilot,&scene);
+    p.resources.energy=.1;pilot_keys(&pilot,&scene,INPUT_FORWARD|INPUT_RIGHT|INPUT_FIRE);
+    {
+        double before=p.shield.shields;
+        tick(&p,&pilot,&scene,&drive,1);
+        CHECK(p.shield.shields>before && p.resources.energy==0. && !p.shots);
+        CHECK(pilot.state.vx==0. && pilot.state.vy==0.);
+    }
+    /* Prior overheating suppresses repair even on the tick that cools enough
+     * to restore movement. Repair resumes on the following tick. */
+    practice_reset(&p);practice_shield_test(&p);pilot_reset(&pilot,&scene);
+    p.resources.overheated=1;p.resources.heat=0.;
+    {
+        double before=p.shield.shields;
+        tick(&p,&pilot,&scene,&drive,0);
+        CHECK(p.shield.shields==before && !p.resources.overheated);
+        tick(&p,&pilot,&scene,&drive,0);
+        CHECK(p.shield.shields>before);
+    }
+    for(i=0;i<5;++i) practice_shield_test(&p);
+    CHECK(p.shield.shields==0.);
+    practice_reset(&p);
+    CHECK(p.shield.shields==p.shield_profile.capacity && !p.shield.delay && !p.shield_test_pulses);
+    puts("shield_composition=pass\nshield_reset_and_drain=pass");
     puts("status=pass\ngeneration_movement_gun_order=pass\npartial_turn_before_thrust=pass\nshared_overheat_recovery=pass\nreset_and_camera=pass");
     return 0;
 }

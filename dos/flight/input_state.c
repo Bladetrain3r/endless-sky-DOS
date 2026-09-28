@@ -24,6 +24,7 @@ __attribute__((noinline)) void input_state_feed(InputState *state, unsigned char
             if(key==0x01) state->pending|=INPUT_EXIT;
             if(key==0x13) state->pending|=INPUT_RESET;
             if(key==0x0f) state->pending|=INPUT_CAMERA;
+            if(key==0x23) state->pending|=INPUT_SHIELD_TEST;
         }
     }
     state->prefix=0;
@@ -40,6 +41,7 @@ unsigned input_state_keys(const InputState *s)
     if(s->normal[0x13]) keys|=INPUT_RESET;
     if(s->normal[0x0f]) keys|=INPUT_CAMERA;
     if(s->normal[0x39]) keys|=INPUT_FIRE;
+    if(s->normal[0x23]) keys|=INPUT_SHIELD_TEST;
     return keys|s->pending;
 }
 

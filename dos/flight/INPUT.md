@@ -15,11 +15,12 @@ installing a second handler. `input_keys()` returns zero while closed.
 | `INPUT_RESET` | R |
 | `INPUT_CAMERA` | Tab |
 | `INPUT_FIRE` | Space |
+| `INPUT_SHIELD_TEST` | H (trainer drain) |
 
 The handler consumes scan-code set 1 make/break bytes directly. It tracks
 physical aliases separately: releasing W does not cancel a held Up key. Key
 repeat leaves the state unchanged. Space is a held level: firing stops when
-Space is released, independently of thrust. Escape, R and Tab make edges stay
+Space is released, independently of thrust. Escape, R, Tab and H make edges stay
 latched until the next `input_keys()` call, so a short tap between polls is delivered
 once. Pause/E1 is ignored. The handler sends one
 PIC end-of-interrupt and does not chain the previous IRQ1 handler after
@@ -38,3 +39,9 @@ Physical keyboards and alternate controllers are not covered by that probe.
 The mask coalesces multiple taps between polls. A caller comparing successive
 masks can also merge release/repress entirely between polls into one hold; a
 future menu/event interface should expose discrete press events separately.
+
+## Shield trainer key
+
+H (scan code 0x23, bit 256) drains 25% of player maximum shields once per
+press. Quick taps latch like Reset/Camera; held-key repeat does not retrigger.
+This is explicitly a trainer control, not a combat weapon. R restores shields.

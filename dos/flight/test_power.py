@@ -10,10 +10,10 @@ import subprocess
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/power/run'
 SOURCES=['dos/flight/power_test.c','dos/flight/power.c','dos/flight/pilot.c',
-         'dos/flight/practice.c','dos/propulsion/propulsion.c','dos/resources/resources.c',
+         'dos/flight/practice.c','dos/propulsion/propulsion.c','dos/shields/shields.c','dos/resources/resources.c',
          'dos/motion/motion.c','dos/projectile/projectile.c','dos/collision/mask.c','dos/damage/damage.c']
 HEADERS=['dos/flight/power.h','dos/flight/pilot.h','dos/flight/practice.h','dos/propulsion/propulsion.h',
-         'dos/resources/resources.h','dos/motion/motion.h','dos/projectile/projectile.h',
+         'dos/shields/shields.h','dos/resources/resources.h','dos/motion/motion.h','dos/projectile/projectile.h',
          'dos/collision/mask.h','dos/damage/damage.h']
 NATIVE='endless-sky-dos-native-reference:local';TOOLS='modern-arena-tools:0.1'
 def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -23,7 +23,7 @@ def docker(image,args,cwd='/work'):
     if r.returncode: raise RuntimeError(r.stdout+r.stderr)
     return r
 RUN.mkdir(parents=True,exist_ok=True)
-profiles=['PILOT.DAT','PROPULSE.DAT','RESOURCE.DAT','BLASTER.DAT','MASKS.BIN','CWSDPMI.EXE']
+profiles=['PILOT.DAT','PROPULSE.DAT','RESOURCE.DAT','BLASTER.DAT','MASKS.BIN','CWSDPMI.EXE','SHIELD.DAT']
 for name in profiles: shutil.copyfile(ROOT/'.work/flight/run'/name,RUN/name)
 flags=['-std=gnu99','-O2','-Wall','-Wextra','-Werror']
 docker(NATIVE,['gcc',*flags,'-g','-fsanitize=address,undefined','-fno-omit-frame-pointer','-no-pie',
@@ -42,7 +42,7 @@ results={'native':fields(native.stdout),'dos':fields((RUN/'RESULT.TXT').read_tex
 assert all(r.get('status')=='pass' for r in results.values()),results
 report={'results':results,'source_sha256':{p:digest(ROOT/p) for p in SOURCES+HEADERS+['dos/flight/test_power.py']},
     'profile_sha256':{p:digest(RUN/p) for p in profiles},'dos_config':conf,'dos_flags':dosflags,
-    'scope':'App composition: generation -> powered pilot/camera -> weapon, partial steering priority, heat drift/recovery, reset. Native Ship kernel comparison is separate propulsion-equivalence.json.',
+    'scope':'App composition: shield repair from prior energy -> generation -> powered pilot/camera -> weapon, partial steering priority, heat drift/recovery, reset and trainer drain. Native Ship kernel comparison is separate propulsion-equivalence.json.',
     'sanitizers':'Portable native ASan/UBSan; leak checking disabled'}
 (ROOT/'dos/reports/flight-power-tests.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(results,indent=2))

@@ -48,11 +48,28 @@ int practice_resources_load(Practice *p,const char *path,int stress)
     resource_reset(&p->resources,&p->resource_profile);
     return 1;
 }
+int practice_shields_load(Practice *p,const char *path)
+{
+    if(!shield_load(&p->shield_profile,path)) return 0;
+    p->shield_enabled=1;
+    shield_reset(&p->shield,&p->shield_profile);
+    return 1;
+}
+/* Explicit trainer input, not a weapon or a native combat damage event. */
+void practice_shield_test(Practice *p)
+{
+    if(!p->shield_enabled) return;
+    shield_damage(&p->shield,&p->shield_profile,p->shield_profile.capacity*.25,
+                  p->resources.overheated);
+    ++p->shield_test_pulses;
+}
 void practice_reset(Practice *p)
 {
     memset(p->bolts,0,sizeof(p->bolts));
     p->shots=p->hits=p->dropped=p->active=p->peak=p->flash=p->cooldown=0;
     p->blocked_energy=p->blocked_heat=0;
+    p->shield_test_pulses=0;
+    if(p->shield_enabled) shield_reset(&p->shield,&p->shield_profile);
     if(p->resource_enabled) resource_reset(&p->resources,&p->resource_profile);
     p->rng=17; p->target_ticks=0;
     p->health=(DamageState){30.,26.}; /* Reduced training target, not stock Barge stats. */
@@ -66,6 +83,10 @@ static double random_unit(Practice *p)
 }
 void practice_begin_tick(Practice *p)
 {
+    /* Native repair spends last tick's remainder before generation. Full-health
+     * Sparrow has no other disabled cause here; NeedsEnergy only gates movement. */
+    if(p->shield_enabled && p->resource_enabled)
+        shield_tick(&p->shield,&p->shield_profile,&p->resources,p->resources.overheated);
     if(p->resource_enabled) resource_tick(&p->resources,&p->resource_profile);
 }
 void practice_step(Practice *p,const Pilot *pilot,int fire)

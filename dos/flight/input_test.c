@@ -43,6 +43,13 @@ int main(void)
     input_state_feed(&s,0x13); input_state_feed(&s,0x93);
     assert(input_state_take(&s)==INPUT_RESET); /* Release/repress latches. */
     assert(input_state_take(&s)==0);
+    input_state_feed(&s,0x23); input_state_feed(&s,0xa3);
+    assert(input_state_take(&s)==INPUT_SHIELD_TEST); /* Quick trainer tap latches. */
+    assert(input_state_take(&s)==0);
+    input_state_feed(&s,0x23); input_state_feed(&s,0x23);
+    assert(input_state_take(&s)==INPUT_SHIELD_TEST);
+    input_state_feed(&s,0x23); input_state_feed(&s,0xa3);
+    assert(input_state_take(&s)==0); /* Holding H does not relatch. */
     input_state_feed(&s,0xe1);
     input_state_feed(&s,0x1d); input_state_feed(&s,0x45);
     input_state_feed(&s,0xe1); input_state_feed(&s,0x9d); input_state_feed(&s,0xc5);

@@ -58,11 +58,14 @@ def guest(stress=None):
             send('keydown', 'w', .3)
             send('keyup', 'w', 3.2)
         send('key', 'Tab', .2)
+        # One held trainer key is one drain, not one drain per frame/repeat.
+        send('keydown', 'h', .8)
+        send('keyup', 'h', .8)
         send('key', 'Escape', .1)
         process.wait(timeout=20)
         fields = dict(line.split('=', 1) for line in result.read_text().splitlines() if '=' in line)
         assert fields['status'] == 'ok' and fields['video_verify'] == 'pass', fields
-        assert int(fields['pilot_input_bits']) == 249 and fields['pilot_keyboard'] == '1', fields
+        assert int(fields['pilot_input_bits']) == 505 and fields['pilot_keyboard'] == '1', fields
         # About 1.5s held fire at5Hz, then >1s released. Broad scheduling
         # allowance still rejects a stuck fire bit after release.
         if stress:
@@ -74,6 +77,9 @@ def guest(stress=None):
         else:
             assert 7 <= int(fields['practice_shots']) <= 10, fields
         assert fields['practice_dropped'] == '0', fields
+        assert int(fields['shield_test_pulses']) == 1, fields
+        shield, capacity = float(fields['player_shields']), float(fields['player_shield_capacity'])
+        assert .75 * capacity < shield < capacity, fields
         assert fields['target_destroyed'] == '1' and int(fields['practice_hits']) == 7, fields
         assert float(fields['target_hull']) < 0 and float(fields['target_shields']) == 0, fields
         assert fields['pilot_follow'] == '0' and fields['pilot_angle'] == '0', fields
@@ -107,10 +113,11 @@ def main():
     assert tested_hash == hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
     report = {'result': fields, 'exe_sha256': tested_hash, 'resource_stress': args.resource_stress,
               'resource_profile_sha256': hashlib.sha256((RUN/'RESOURCE.DAT').read_bytes()).hexdigest(),
+              'shield_profile_sha256': hashlib.sha256((RUN/'SHIELD.DAT').read_bytes()).hexdigest(),
               'propulsion_profile_sha256': hashlib.sha256((RUN/'PROPULSE.DAT').read_bytes()).hexdigest(), 'dos_config': config,
               'test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'image_id': subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
-              'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; physical feel awaits human check.'}
+              'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; held H single shield drain and recharge; physical feel awaits human check.'}
     (ROOT / ('dos/reports/flight-controls'+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(fields, indent=2))
 

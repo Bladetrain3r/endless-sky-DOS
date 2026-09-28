@@ -24,6 +24,26 @@ Original collision masks and flight arithmetic are unchanged. The old full-size
 build is preserved locally; `watch.py --pilot --accepted` runs it for comparison.
 See [alignment qualification](ALIGNMENT.md) and [collision notes](../collision/README.md).
 
+## Player shield recharge (2026-09-28)
+
+The Sparrow now has its stock 1,400 shield points and D14-RN generator:
+0.2 shield points per simulation tick (12/second), costing 0.2 energy per tick
+while fully recharging. Recharge spends the previous tick's remaining energy,
+before generator output, steering, thrust and firing. Overheating suspends it;
+on the cooling-recovery tick movement can resume one tick before recharge.
+
+Press **H** to remove 25% of maximum shields as an explicit trainer input.
+Holding H drains once; release and press again for another pulse. No hull damage
+is applied. The new shield readout shows recovery; one pulse takes roughly
+29 seconds to refill with normal resources. **R** restores shields and resources
+along with the rest of the trainer. Try the existing `--resource-stress energy`
+and `--resource-stress heat` presets to observe competition and suspension.
+The target retains its reduced, non-regenerating training health; incoming fire
+and player hull damage are still a separate future slice.
+
+See [shield qualification](../shields/README.md) for native oracle coverage and
+supported profile limits. This checkpoint awaits human playtest feedback.
+
 ## Corrected-scale checkpoint (2026-09-27)
 
 Rotating hulls use64 resident headings (5.625 degrees apart), selected nearest the

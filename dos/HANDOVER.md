@@ -1,5 +1,5 @@
 # Endless Sky DOS handover
-Updated 2026-09-28. Powered opponent ready; prior pursuit/incoming human accepted.
+Updated 2026-09-30. Powered opponent human accepted: normal/heat/energy rounds.
 
 ## Current build
 - Launch `python3 dos/flight/watch.py --pilot --pursuit`.
@@ -76,5 +76,5 @@ Updated 2026-09-28. Powered opponent ready; prior pursuit/incoming human accepte
 - Earlier preserved flight .work/flight/accepted-44aced341; --accepted uses0636c12dc.
 
 ## Next
-- Prior pursuit human pass: target destroyed twice, accurate aim. New lifecycle pending.
-  Test default quick fight, shield recharge, disabled drift, R; optional stock/stress.
+- Human normal/heat/energy pass: low-energy fire slows/rotates; overheat halts motion.
+  Stock-health human test unreported. Next: choose navigation/multiple-target slice.

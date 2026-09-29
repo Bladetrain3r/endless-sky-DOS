@@ -148,8 +148,13 @@ state. R resets both ships and their budgets. Legacy `--incoming-fire` without
 pursuit keeps the old unlimited-power scripted comparison target. Opponent
 energy stress is capacity40/generation.25 per tick; heat stress is max450 with
 zero passive heat generation. Both are explicit trainer overrides. Neither
-changes the player's resource profile. New lifecycle human playtest pending;
-the preceding unrestricted pursuit build was accepted with two target kills.
+changes the player's resource profile. Human playtest accepted 2026-09-30:
+three rounds (normal, heat stress, energy stress) all behaved as expected.
+Energy stress sharply reduced firing and eventually left the enemy rotating in
+place; overheat stopped movement, with normal firing cadence below its critical
+threshold. These are qualitative observations, not a new timing measurement.
+Full-health preset was not reported tested. The preceding unrestricted pursuit
+build was accepted with two target kills.
 
 ## Corrected-scale checkpoint (2026-09-27)
 

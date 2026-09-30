@@ -1,5 +1,5 @@
 # Endless Sky DOS handover
-Updated 2026-09-30. Sol landing loop implemented; automated checks pass, human test pending.
+Updated 2026-09-30. Beta parity survey/roadmap/local queue added; landing human test pending.
 
 ## Current build
 - Latest: `python3 dos/flight/watch.py --navigation`; Docker/X11,120seconds,800x600.
@@ -71,5 +71,9 @@ Updated 2026-09-30. Sol landing loop implemented; automated checks pass, human t
 - Earlier preserved flight .work/flight/accepted-44aced341; --accepted uses0636c12dc.
 
 ## Next
-- Human navigation/dock acceptance pending; next candidate is a bounded trading service.
+- User: vanilla parity is beta; our flair follows toward1.0. dos/VANILLA-PARITY.md
+  +ROADMAP.md +TICKETS.md; detailed source audits in dos/planning/,204-file inventory.
+- ESDOS-001 awaits landing playtest; ESDOS-002 ready: persistent-pilot/save contract.
+  ESDOS-003 durable pilot,004 trade,005 travel spec proposed; none started.
+- BBS assessment ../../docs/BBS-TASK-BOARD-ASSESSMENT.md: aggregate first; no deployment.
 - Arena humanaccepted:several rounds,damage/victory; HUD polish deferred until systems settle.

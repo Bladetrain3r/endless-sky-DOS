@@ -10,6 +10,11 @@ Latest playtest: [Sol landing and takeoff loop](flight/NAVIGATION.md),
 [combat arena and cockpit HUD](flight/ARENA.md) remains available with `--arena`;
 earlier quiet and single-opponent modes remain.
 
+Planning: [vanilla parity checklist](VANILLA-PARITY.md), [beta roadmap](ROADMAP.md)
+and [local ticket queue](TICKETS.md). The user defines beta as vanilla feature
+parity; original additions follow toward 1.0. The survey is pinned to the source
+below and distinguishes narrow working slices from complete feature families.
+
 Current upstream checkout: `061a9461a93898fb691504536589d1dcddc5d79b`
 (CMake project version 0.11.4). See [feasibility](FEASIBILITY.md) and
 [handover](HANDOVER.md). Source/backend work should retain upstream notices and

@@ -98,8 +98,12 @@ was 29.361 ms, max 34.344 ms, on this bounded route. That is not a whole-game FP
 claim. Arena rendering is measured as one draw pass; legacy per-layer timing
 fields are unmeasured zeros in arena mode.
 
-Human acceptance pending: fight both ships, cycle targets while firing, follow a
-contact off-screen, and reset after a kill. Check HUD readability and whether
-the lower panel leaves enough useful flight space. Next scope should follow
-that feedback: navigation/landing or broader combat behavior, rather than adding
-more status text speculatively.
+Human playtest accepted 2026-09-30: the user played several rounds, took shield
+damage and won. The HUD provides the key information and its DOS sci-fi look is
+a suitable starting point. Visual polish is deferred until the game is playable
+and the required screen contents settle. Individual target-key/off-screen/reset
+checks were not separately reported; their automated evidence remains above.
+
+Proposed next slice: planet selection, approach, landing and takeoff, with a
+minimal landing screen. Confirm the native behavior/data boundary before coding;
+this is a recommendation, not an implemented or newly accepted scope.

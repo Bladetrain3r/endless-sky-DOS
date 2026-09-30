@@ -1,5 +1,5 @@
 # Endless Sky DOS handover
-Updated 2026-09-30. Two-opponent arena/HUD staged; human playtest pending.
+Updated 2026-09-30. Two-opponent arena/HUD human accepted; several rounds, shield damage, victory.
 
 ## Current build
 - Launch `python3 dos/flight/watch.py --arena`; Docker/X11,120seconds,800x600.
@@ -75,6 +75,6 @@ Updated 2026-09-30. Two-opponent arena/HUD staged; human playtest pending.
 - Earlier preserved flight .work/flight/accepted-44aced341; --accepted uses0636c12dc.
 
 ## Next
-- Human arena check: fight both, change selection while firing, offscreen contact,
-  reset after kill; HUD readability/usable viewport. Then choose navigation or combat.
+- Human: several rounds won; HUD has key info, DOS sci-fi look accepted as baseline.
+  Polish after playable systems/screen contents settle. Proposed next: navigation/landing.
 - Powered single-opponent normal/heat/energy humanaccepted; stock HP unreported.

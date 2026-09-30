@@ -9,8 +9,12 @@ not a schedule or evidence of implementation. Baseline and complete feature ledg
 
 Flight, resources, ordinary projectiles/hits, two-opponent arena and cockpit have
 bounded native/DOS evidence and human playtests. The Earth/Luna landing slice is
-implemented and automatically checked, awaiting human acceptance. We have a
+automatically checked and human accepted at both destinations. We have a
 useful sandbox, not a campaign runtime. No full-game completion percentage yet.
+
+Persistence foundation: [reviewed contract](planning/PERSISTENCE-CONTRACT.md) and
+[native transaction/reload fixture](persistence/README.md) complete; DOS save/load
+implementation is next (ESDOS-003). Native interchange remains a separate gate.
 
 ## Sequence
 
@@ -63,5 +67,6 @@ observable behavior, then widen content coverage.
   policies; neither uncertainty prevents implementing our own correct persistence.
 - Audio conversion/backend and performance envelope require measured candidates.
   No silent approval of crowd/economy reductions or a worse timebase.
-- BBS adoption is a parallel tooling proposal, not a prerequisite to game work.
+- Independent Swarm Workboard now initialized at /data/NuCode/Swarm_Workboard;
+  ticket projection remains future work, not a prerequisite to game work.
   See [the workboard assessment](../../docs/BBS-TASK-BOARD-ASSESSMENT.md).

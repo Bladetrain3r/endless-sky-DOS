@@ -15,9 +15,9 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
 
 | ID | State | Owner | Scope | Depends on |
 |---|---|---|---|---|
-| ESDOS-001 | awaiting_playtest | astra_dawn; playtester Ziggy | Earth/Luna landing acceptance | none |
-| ESDOS-002 | ready | astra_dawn | Persistent-pilot and transaction contract, research/design only | none |
-| ESDOS-003 | proposed | unassigned | Implement smallest durable pilot/save slice | ESDOS-002 |
+| ESDOS-001 | done | astra_dawn; playtester Ziggy | Earth/Luna landing acceptance | none |
+| ESDOS-002 | done | astra_dawn | Persistent-pilot and transaction contract, research/design only | none |
+| ESDOS-003 | ready | unassigned | Implement smallest durable pilot/save slice | ESDOS-002 |
 | ESDOS-004 | proposed | unassigned | Two-port commodity trade loop | ESDOS-003; ESDOS-001 |
 | ESDOS-005 | proposed | unassigned | Fuel/drive/system-transition slice specification | ESDOS-002 |
 
@@ -32,12 +32,16 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
   in [NAVIGATION.md](flight/NAVIGATION.md); earlier combat regressions pass.
 - Acceptance: record approach/landing/departure feel, readable destination/dock
   information and control restoration. Record defects with destination/input order.
-- Next action: await the user's planned playtest; no repeated prompt required.
+- 2026-09-30 human acceptance: user reports successful landing at both Luna and
+  Earth in a quick playtest. Combined with existing automated gates, bounded
+  landing checkpoint accepted. No claim of exhaustive manual edge-case testing.
 - Closing this ticket accepts the bounded scene, not general campaign landing.
 
 ### ESDOS-002 — define persistent pilot and landed transactions
 
-- Created 2026-09-30; ready to pick up, **not started**. Owner astra_dawn.
+- Created/completed 2026-09-30; user-authorized design. Owner astra_dawn.
+- Scope refined: assess LIFE-06 native interchange alongside the required DOS
+  persistence contract, keeping compatibility claims separate from save/load.
 - Deliver one reviewed design/acceptance contract under `dos/planning/`, with
   source anchors in PlayerInfo/Account/CargoHold/Ship/mission persistence.
 - Scope: ownership and stable IDs; minimal ship/location/credits/cargo/date state;
@@ -53,17 +57,27 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
 - Output must name the fixture and result schema, test cases, numerical/integer
   invariants, file ownership and implementation boundary for ESDOS-003. Root reviews
   against upstream methods; no code delegation before that verification exists.
-- No dependency on human flight feel or BBS availability. This is the recommended
-  next engineering task; this ticket alone does not launch background work.
+- Completed: [reviewed contract](planning/PERSISTENCE-CONTRACT.md),
+  [source audit](planning/NATIVE-SAVE-AUDIT.md) and [executed native fixture](persistence/README.md).
+  Six native checks pass: purchase/reload, next action, transaction isolation,
+  quantity clamps, pending-sale reload and save eligibility. Root reviewed source
+  and inspected trace/report. Design includes a mission/condition/event growth
+  example; its nonempty state is deliberately unsupported in version 1.
+- Two-slot DOS envelope/recovery and PS-01–09 acceptance are specified, not yet
+  implemented. No native-save compatibility or campaign persistence claimed.
 
 ### ESDOS-003 — smallest durable pilot
 
-- Created 2026-09-30; proposed, owner unassigned. Depends on ESDOS-002.
+- Created 2026-09-30; ready, owner unassigned. ESDOS-002 completed.
 - Intended outcome: current dock/flight scene runs from persistent player-owned
   ship/location/credits/cargo state; landed save/restart retains it.
-- Not ready: exact ownership/format, native fixture and interruption gate must be
-  supplied by ESDOS-002 before implementation assignment. Scope excludes full
-  missions/fleets/native-save import. Existing trainers stay reproducible.
+- Contract: [PERSISTENCE-CONTRACT.md](planning/PERSISTENCE-CONTRACT.md), PS-01–09.
+  Ownership: new dos/persistence state/codec/store + tests and a small flight adapter.
+  First implementation step: executable codec/failure gates, then two-slot DOS I/O
+  and dock/restart integration. Local-model delegation still requires those gates
+  to exist first. Native oracle/trace are checked in; DOS acceptance is not yet run.
+- Scope excludes full missions/fleets/native-save import. Existing trainers stay
+  reproducible; trainer reset cannot overwrite a persistent campaign.
 - Closure needs the specified native/DOS roundtrip/recovery gates and human restart
   check, source revision and evidence links. Links LIFE-02–04 subsets.
 
@@ -73,13 +87,13 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
 - Intended outcome: buy/sell a native commodity at two ports with credits,
   capacity, cargo mass and price rules; repeated dock/trade/save/reload is coherent.
 - Not ready: select stock fixture, quantity/price semantics and transaction owner
-  after ESDOS-002; specify rejection tests for insufficient funds/space/holdings.
+  after ESDOS-002; specify native clamping/no-op tests for insufficient funds/space/holdings.
 - No inventing an economy to replace native behavior; frozen-fixture prices must
   be labelled until the full daily economy is integrated. Links PORT-03–05 subsets.
 
 ### ESDOS-005 — inter-system travel contract
 
-- Created 2026-09-30; proposed, owner unassigned. Depends on ESDOS-002.
+- Created 2026-09-30; ready, owner unassigned. ESDOS-002 completed.
 - Intended output: bounded hyperdrive/fuel/active-system transition specification,
   native trace fixture and acceptance gates, compatible with future other drives
   and wormholes. Select one linked-system round trip, date/knowledge/fuel effects,
@@ -92,3 +106,6 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
 - 2026-09-30: initial queue created after user requested ticketing and beta survey.
   Only ESDOS-001 describes already-implemented game work. The other tickets are
   prospective; no new gameplay or BBS runtime was started during the survey.
+
+- 2026-09-30: ESDOS-001 closed on Earth/Luna human acceptance; ESDOS-002
+  completed as design/native evidence; ESDOS-003 ready, no DOS save code yet.

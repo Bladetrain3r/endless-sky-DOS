@@ -1,0 +1,62 @@
+# Native persistence fixture
+
+2026-09-30. This directory begins the save/load work with a **native reference
+fixture**, not a DOS save implementation. The governing implementation contract is
+[PERSISTENCE-CONTRACT.md](../planning/PERSISTENCE-CONTRACT.md); the source review is
+[NATIVE-SAVE-AUDIT.md](../planning/NATIVE-SAVE-AUDIT.md).
+
+From the project root, using the existing native reference image/build:
+
+```sh
+python3 dos/persistence/native.py
+```
+
+The runner links the fixture to unchanged upstream objects at
+`061a9461a93898fb691504536589d1dcddc5d79b`. It rejects changed/untracked reference
+source/data, runs without network in Docker, and uses a temporary configuration.
+It never opens a user's pilot. Source/data hashes, image ID, compiler flags and
+generated artifact hashes are recorded in
+[native-persistence-contract.json](../reports/native-persistence-contract.json).
+Full generated native saves remain under ignored `.work/persistence/`; the small
+[native-trace.csv](native-trace.csv) is the durable observable-state record.
+
+The scene uses a stock Sparrow, fixed ship UUID, default gamerules, Earth in Sol,
+10,000 credits and Food at 505 credits/ton. It directly calls native trading,
+serialization, load and landed initialization, without drawing UI. Initialize
+`GameData::FinishLoading()` before creating/loading pilots: their reset path needs
+the default registries it snapshots. Omitting it crashed the first harness;
+upstream source required no modification.
+
+## Executed checks
+
+- Buy 3 tons: 8,485 credits, 1,515 cost basis, 3/15 tons held. Reload reproduces
+  the selected normalized fields exactly, including stable ship identity.
+- The next 1-ton buy gives the same result before and after reload: 7,980 credits,
+  2,020 cost basis and 4 tons held.
+- During `StartTransaction`, saving retains the prior serialized state despite
+  live changes. `FinishTransaction` allows the new state to persist. No rollback
+  of live memory is implied.
+- An oversized purchase clamps to the remaining 12 tons of capacity; selling an
+  oversized amount empties all 15 tons, clears cost basis and restores 10,000
+  credits. Native pending sales become -15 and survive reload; buys add no entry.
+- `CanBeSaved` accepts the landed pilot and rejects the in-flight and locked cases.
+
+Compared fields are credits, commodity quantity/basis, capacity/free space, date,
+unit price, pending sales, ship UUID, system/planet and normalized shield/hull/
+energy/heat. All current comparisons are exact; no numerical tolerance is hidden.
+The native reload restores port resources/IdleHeat, so this is not evidence of
+preserving arbitrary in-flight resource values.
+
+## Limits and next gate
+
+This invokes the path serializer explicitly and tests save eligibility separately;
+it does not exercise the public save method's backup rotation or global-file write
+sequence. Reloads occur within one process using native `Load` then `Land`, not a
+full executable restart. It does not compare every mission, profile or ship field,
+and the random new-pilot identity/full campaign save bytes need not be reproducible
+between runs. The checked trace and selected next action are the evidence.
+
+No DOS codec, file-failure durability, native interchange, broad campaign parity,
+or whole-game memory/performance is qualified here. ESDOS-003 must implement and
+pass PS-01–09, including actual DOS restart and injected I/O failure cases. Landed
+campaign saves and deterministic in-flight checkpoints remain separate artifacts.

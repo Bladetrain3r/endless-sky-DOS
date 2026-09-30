@@ -21,6 +21,9 @@ Current upstream checkout: `061a9461a93898fb691504536589d1dcddc5d79b`
 GPL-3.0-or-later licensing; asset conversions retain the per-file provenance and
 terms recorded in `../copyright`.
 
+Next: [persistent-pilot contract](planning/PERSISTENCE-CONTRACT.md) and
+[native save/reload fixture](persistence/README.md); DOS persistence remains to implement.
+
 ## First executable: banked VBE diagnostic
 
 `probes/vbe_fill.asm` is a standalone NASM DOS COM program. It queries mode 103h,

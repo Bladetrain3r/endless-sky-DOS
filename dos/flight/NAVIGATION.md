@@ -112,4 +112,6 @@ Counted navigation heap is 2,901,550 bytes, excluding code/stack/runtime/VRAM.
 The dock's initial full text draw is slower than ordinary flight; subsequent
 frames reuse it. Whole-route averages mix flight and dock frames and are not a
 whole-game FPS claim. Per-layer legacy timing fields are unmeasured zeros here.
-Root reviewed the captured dock and flight views; human acceptance is pending.
+Root reviewed the captured dock and flight views. On 2026-09-30 the user reported
+successful landings at both Luna and Earth in a quick playtest; bounded landing
+checkpoint accepted. The report does not claim exhaustive manual edge-case coverage.

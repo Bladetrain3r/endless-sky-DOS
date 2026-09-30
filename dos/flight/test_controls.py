@@ -15,7 +15,7 @@ RUN = ROOT / '.work/flight/run'
 IMAGE = 'modern-arena-tools:0.1'
 
 
-def guest(stress=None,incoming=False,pursuit=False,arena=False):
+def guest(stress=None,incoming=False,pursuit=False,arena=False,navigation=False,launch=False):
     result = RUN / 'KEYS.TXT'
     result.unlink(missing_ok=True)
     process = subprocess.Popen(['dosbox', '-conf', '.work/flight/run/keys.conf'],
@@ -42,7 +42,19 @@ def guest(stress=None,incoming=False,pursuit=False,arena=False):
             subprocess.run(['xdotool', action, key], check=True)
             time.sleep(pause)
 
-        if arena:
+        if navigation:
+            send('key','p',.1);send('key','p',.1)
+            send('key','l',.2);send('keydown','w',.2);send('keyup','w',.1)
+            send('key','r',.2)
+            send('keydown','h',.8);send('keyup','h',.1)
+            # Holding L crosses the dock transition: it must not auto-depart.
+            send('keydown','l',6.);send('keyup','l',.2)
+            if launch:
+                send('key','l',1.5)
+                send('keydown','space',.4);send('keyup','space',.2)
+                send('key','p',.1);send('key','l',.2);send('key','l',.2)
+            send('key','Escape',.1)
+        elif arena:
             # Exercise movement/fire and camera, then reset. Only the post-reset
             # target taps may remain in selection counters. Hold T past repeat.
             send('keydown', 'w', .3)
@@ -91,6 +103,23 @@ def guest(stress=None,incoming=False,pursuit=False,arena=False):
         process.wait(timeout=20)
         fields = dict(line.split('=', 1) for line in result.read_text().splitlines() if '=' in line)
         assert fields['status'] == 'ok' and fields['video_verify'] == 'pass', fields
+        if navigation:
+            assert fields['navigation']=='1' and fields['nav_landings']=='1',fields
+            assert fields['nav_launches']==('1' if launch else '0'),fields
+            assert fields['nav_phase']==('0' if launch else '2'),fields
+            assert fields['nav_approach']=='0' and fields['shield_test_pulses']=='1',fields
+            assert fields['player_shields']=='1400' and fields['player_hull']=='300',fields
+            assert int(fields['pilot_input_bits']) & (2048|4096)==(2048|4096),fields
+            assert fields['enemy_shots']=='0' and float(fields['discarded_sim_ms'])==0.,fields
+            assert int(fields['nav_docked_ticks'])>60,fields
+            if launch:
+                assert int(fields['practice_shots'])>=1 and fields['nav_selected']=='1',fields
+                assert fields['nav_cancellations']=='1',fields
+            else:
+                assert fields['energy']=='4000' and fields['practice_shots']=='0',fields
+                assert fields['nav_selected']=='0' and fields['nav_zoom']=='0',fields
+            print(json.dumps(fields))
+            return
         if arena:
             assert fields['arena']=='1' and fields['arena_alive']=='2',fields
             assert fields['arena_selected']=='1' and fields['arena_selection_changes']=='1',fields
@@ -142,18 +171,23 @@ def guest(stress=None,incoming=False,pursuit=False,arena=False):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--navigation',action='store_true')
+    parser.add_argument('--launch',action='store_true',help='also leave dock and check flight controls')
     parser.add_argument('--arena',action='store_true')
     parser.add_argument('--guest',action='store_true')
     parser.add_argument('--incoming-fire',action='store_true')
     parser.add_argument('--pursuit',action='store_true')
     parser.add_argument('--resource-stress',choices=('energy','heat'))
     args = parser.parse_args()
-    if args.guest: return guest(args.resource_stress,args.incoming_fire,args.pursuit,args.arena)
+    if args.launch and not args.navigation: parser.error('launch requires navigation')
+    if args.navigation and (args.arena or args.pursuit or args.incoming_fire or args.resource_stress): parser.error('navigation is a separate test')
+    if args.guest: return guest(args.resource_stress,args.incoming_fire,args.pursuit,args.arena,args.navigation,args.launch)
     stress_option = ' --resource-stress '+args.resource_stress if args.resource_stress else ''
     if args.incoming_fire: stress_option+=' --incoming-fire'
+    if args.navigation: stress_option+=' --navigation'
     if args.arena: stress_option+=' --arena'
     if args.pursuit: stress_option+=' --pursuit'
-    target_option='' if (args.pursuit or args.arena) else ' --stationary-target'
+    target_option='' if (args.pursuit or args.arena or args.navigation) else ' --stationary-target'
     base = (ROOT / 'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     config = base + ('[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
                      f'FLIGHT.EXE --demo --pilot{target_option} --seconds 25{stress_option} > KEYS.TXT\nexit\n')
@@ -165,11 +199,13 @@ def main():
         *(['--resource-stress',args.resource_stress] if args.resource_stress else []),
         *(['--incoming-fire'] if args.incoming_fire else []),
         *(['--pursuit'] if args.pursuit else []),
-        *(['--arena'] if args.arena else [])],
+        *(['--arena'] if args.arena else []),
+        *(['--navigation'] if args.navigation else []),
+        *(['--launch'] if args.launch else [])],
         check=True, capture_output=True, text=True, timeout=65)
     fields = json.loads(result.stdout)
     assert tested_hash == hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
-    report = {'result': fields, 'exe_sha256': tested_hash, 'resource_stress': args.resource_stress,
+    report = {'navigation_profiles':{name:hashlib.sha256((RUN/name).read_bytes()).hexdigest() for name in ('NAV.DAT','APPROACH.DAT') if args.navigation}, 'result': fields, 'exe_sha256': tested_hash, 'resource_stress': args.resource_stress,
               'opponent_profile_sha256':{name:hashlib.sha256((RUN/name).read_bytes()).hexdigest() for name in ('BARGERES.DAT','BARGESH.DAT','BARGEPRO.DAT','BARGEHP.DAT')},
             'pursuit_profile_sha256': hashlib.sha256((RUN/'PURSUIT.DAT').read_bytes()).hexdigest(),
               'player_profile_sha256': hashlib.sha256((RUN/'PLAYER.DAT').read_bytes()).hexdigest(),
@@ -178,8 +214,8 @@ def main():
               'propulsion_profile_sha256': hashlib.sha256((RUN/'PROPULSE.DAT').read_bytes()).hexdigest(), 'dos_config': config,
               'test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'image_id': subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
-              'scope': ('Arena: pre-reset thrust/turn/fire, reset, held T cycle once, N delivery, camera, two owners firing at one player; ' if args.arena else '')+'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; held H single shield drain and recharge; physical feel awaits human check.'}
-    (ROOT / ('dos/reports/flight-controls'+('-arena' if args.arena else '-pursuit' if args.pursuit else '-incoming' if args.incoming_fire else '')+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
+              'scope': ('Navigation: target cycle, manual cancel/reset, held L across docking, native port restoration and paused sim; optional takeoff/fire/approach toggle. ' if args.navigation else '')+('Arena: pre-reset thrust/turn/fire, reset, held T cycle once, N delivery, camera, two owners firing at one player; ' if args.arena else '')+'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; held H single shield drain and recharge; physical feel awaits human check.'}
+    (ROOT / ('dos/reports/flight-controls'+('-navigation-launch' if args.navigation and args.launch else '-navigation-dock' if args.navigation else '-arena' if args.arena else '-pursuit' if args.pursuit else '-incoming' if args.incoming_fire else '')+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(fields, indent=2))
 
 

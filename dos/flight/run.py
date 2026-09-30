@@ -14,7 +14,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/run'
 IMAGE='modern-arena-tools:0.1'
-SOURCES=['dos/flight/arena.c','dos/flight/arena_view.c','dos/flight/target_power.c','dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
+SOURCES=['dos/flight/navigation.c','dos/flight/navigation_view.c','dos/navigation/approach.c','dos/flight/arena.c','dos/flight/arena_view.c','dos/flight/target_power.c','dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
          'dos/flight/scene.c','dos/flight/power.c','dos/propulsion/propulsion.c','dos/flight/sprite_reference.c','dos/world/active.c',
          'dos/shields/shields.c','dos/resources/resources.c','dos/damage/damage.c','dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/flight/pilot.c','dos/flight/input.c','dos/flight/input_state.c','dos/motion/motion.c']
@@ -36,6 +36,7 @@ def convert():
 
 def main():
     parser=argparse.ArgumentParser()
+    parser.add_argument('--navigation-test',action='store_true',help='Earth land-launch then Luna land-launch route')
     parser.add_argument('--arena-test',action='store_true',help='pilot route through two-opponent arena')
     parser.add_argument('--opponent-stock',action='store_true')
     parser.add_argument('--opponent-stress',choices=('energy','heat'))
@@ -52,6 +53,7 @@ def main():
     parser.add_argument('--practice-test',action='store_true',help='stationary held-fire training route')
     parser.add_argument('--replay',action='store_true',help='replay a pilot control route through native-matched motion')
     args=parser.parse_args()
+    if args.navigation_test and (args.arena_test or args.pursuit_test or args.incoming_test or args.practice_test or args.replay or args.camera or args.resource_stress or args.moving_target or args.opponent_stock or args.opponent_stress or args.destructible_target): parser.error('navigation-test is a separate route')
     if (args.opponent_stock or args.opponent_stress) and not (args.pursuit_test or args.arena_test): parser.error('opponent options require pursuit-test')
     if args.arena_test and (args.pursuit_test or args.incoming_test or args.practice_test or args.replay or args.camera or args.resource_stress or args.moving_target): parser.error('arena-test is a separate pilot route')
     if args.pursuit_test and (args.incoming_test or args.practice_test or args.replay or args.camera or args.resource_stress or args.moving_target): parser.error('pursuit-test is a separate pilot route')
@@ -68,6 +70,9 @@ def main():
             '-e','HOME=/tmp','-v',f'{ROOT}:/work','-w','/work',IMAGE]
     subprocess.run(docker+['python3','dos/flight/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/flight/pilot_assets.py'],check=True)
+    if (ROOT/'.work/navigation/PLANETS.json').exists():
+        subprocess.run(docker+['python3','dos/flight/navigation_assets.py'],check=True)
+    elif args.navigation_test: parser.error('run dos/navigation/check.py first to export navigation profiles')
     subprocess.run(docker+['python3','dos/projectile/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/damage/assets.py'],check=True)
     subprocess.run(docker+['python3','dos/resources/assets.py'],check=True)
@@ -80,13 +85,14 @@ def main():
     assert digest(archive)=='deacda0488e1cdd7c4a9f32fab45662b34c0ed6b2d7d4d13bc07041b62004a8c'
     with zipfile.ZipFile(archive) as z:
         (RUN/'CWSDPMI.EXE').write_bytes(z.read('bin/CWSDPMI.EXE'))
-    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h','dos/shields/shields.h','dos/resources/resources.h','dos/propulsion/propulsion.h','dos/pursuit/pursuit.h']
+    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h','dos/shields/shields.h','dos/resources/resources.h','dos/propulsion/propulsion.h','dos/pursuit/pursuit.h','dos/navigation/approach.h']
     source_hashes={s:digest(ROOT/s) for s in inputs}
     subprocess.run(docker+['.work/toolchain/djgpp/bin/i586-pc-msdosdjgpp-gcc',*FLAGS,
                           *(['-DREFERENCE_RENDERER'] if args.reference else []),*SOURCES,'-lm','-o','.work/flight/run/FLIGHT.EXE'],check=True)
     assert source_hashes=={s:digest(ROOT/s) for s in inputs}, 'source changed during build'
     base=(ROOT/'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     options=f'--ships {args.ships} --frames {args.frames}'
+    if args.navigation_test: options+=' --navigation-test'
     if args.camera: options+=' --camera'
     if args.replay: options+=' --replay'
     if args.incoming_test: options+=' --incoming-test'
@@ -96,8 +102,8 @@ def main():
     if args.opponent_stress: options+=' --opponent-stress '+args.opponent_stress
     if args.practice_test: options+=' --practice-test'
     if args.resource_stress: options+=' --resource-stress '+args.resource_stress
-    if not args.moving_target and not (args.pursuit_test or args.arena_test): options+=' --stationary-target'
-    if not args.destructible_target: options+=' --invulnerable-target'
+    if not args.moving_target and not (args.pursuit_test or args.arena_test or args.navigation_test): options+=' --stationary-target'
+    if not args.destructible_target and not args.navigation_test: options+=' --invulnerable-target'
     if args.headless_demo: options+=' --demo --seconds 4'
     conf=base+'[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
     conf+=f'FLIGHT.EXE {options} > FLIGHT.TXT\nexit\n'
@@ -115,12 +121,13 @@ def main():
     fields=dict(line.split('=',1) for line in (RUN/'FLIGHT.TXT').read_text().splitlines() if '=' in line)
     assert fields['status']=='ok' and fields['video_verify']=='pass',fields
     if not args.headless_demo:
-        assert int(fields['frames'])==args.frames and int(fields['simulation_ticks'])==args.frames*2
+        assert int(fields['frames'])==args.frames
+        assert int(fields['simulation_ticks'])+int(fields.get('nav_docked_ticks',0))==args.frames*2
     if args.headless_demo:
         assert float(fields['discarded_sim_ms'])==0,fields
         expected=float(fields['wall_elapsed_ms'])*60/1000
         allowance=float(fields['frame_max_ms'])*60/1000+3
-        assert abs(int(fields['simulation_ticks'])-expected)<=allowance,fields
+        assert abs(int(fields['simulation_ticks'])+int(fields.get('nav_docked_ticks',0))-expected)<=allowance,fields
     if args.replay or args.pursuit_test or args.arena_test:
         ticks=int(fields['simulation_ticks'])
         assert int(fields['pilot_ticks'])==ticks
@@ -129,6 +136,14 @@ def main():
         for key,offset in [('x',275.),('y',373.),('vx',0.),('vy',0.)]:
             assert abs(float(fields['pilot_'+key])-float(expected[key])-offset)<1e-7,(key,fields,expected)
         assert int(fields['pilot_angle'])==int(expected['angle_steps'])
+    if args.navigation_test:
+        assert fields['navigation']=='1',fields
+        if not args.headless_demo and args.frames>=900:
+            assert fields['nav_selected']=='1',fields
+            assert fields['nav_landings']=='2' and fields['nav_launches']=='2' and fields['nav_test_stage']=='7',fields
+            assert fields['nav_phase']=='0' and fields['nav_approach']=='0',fields
+            assert float(fields['player_shields'])==float(fields['player_shield_capacity']),fields
+        assert fields['enemy_shots']=='0' and fields['practice_shots']=='0',fields
     if args.arena_test:
         assert fields['arena']=='1' and fields['arena_alive']=='2',fields
         assert fields['arena_ticks']==fields['pilot_ticks'] and fields['enemy_dropped']=='0',fields
@@ -165,10 +180,11 @@ def main():
     assert (RUN/'FRAME.IDX').stat().st_size==480000
     subprocess.run(docker+['python3','-c',
         'import sys; sys.path.insert(0,"dos/flight"); from run import convert; convert()'],check=True)
-    report=dict(reference_renderer=args.reference,kind='bounded-arena-pilot' if args.arena_test else 'bounded-pursuit-pilot' if args.pursuit_test else 'bounded-incoming-fire' if args.incoming_test else 'bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
+    report=dict(reference_renderer=args.reference,kind='bounded-navigation-loop' if args.navigation_test else 'bounded-arena-pilot' if args.arena_test else 'bounded-pursuit-pilot' if args.pursuit_test else 'bounded-incoming-fire' if args.incoming_test else 'bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
                 image_id=subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
                 compiler_flags=FLAGS,config=conf,source_sha256=source_hashes,
                 opponent_profile_sha256={name:digest(RUN/name) for name in ('BARGERES.DAT','BARGESH.DAT','BARGEPRO.DAT','BARGEHP.DAT')},
+                navigation_profiles={name:digest(RUN/name) for name in ('NAV.DAT','APPROACH.DAT') if (RUN/name).exists()},
                 pursuit_profile_sha256=digest(RUN/'PURSUIT.DAT'),
                 player_profile_sha256=digest(RUN/'PLAYER.DAT'),
                 shield_profile_sha256=digest(RUN/'SHIELD.DAT'),
@@ -188,6 +204,7 @@ def main():
     if args.reference: stem+='-reference'
     if args.replay: stem+='-pilot'
     if args.incoming_test: stem+='-incoming'
+    if args.navigation_test: stem+='-navigation'
     if args.arena_test: stem+='-arena'
     if args.pursuit_test: stem+='-pursuit'
     if args.opponent_stock: stem+='-stock'

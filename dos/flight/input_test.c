@@ -58,6 +58,14 @@ int main(void)
     input_state_feed(&s,0x31); input_state_feed(&s,0xb1);
     assert(input_state_take(&s)==(INPUT_TARGET_NEXT|INPUT_TARGET_NEAREST));
     assert(input_state_take(&s)==0);
+    input_state_feed(&s,0x26);input_state_feed(&s,0xa6);
+    input_state_feed(&s,0x19);input_state_feed(&s,0x99);
+    assert(input_state_take(&s)==(INPUT_LAND|INPUT_PLANET));
+    assert(input_state_take(&s)==0);
+    input_state_feed(&s,0x26);input_state_feed(&s,0x26);
+    assert(input_state_take(&s)==INPUT_LAND);
+    input_state_feed(&s,0x26);input_state_feed(&s,0xa6);
+    assert(input_state_take(&s)==0);
     input_state_feed(&s,0xe1);
     input_state_feed(&s,0x1d); input_state_feed(&s,0x45);
     input_state_feed(&s,0xe1); input_state_feed(&s,0x9d); input_state_feed(&s,0xc5);

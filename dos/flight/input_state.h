@@ -13,6 +13,8 @@
 #define INPUT_SHIELD_TEST 256u
 #define INPUT_TARGET_NEXT 512u
 #define INPUT_TARGET_NEAREST 1024u
+#define INPUT_LAND 2048u
+#define INPUT_PLANET 4096u
 
 typedef struct {
     volatile unsigned char normal[128];

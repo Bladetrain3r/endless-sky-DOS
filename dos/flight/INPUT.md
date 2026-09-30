@@ -18,11 +18,13 @@ installing a second handler. `input_keys()` returns zero while closed.
 | `INPUT_SHIELD_TEST` | H (trainer drain) |
 | `INPUT_TARGET_NEXT` | T (arena target cycle) |
 | `INPUT_TARGET_NEAREST` | N (arena nearest target) |
+| `INPUT_LAND` | L (navigation approach / depart) |
+| `INPUT_PLANET` | P (navigation destination cycle) |
 
 The handler consumes scan-code set 1 make/break bytes directly. It tracks
 physical aliases separately: releasing W does not cancel a held Up key. Key
 repeat leaves the state unchanged. Space is a held level: firing stops when
-Space is released, independently of thrust. Escape, R, Tab, H, T and N make edges stay
+Space is released, independently of thrust. Escape, R, Tab, H, T, N, L and P make edges stay
 latched until the next `input_keys()` call, so a short tap between polls is delivered
 once. Pause/E1 is ignored. The handler sends one
 PIC end-of-interrupt and does not chain the previous IRQ1 handler after
@@ -52,3 +54,8 @@ Arena T (0x14, bit512) and N (0x31, bit1024) use the same latched make-edge
 contract. The arena consumes rising edges to avoid cycling every held frame.
 The decoder checks repeat/quick taps; `test_controls.py --arena` checks the actual
 application cycle/reset through DOSBox. Other modes ignore these target keys.
+
+Navigation L (0x26, bit2048) and P (0x19, bit4096) also latch make edges.
+Holding L through landing does not launch from the dock. Descent/takeoff ignore
+flight controls, and held controls must be released before use after departure.
+`test_controls.py --navigation` and `--navigation --launch` exercise the app.

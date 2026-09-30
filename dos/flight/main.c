@@ -8,6 +8,7 @@
 #include "threat.h"
 #include "opponent.h"
 #include "arena_view.h"
+#include "navigation_view.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -50,6 +51,23 @@ static int snapshot(const unsigned char *frame)
     if(fclose(f)) ok=0;
     return ok;
 }
+/* A bounded quiet route: land on Earth, pause on dock, launch, select Luna,
+ * land and launch again. No teleport or direct phase writes. */
+static unsigned nav_replay(const Navigation *n,int *stage,unsigned *dock_ticks)
+{
+    switch(*stage) {
+        case 0: *stage=1;return INPUT_LAND;
+        case 1:
+            if(n->phase==NAV_DOCKED && ++*dock_ticks>=60) { *stage=2;*dock_ticks=0;return INPUT_LAND; }
+            break;
+        case 2: if(n->phase==NAV_FLYING) { *stage=3;return INPUT_PLANET; } break;
+        case 3: *stage=6;return INPUT_LAND;
+        case 6:
+            if(n->phase==NAV_DOCKED && ++*dock_ticks>=60) { *stage=7;return INPUT_LAND; }
+            break;
+    }
+    return 0;
+}
 int main(int argc,char **argv)
 {
     const char *names[]={"SPARROW.SPR","BARGE.SPR","FALCON.SPR","EARTH.SPR","LUNA.SPR","GLOW.SPR"};
@@ -62,7 +80,8 @@ int main(int argc,char **argv)
     int controlled=0,replay=0,keyboard=0,practice_test=0,stationary_target=0,invulnerable_target=0;
     int resource_stress=0,incoming_fire=0,incoming_test=0,pursuit=0;
     int opponent_stock=0,opponent_stress=0,arena_mode=0;
-    Arena *arena=NULL;
+    Arena *arena=NULL;Navigation *navigation=NULL;
+    int navigation_mode=0,navigation_test=0,nav_stage=0,dock_cached=0,dock_follow=0;unsigned dock_ticks=0,docked_ticks=0;
     unsigned keys_seen=0;
     uint64_t id; size_t memory=0;
     unsigned long before=pages(),resident=0;
@@ -71,6 +90,8 @@ int main(int argc,char **argv)
     for(i=1;i<(unsigned)argc;++i) {
         if(!strcmp(argv[i],"--demo")) demo=1;
         else if(!strcmp(argv[i],"--incoming-fire")) incoming_fire=1;
+        else if(!strcmp(argv[i],"--navigation")) navigation_mode=controlled=1;
+        else if(!strcmp(argv[i],"--navigation-test")) navigation_test=navigation_mode=controlled=replay=1;
         else if(!strcmp(argv[i],"--arena")) arena_mode=controlled=pursuit=incoming_fire=1;
         else if(!strcmp(argv[i],"--pursuit")) pursuit=incoming_fire=1;
         else if(!strcmp(argv[i],"--opponent-stock")) opponent_stock=1;
@@ -100,6 +121,10 @@ int main(int argc,char **argv)
     }
     if(!frames || frames>3600 || !ships || ships>64 || !(seconds>0. && seconds<=120.)) {
         error="argument_range"; goto done;
+    }
+    if(navigation_mode && (arena_mode || pursuit || incoming_fire || stationary_target || practice_test || camera ||
+       resource_stress || opponent_stock || opponent_stress || (replay && !navigation_test))) {
+        error="navigation_incompatible_options";goto done;
     }
     if(arena_mode && (stationary_target || practice_test || incoming_test || camera)) { error="arena_incompatible_route";goto done; }
     if(pursuit && (!controlled || stationary_target)) { error="pursuit_requires_pilot_moving_target"; goto done; }
@@ -147,6 +172,13 @@ int main(int argc,char **argv)
             }
             memory+=sizeof(*arena);
         }
+        if(navigation_mode) {
+            navigation=malloc(sizeof(*navigation));
+            if(!navigation || !navigation_load(navigation,&scene,"NAV.DAT") ||
+               !pursuit_load(&pilot.parameters,"APPROACH.DAT")) {error="navigation_assets_failed";goto done;}
+            memory+=sizeof(*navigation);
+            if(navigation_test) practice_shield_test(practice);
+        }
         if(incoming_test) for(i=0;i<4;++i) practice_shield_test(practice);
         memory+=sizeof(*practice)+sizeof(*threat)+sizeof(*opponent);
     }
@@ -180,8 +212,10 @@ int main(int argc,char **argv)
             if((keys & ~pilot.previous_keys) & INPUT_RESET) {
                 practice_reset(practice);threat_reset(threat);opponent_reset(opponent,practice);
                 if(arena) arena_reset(arena,practice);
+                if(navigation) navigation_reset(navigation);
             }
-            if(!threat->destroyed && ((keys & ~pilot.previous_keys) & INPUT_SHIELD_TEST)) practice_shield_test(practice);
+            if((!navigation || navigation->phase==NAV_FLYING) && !threat->destroyed && ((keys & ~pilot.previous_keys) & INPUT_SHIELD_TEST)) practice_shield_test(practice);
+            if(navigation) navigation_keys(navigation,&pilot,&scene,keys);
             if(arena) arena_keys(arena,&pilot,keys & ~pilot.previous_keys);
             pilot_keys(&pilot,&scene,keys);
         } else if(kbhit() && getch()==27) break;
@@ -192,79 +226,94 @@ int main(int argc,char **argv)
             if(accumulator>250.) { discarded_ms+=accumulator-250.; accumulator=250.; }
         } else accumulator=2000./60.;
         while(accumulator>=1000./60.) {
-            scene_step(&scene);
+            if(navigation_test) {
+                unsigned keys=nav_replay(navigation,&nav_stage,&dock_ticks);
+                navigation_keys(navigation,&pilot,&scene,keys);pilot_keys(&pilot,&scene,keys);
+            }
+            if(!navigation || navigation->phase!=NAV_DOCKED) scene_step(&scene);
+            else ++docked_ticks;
             if(controlled) {
-                if(replay) pilot_keys(&pilot,&scene,incoming_test?0:(practice_test?INPUT_FIRE:pilot_replay_keys(pilot.ticks)));
-                practice_begin_tick_disabled(practice,threat->disabled);
-                if(threat->destroyed) ++pilot.ticks; /* Trainer death freezes position until R. */
-                else if(threat->disabled) pilot_disabled_step(&pilot,&scene);
-                else pilot_powered_step(&pilot,&scene,&practice->resources,&practice->resource_profile,&drive);
-                if(arena) arena_step(arena,practice,&pilot,threat,!!(pilot.previous_keys & INPUT_FIRE));
+                if(replay && !navigation_test) pilot_keys(&pilot,&scene,incoming_test?0:(practice_test?INPUT_FIRE:pilot_replay_keys(pilot.ticks)));
+                if(navigation) navigation_step(navigation,&pilot,&scene,practice,threat,&drive);
                 else {
-                    opponent_step(opponent,practice,&pilot,threat->destroyed);
-                    practice_finish_tick(practice,&pilot,!threat->disabled && !!(pilot.previous_keys & INPUT_FIRE));
-                    threat_step(threat,practice,&pilot);
+                    practice_begin_tick_disabled(practice,threat->disabled);
+                    if(threat->destroyed) ++pilot.ticks; /* Trainer death freezes position until R. */
+                    else if(threat->disabled) pilot_disabled_step(&pilot,&scene);
+                    else pilot_powered_step(&pilot,&scene,&practice->resources,&practice->resource_profile,&drive);
+                    if(arena) arena_step(arena,practice,&pilot,threat,!!(pilot.previous_keys & INPUT_FIRE));
+                    else {
+                        opponent_step(opponent,practice,&pilot,threat->destroyed);
+                        practice_finish_tick(practice,&pilot,!threat->disabled && !!(pilot.previous_keys & INPUT_FIRE));
+                        threat_step(threat,practice,&pilot);
+                    }
                 }
             }
             accumulator-=1000./60.;
         }
         b=ms(); sample(&sim,b-a); a=b;
-        if(arena) {
+        if(navigation) {
+            /* The dock screen has no ticking systems. Reuse its frame until
+             * departure/reset or a camera-mode change alters the cockpit text. */
+            if(navigation->phase!=NAV_DOCKED || !dock_cached || dock_follow!=pilot.follow)
+                navigation_view_draw(frame,navigation,practice,&pilot,threat,&scene,sprites,blend,add);
+            dock_cached=navigation->phase==NAV_DOCKED;dock_follow=pilot.follow;
+            b=ms();sample(&draw,b-a);a=b;
+        } else if(arena) {
             arena_view_draw(frame,arena,practice,&pilot,threat,&scene,sprites,blend,add);
             b=ms();sample(&draw,b-a);a=b;
         } else {
-        scene_draw(frame,&scene,sprites,blend,add,&profile);
-        if(controlled) {
-            double pilot_start=ms();
-            practice_draw(frame,practice,&scene,&sprites[1],blend,add);
-            threat_draw(frame,threat,&scene);
-            if(!threat->destroyed) pilot_draw(frame,&pilot,&scene,&sprites[0],blend,add);
-            sample(&pilot_draw_time,ms()-pilot_start);
-        }
-        sample(&background,profile.background_ms); sample(&orbital,profile.orbital_ms);
-        sample(&traffic,profile.traffic_ms); sample(&effect,profile.effect_ms);
-        hud_start=ms();
-        memcpy(frame,hud_pixels,32000);
-        memcpy(frame+800*570,hud_pixels+32000,24000);
-        if(controlled) {
-            char label[100];
-            snprintf(label,sizeof(label),"SPEED %.0f  CAMERA %s  NO REVERSE ENGINES",
-                     sqrt(pilot.state.vx*pilot.state.vx+pilot.state.vy*pilot.state.vy)*60.,
-                     pilot.follow?"FOLLOW":"FIXED");
-            video_text(frame,420,10,label,1);
-            snprintf(label,sizeof(label),"SHOTS %u  HITS %u  ACTIVE %u",practice->shots,practice->hits,practice->active);
-            video_text(frame,490,24,label,1);
-            snprintf(label,sizeof(label),"ENERGY %.0f/%.0f  HEAT %.0f%%  %s",
-                     practice->resources.energy,practice->resource_profile.capacity,
-                     100.*practice->resources.heat/practice->resource_profile.max_heat,
-                     threat->destroyed?"DESTROYED":threat->disabled?"HULL DISABLED":
-                     practice->resources.overheated?"OVERHEATED":
-                     practice->resources.energy<practice->resource_profile.shot_energy?"GUN LOW ENERGY":
-                     practice->cooldown?"RELOADING":"READY");
-            video_text(frame,12,590,label,practice->resources.overheated?4:2);
-            if(practice->destructible)
-                snprintf(label,sizeof(label),"TARGET SH %.1f  HULL %.1f%s",practice->health.shields,
-                    practice->health.hull>0.?practice->health.hull:0.,practice->destroyed?"  DESTROYED":practice->target_power.disabled?" DISABLED":"");
-            else snprintf(label,sizeof(label),"TARGET INVULNERABLE");
-            video_text(frame,490,590,label,1);
-            snprintf(label,sizeof(label),"SHIELD %.1f/%.0f  HULL %.1f/%.0f  H: DRAIN 25%% (TRAINER)",
-                     practice->shield.shields,practice->shield_profile.capacity,
-                     threat->hull>0.?threat->hull:0.,threat->max_hull);
-            video_text(frame,12,44,label,threat->flash?4:2);
-            if(practice->target_power.enabled) {
-                const TargetPower *tp=&practice->target_power;
-                snprintf(label,sizeof(label),"ENEMY %s  E %.0f/%.0f  HEAT %.0f%%  %s",
-                    tp->stock?"STOCK HP":"TRAINING HP",tp->resources.energy,tp->budget.capacity,
-                    100.*tp->resources.heat/tp->budget.max_heat,
-                    practice->destroyed?"DESTROYED":tp->disabled?"DISABLED":
-                    tp->resources.overheated?"OVERHEATED":
-                    tp->resources.energy<tp->budget.shot_energy?"LOW ENERGY":"READY");
-                video_text(frame,12,56,label,2);
+            scene_draw(frame,&scene,sprites,blend,add,&profile);
+            if(controlled) {
+                double pilot_start=ms();
+                practice_draw(frame,practice,&scene,&sprites[1],blend,add);
+                threat_draw(frame,threat,&scene);
+                if(!threat->destroyed) pilot_draw(frame,&pilot,&scene,&sprites[0],blend,add);
+                sample(&pilot_draw_time,ms()-pilot_start);
             }
-            if(threat->destroyed) video_text(frame,250,280,"SHIP DESTROYED - R TO RESET",4);
-            else if(threat->disabled) video_text(frame,250,280,"HULL DISABLED - R TO RESET",4);
-        }
-        b=ms(); sample(&hud,b-hud_start); sample(&draw,b-a); a=b;
+            sample(&background,profile.background_ms); sample(&orbital,profile.orbital_ms);
+            sample(&traffic,profile.traffic_ms); sample(&effect,profile.effect_ms);
+            hud_start=ms();
+            memcpy(frame,hud_pixels,32000);
+            memcpy(frame+800*570,hud_pixels+32000,24000);
+            if(controlled) {
+                char label[100];
+                snprintf(label,sizeof(label),"SPEED %.0f  CAMERA %s  NO REVERSE ENGINES",
+                         sqrt(pilot.state.vx*pilot.state.vx+pilot.state.vy*pilot.state.vy)*60.,
+                         pilot.follow?"FOLLOW":"FIXED");
+                video_text(frame,420,10,label,1);
+                snprintf(label,sizeof(label),"SHOTS %u  HITS %u  ACTIVE %u",practice->shots,practice->hits,practice->active);
+                video_text(frame,490,24,label,1);
+                snprintf(label,sizeof(label),"ENERGY %.0f/%.0f  HEAT %.0f%%  %s",
+                         practice->resources.energy,practice->resource_profile.capacity,
+                         100.*practice->resources.heat/practice->resource_profile.max_heat,
+                         threat->destroyed?"DESTROYED":threat->disabled?"HULL DISABLED":
+                         practice->resources.overheated?"OVERHEATED":
+                         practice->resources.energy<practice->resource_profile.shot_energy?"GUN LOW ENERGY":
+                         practice->cooldown?"RELOADING":"READY");
+                video_text(frame,12,590,label,practice->resources.overheated?4:2);
+                if(practice->destructible)
+                    snprintf(label,sizeof(label),"TARGET SH %.1f  HULL %.1f%s",practice->health.shields,
+                        practice->health.hull>0.?practice->health.hull:0.,practice->destroyed?"  DESTROYED":practice->target_power.disabled?" DISABLED":"");
+                else snprintf(label,sizeof(label),"TARGET INVULNERABLE");
+                video_text(frame,490,590,label,1);
+                snprintf(label,sizeof(label),"SHIELD %.1f/%.0f  HULL %.1f/%.0f  H: DRAIN 25%% (TRAINER)",
+                         practice->shield.shields,practice->shield_profile.capacity,
+                         threat->hull>0.?threat->hull:0.,threat->max_hull);
+                video_text(frame,12,44,label,threat->flash?4:2);
+                if(practice->target_power.enabled) {
+                    const TargetPower *tp=&practice->target_power;
+                    snprintf(label,sizeof(label),"ENEMY %s  E %.0f/%.0f  HEAT %.0f%%  %s",
+                        tp->stock?"STOCK HP":"TRAINING HP",tp->resources.energy,tp->budget.capacity,
+                        100.*tp->resources.heat/tp->budget.max_heat,
+                        practice->destroyed?"DESTROYED":tp->disabled?"DISABLED":
+                        tp->resources.overheated?"OVERHEATED":
+                        tp->resources.energy<tp->budget.shot_energy?"LOW ENERGY":"READY");
+                    video_text(frame,12,56,label,2);
+                }
+                if(threat->destroyed) video_text(frame,250,280,"SHIP DESTROYED - R TO RESET",4);
+                else if(threat->disabled) video_text(frame,250,280,"HULL DISABLED - R TO RESET",4);
+            }
+            b=ms(); sample(&hud,b-hud_start); sample(&draw,b-a); a=b;
         }
         if(!video_present(frame)) { error=video_error(); goto done; }
         b=ms(); sample(&present,b-a); sample(&total,b-t); ++done;
@@ -296,9 +345,9 @@ done:
     if(practice && ok) printf("practice_shots=%u\npractice_hits=%u\npractice_active=%u\n"
         "practice_peak=%u\npractice_dropped=%u\n",practice->shots,practice->hits,
         practice->active,practice->peak,practice->dropped);
-    if(practice && ok && !arena) printf("target_moving=%d\ntarget_ticks=%u\ntarget_x=%.17g\ntarget_y=%.17g\ntarget_angle=%u\n",
+    if(practice && ok && !arena && !navigation) printf("target_moving=%d\ntarget_ticks=%u\ntarget_x=%.17g\ntarget_y=%.17g\ntarget_angle=%u\n",
         practice->moving_target,practice->target_ticks,practice->target.x,practice->target.y,(unsigned)practice->target.angle);
-    if(practice && ok && !arena) printf("target_destroyed=%d\ntarget_shields=%.17g\ntarget_hull=%.17g\nexplosion_ticks=%u\n",
+    if(practice && ok && !arena && !navigation) printf("target_destroyed=%d\ntarget_shields=%.17g\ntarget_hull=%.17g\nexplosion_ticks=%u\n",
         practice->destroyed,practice->health.shields,practice->health.hull,practice->explosion);
     if(practice && ok) printf("resource_stress=%d\nenergy=%.17g\nheat=%.17g\noverheated=%d\n"
         "blocked_energy_ticks=%u\nblocked_heat_ticks=%u\n",
@@ -310,7 +359,7 @@ done:
         "player_hull=%.17g\nplayer_minimum_hull=%.17g\nplayer_disabled=%d\nplayer_destroyed=%d\n",
         threat->enabled,threat->shots,threat->hits,threat->active,threat->dropped,
         threat->hull,threat->minimum_hull,threat->disabled,threat->destroyed);
-    if(opponent && ok && !arena) printf("pursuit=%d\nopponent_ticks=%u\nopponent_thrust_ticks=%u\nopponent_turn_ticks=%u\n"
+    if(opponent && ok && !arena && !navigation) printf("pursuit=%d\nopponent_ticks=%u\nopponent_thrust_ticks=%u\nopponent_turn_ticks=%u\n"
         "opponent_x=%.17g\nopponent_y=%.17g\nopponent_vx=%.17g\nopponent_vy=%.17g\nopponent_angle=%u\n",
         opponent->enabled,opponent->ticks,opponent->thrust_ticks,opponent->turn_ticks,
         opponent->state.x,opponent->state.y,opponent->state.vx,opponent->state.vy,(unsigned)opponent->state.angle);
@@ -323,12 +372,13 @@ done:
             tp->disabled,tp->minimum_hull,tp->blocked_energy,tp->blocked_heat);
     }
     if(arena && ok) arena_report(arena);
+    if(navigation && ok) {navigation_report(navigation);printf("nav_test_stage=%d\nnav_docked_ticks=%u\n",nav_stage,docked_ticks);}
     report("background",&background); report("orbital",&orbital);
     report("traffic",&traffic); report("effect",&effect); report("hud",&hud);
     if(controlled) report("pilot_draw",&pilot_draw_time);
     report("sim",&sim); report("draw",&draw); report("present",&present); report("frame",&total);
     for(i=0;i<6;++i) sprite_free(&sprites[i]);
-    free(arena); free(opponent); free(threat); free(practice); free(hud_pixels); free(frame); free(blend); free(add);
+    free(navigation); free(arena); free(opponent); free(threat); free(practice); free(hud_pixels); free(frame); free(blend); free(add);
     world_release_system(&system); world_close(world);
     return ok?0:1;
 }

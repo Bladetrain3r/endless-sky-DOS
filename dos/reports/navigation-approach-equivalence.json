@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "oracle": {
+    "schema": 1,
+    "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
+    "oracle_source_sha256": "13c81348ba447330e4205c09eeb2f19abf59b8ab4a8da7b7791f1841eb36aa62",
+    "runner_source_sha256": "62bf81bb5321d92b358f94d0597b183f23803112dba37455017fbdf8d8183935",
+    "trace_sha256": "d64f7a5abe53ce245ee1078c20f0139b6f0afa6a2b53c8b834225d0e34d8dbd3",
+    "profile_sha256": "7a20df7bf2f31745bb82fd7afb94113d98f1355be1ff4ecd7f73521464deacae",
+    "planets_sha256": "10528f8f72a8481749134f1509f47f044044b875acbe17d30db4de6d47099710",
+    "behavior_source_sha256": {
+      "AI.cpp": "7dacc4c86028ff8f2dfebf8f082e111cd2cb086de9d6a373fc38a19e2b1c7401",
+      "AI.h": "7a6684dd686d538999c1c53b4f9d0b49f382deb7bdcab4ca61acf486e3471ee7",
+      "Ship.cpp": "1073d0efb023c3780b9cbbbffc3b153b57fb933f0d77c5bf39a8e6b0aca44dd9",
+      "Ship.h": "7818511cd1e7f3ab200637873e19345f5ab2e61d048b692e7fa7e4e6a15d12ba",
+      "Planet.cpp": "5aa8eae30c4c02604a49fb34c9c81e4a9ca6294b7435f4f723e632a0d94a06c4",
+      "Planet.h": "38eb147319e32f999d1ff6d90771bb29da0bb7649b373f839a828636fe04c354",
+      "Port.cpp": "1a619fdcab6f536d1d64a9b0457b3b7939a3ee838fa27346d8cbffe798c7045c",
+      "Port.h": "5546c7772a9a424bff4da103554e356fe41e325fc91a96efbdb0fff24cc402cf"
+    },
+    "stock_ship_data_sha256": "434fffaf7fb44c1c6687fe8bd20efc59fce9fc875b82a12f98ce12015ebf3e96",
+    "stock_outfit_data_sha256": {
+      "engines.txt": "2a78ce13be9e2d8d9bbe2f774d5f6aa4179f11f29e7c6d90c734e9c736fea680",
+      "power.txt": "c6645ef750bc208d013aaa0714d2b6bd28cce9c535a656735f214cd213df7352",
+      "outfits.txt": "3172b96e33196a7c3d7ca4acf78665c5b1ebf7f64d1bc098ab6fee5f29877da4"
+    },
+    "compiler_flags": [
+      "-DAVIF_DLL",
+      "-isystem",
+      "/usr/include/SDL2",
+      "-isystem",
+      "/usr/include/AL",
+      "-O3",
+      "-DNDEBUG",
+      "-std=c++20",
+      "-flto=auto",
+      "-fno-fat-lto-objects",
+      "-Wall",
+      "-pedantic-errors",
+      "-Wold-style-cast",
+      "-fno-rtti"
+    ],
+    "oracle_stdout": "cases=20 accel=0.11693548387096774 reverse=0 turn=2.475806451612903 drag=0.0051075268817204296 mult=1 max_velocity=22.894736842105264 landing_speed=0"
+  },
+  "native_asan_ubsan": {
+    "cases": "20",
+    "turn_max_error": "0",
+    "status": "pass"
+  },
+  "dosbox_16mib_20k": {
+    "cases": "20",
+    "turn_max_error": "0",
+    "status": "pass"
+  },
+  "source_sha256": {
+    "dos/navigation/approach.c": "5d0cf2db21b7788e78261ad5f378c0365030dfe75c5bf5e5dc524894a1601b49",
+    "dos/navigation/check.c": "7a7f8e1cc2f28c95bfee7e4ffaee554fefbc9bcbc80cc89926d3eaab291f2d3e",
+    "dos/pursuit/pursuit.c": "118d8214f130c2584a012079f13e5bd14f363ea42a922dca025bcb1b08ccd121",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/navigation/approach.h": "25ada3f4777fa291295f4a739301afbebd131b6a026dbf07eceeebaae0e23416",
+    "dos/navigation/check.py": "6a9d685e19d3e77300d04664e800d6c350be948603b854cbda94f7e9c4d5da29",
+    "dos/pursuit/pursuit.h": "48a306e43b7b2d7675ba48a927b840b795770335ba17644a9c77e8d7fd472bd9",
+    "dos/motion/motion.h": "5f3db1677f424f1d3d8f5176dde5e7710781b87a24236f863d0f88f85de5cc56"
+  },
+  "trace_sha256": "fcbea8562fb8ed9286d61c1798ed6f1ed6b4e39ca0998bca1c255a3aa1a00108",
+  "profile_sha256": "7a20df7bf2f31745bb82fd7afb94113d98f1355be1ff4ecd7f73521464deacae",
+  "planets_sha256": "10528f8f72a8481749134f1509f47f044044b875acbe17d30db4de6d47099710",
+  "dos_exe_sha256": "33c5888f27749fe8800f3f4b2865fdbd47be48c1cee62f3463fd5f71e67ddd0b",
+  "tolerance": "flags exact; turn absolute <=1e-12",
+  "scope": "Fully crewed stock Sparrow, stationary target, no reverse/afterburner or cruise speed."
+}

@@ -14,6 +14,7 @@ RUN=ROOT/'.work/flight/run'
 
 def main():
     parser=argparse.ArgumentParser()
+    parser.add_argument('--navigation',action='store_true',help='quiet Sol planet selection, landing and takeoff')
     parser.add_argument('--arena',action='store_true',help='two-opponent combat arena and cockpit HUD')
     parser.add_argument('--opponent-stock',action='store_true',help='full native Barge health instead of reduced training health')
     parser.add_argument('--opponent-stress',choices=('energy','heat'),help='constrain enemy energy or heat for lifecycle testing')
@@ -27,6 +28,10 @@ def main():
     parser.add_argument('--pilot',action='store_true',help='fly the stock Sparrow with held keys')
     parser.add_argument('--seconds',type=int,default=None,help='duration1..120seconds; default30watch/120pilot')
     args=parser.parse_args()
+    if args.navigation:
+        args.pilot=True
+        if args.arena or args.pursuit or args.incoming_fire or args.accepted or args.stationary_target or args.invulnerable_target or args.resource_stress or args.opponent_stock or args.opponent_stress:
+            parser.error('navigation is a separate quiet stock-Sparrow route')
     if args.arena: args.pilot=args.pursuit=True
     run=ROOT/'.work/flight/accepted-0636c12dc' if args.accepted else RUN
     seconds=args.seconds if args.seconds is not None else (120 if args.pilot else 30)
@@ -39,6 +44,7 @@ def main():
     if args.invulnerable_target and (not args.pilot or args.accepted): parser.error('invulnerable-target requires current --pilot build')
     if args.stationary_target and (not args.pilot or args.accepted): parser.error('stationary-target requires current --pilot build')
     camera=' --pilot' if args.pilot else ('' if args.stationary else ' --camera')
+    if args.navigation: camera+=' --navigation'
     if args.arena: camera+=' --arena'
     elif args.pursuit: camera+=' --pursuit'
     if args.opponent_stock: camera+=' --opponent-stock'

@@ -6,7 +6,9 @@ Luna, the Falcon and scripted traffic provide reference points. This is a flight
 sandbox with a training blaster, single-target comparison modes, and an optional
 [two-opponent arena and cockpit HUD](ARENA.md). Launch it with
 `python3 dos/flight/watch.py --arena`. No ship collisions, landing, complete AI,
-missions or saves. Propulsion and firing now share an
+missions or saves in the combat modes. The separate
+[Sol navigation loop](NAVIGATION.md) adds planet selection, landing and takeoff:
+`python3 dos/flight/watch.py --navigation`. Propulsion and firing now share an
 energy/heat budget.64 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
 
@@ -419,8 +421,8 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: human arena/HUD feedback, then choose navigation/landing or a broader combat
-slice. Shield regeneration and hull-disable resource contracts are implemented;
+Next: human navigation/dock feedback, then a bounded port service such as trading.
+The arena/HUD baseline is human accepted. Shield regeneration and hull-disable resource contracts are implemented;
 real hardpoints/beams remain outside this trainer. See ../damage/README.md.
 Ordinary bolt traces and the first firing range are qualified in ../projectile/README.md;
 complete combat and heavier scenes remain unqualified.

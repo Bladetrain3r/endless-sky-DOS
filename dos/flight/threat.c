@@ -42,6 +42,25 @@ void threat_reset(Threat *threat)
     threat->hull=max_hull;threat->enabled=enabled;
 }
 
+void threat_hit(Threat *threat,Practice *practice)
+{
+    if(threat->destroyed) return;
+    DamageState health={practice->shield.shields,threat->hull};
+    double before=health.shields;
+    int was_disabled=threat->disabled || practice->resources.overheated;
+    ++threat->hits;threat->flash=8;
+    damage_hit(&health,practice->shield_damage,practice->hull_damage);
+    /* shield_damage owns the delay transition; its drain matches
+     * damage_hit's actual shield loss, so no second drain occurs. */
+    if(practice->shield_enabled && before>health.shields)
+        shield_damage(&practice->shield,&practice->shield_profile,
+                      before-health.shields,was_disabled);
+    practice->shield.shields=health.shields;
+    threat->hull=health.hull;
+    threat->disabled=threat->hull<threat->minimum_hull;
+    threat->destroyed=threat->hull<0.;
+}
+
 void threat_step(Threat *threat,Practice *practice,const Pilot *pilot)
 {
     double source_vx=0.,source_vy=0.;
@@ -99,20 +118,7 @@ void threat_step(Threat *threat,Practice *practice,const Pilot *pilot)
     for(i=0;i<THREAT_BOLTS;++i) {
         Bolt *bolt=&threat->bolts[i];double fraction;
         if(!threat->destroyed && bolt_hit(bolt,&player,1,&fraction)>=0) {
-            DamageState health={practice->shield.shields,threat->hull};
-            double before=health.shields;
-            int was_disabled=threat->disabled || practice->resources.overheated;
-            bolt->alive=0;++threat->hits;threat->flash=8;
-            damage_hit(&health,practice->shield_damage,practice->hull_damage);
-            /* shield_damage owns the delay transition; its drain matches
-             * damage_hit's actual shield loss, so no second drain occurs. */
-            if(practice->shield_enabled && before>health.shields)
-                shield_damage(&practice->shield,&practice->shield_profile,
-                              before-health.shields,was_disabled);
-            practice->shield.shields=health.shields;
-            threat->hull=health.hull;
-            threat->disabled=threat->hull<threat->minimum_hull;
-            threat->destroyed=threat->hull<0.;
+            bolt->alive=0;threat_hit(threat,practice);
         }
         if(bolt->alive) ++threat->active;
     }

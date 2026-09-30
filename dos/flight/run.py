@@ -14,7 +14,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/run'
 IMAGE='modern-arena-tools:0.1'
-SOURCES=['dos/flight/target_power.c','dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
+SOURCES=['dos/flight/arena.c','dos/flight/arena_view.c','dos/flight/target_power.c','dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
          'dos/flight/scene.c','dos/flight/power.c','dos/propulsion/propulsion.c','dos/flight/sprite_reference.c','dos/world/active.c',
          'dos/shields/shields.c','dos/resources/resources.c','dos/damage/damage.c','dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/flight/pilot.c','dos/flight/input.c','dos/flight/input_state.c','dos/motion/motion.c']
@@ -36,6 +36,7 @@ def convert():
 
 def main():
     parser=argparse.ArgumentParser()
+    parser.add_argument('--arena-test',action='store_true',help='pilot route through two-opponent arena')
     parser.add_argument('--opponent-stock',action='store_true')
     parser.add_argument('--opponent-stress',choices=('energy','heat'))
     parser.add_argument('--pursuit-test',action='store_true',help='pilot route with pursuing target and predictive fire')
@@ -51,7 +52,8 @@ def main():
     parser.add_argument('--practice-test',action='store_true',help='stationary held-fire training route')
     parser.add_argument('--replay',action='store_true',help='replay a pilot control route through native-matched motion')
     args=parser.parse_args()
-    if (args.opponent_stock or args.opponent_stress) and not args.pursuit_test: parser.error('opponent options require pursuit-test')
+    if (args.opponent_stock or args.opponent_stress) and not (args.pursuit_test or args.arena_test): parser.error('opponent options require pursuit-test')
+    if args.arena_test and (args.pursuit_test or args.incoming_test or args.practice_test or args.replay or args.camera or args.resource_stress or args.moving_target): parser.error('arena-test is a separate pilot route')
     if args.pursuit_test and (args.incoming_test or args.practice_test or args.replay or args.camera or args.resource_stress or args.moving_target): parser.error('pursuit-test is a separate pilot route')
     if args.incoming_test and (args.practice_test or args.replay or args.camera or args.resource_stress): parser.error('incoming-test is a separate route')
     if args.resource_stress and not args.practice_test: parser.error("resource-stress requires practice-test")
@@ -59,7 +61,7 @@ def main():
     if args.moving_target and not args.practice_test: parser.error('moving-target requires practice-test')
     if args.practice_test and (args.camera or args.replay): parser.error('practice-test is a separate controlled route')
     if args.replay and args.camera: parser.error('pilot replay follows the ship; --camera selects the scripted pan')
-    if (args.replay or args.pursuit_test) and args.frames>450: parser.error('pilot reference route is bounded to450frames/900ticks')
+    if (args.replay or args.pursuit_test or args.arena_test) and args.frames>450: parser.error('pilot reference route is bounded to450frames/900ticks')
     if not 1<=args.frames<=3600: parser.error('frames must be1..3600')
     RUN.mkdir(parents=True,exist_ok=True)
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
@@ -88,12 +90,13 @@ def main():
     if args.camera: options+=' --camera'
     if args.replay: options+=' --replay'
     if args.incoming_test: options+=' --incoming-test'
+    if args.arena_test: options+=' --replay --arena'
     if args.pursuit_test: options+=' --replay --pursuit'
     if args.opponent_stock: options+=' --opponent-stock'
     if args.opponent_stress: options+=' --opponent-stress '+args.opponent_stress
     if args.practice_test: options+=' --practice-test'
     if args.resource_stress: options+=' --resource-stress '+args.resource_stress
-    if not args.moving_target and not args.pursuit_test: options+=' --stationary-target'
+    if not args.moving_target and not (args.pursuit_test or args.arena_test): options+=' --stationary-target'
     if not args.destructible_target: options+=' --invulnerable-target'
     if args.headless_demo: options+=' --demo --seconds 4'
     conf=base+'[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
@@ -118,7 +121,7 @@ def main():
         expected=float(fields['wall_elapsed_ms'])*60/1000
         allowance=float(fields['frame_max_ms'])*60/1000+3
         assert abs(int(fields['simulation_ticks'])-expected)<=allowance,fields
-    if args.replay or args.pursuit_test:
+    if args.replay or args.pursuit_test or args.arena_test:
         ticks=int(fields['simulation_ticks'])
         assert int(fields['pilot_ticks'])==ticks
         with (ROOT/'.work/motion/native.csv').open() as f:
@@ -126,6 +129,13 @@ def main():
         for key,offset in [('x',275.),('y',373.),('vx',0.),('vy',0.)]:
             assert abs(float(fields['pilot_'+key])-float(expected[key])-offset)<1e-7,(key,fields,expected)
         assert int(fields['pilot_angle'])==int(expected['angle_steps'])
+    if args.arena_test:
+        assert fields['arena']=='1' and fields['arena_alive']=='2',fields
+        assert fields['arena_ticks']==fields['pilot_ticks'] and fields['enemy_dropped']=='0',fields
+        assert fields['arena_0_x']!=fields['arena_1_x'],fields
+        if args.frames>=450:
+            assert int(fields['arena_0_shots'])>0 and int(fields['arena_1_shots'])>0,fields
+        assert fields['player_destroyed']=='0',fields
     if args.pursuit_test:
         assert fields['pursuit']=='1' and fields['incoming_fire']=='1',fields
         assert int(fields['opponent_thrust_ticks'])>0 and int(fields['opponent_turn_ticks'])>0,fields
@@ -155,7 +165,7 @@ def main():
     assert (RUN/'FRAME.IDX').stat().st_size==480000
     subprocess.run(docker+['python3','-c',
         'import sys; sys.path.insert(0,"dos/flight"); from run import convert; convert()'],check=True)
-    report=dict(reference_renderer=args.reference,kind='bounded-pursuit-pilot' if args.pursuit_test else 'bounded-incoming-fire' if args.incoming_test else 'bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
+    report=dict(reference_renderer=args.reference,kind='bounded-arena-pilot' if args.arena_test else 'bounded-pursuit-pilot' if args.pursuit_test else 'bounded-incoming-fire' if args.incoming_test else 'bounded-practice-fire' if args.practice_test else ('bounded-pilot-replay' if args.replay else 'scripted-indexed-flight-prototype-not-native-gameplay'),results=fields,
                 image_id=subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
                 compiler_flags=FLAGS,config=conf,source_sha256=source_hashes,
                 opponent_profile_sha256={name:digest(RUN/name) for name in ('BARGERES.DAT','BARGESH.DAT','BARGEPRO.DAT','BARGEHP.DAT')},
@@ -178,6 +188,7 @@ def main():
     if args.reference: stem+='-reference'
     if args.replay: stem+='-pilot'
     if args.incoming_test: stem+='-incoming'
+    if args.arena_test: stem+='-arena'
     if args.pursuit_test: stem+='-pursuit'
     if args.opponent_stock: stem+='-stock'
     if args.opponent_stress: stem+='-enemy-'+args.opponent_stress

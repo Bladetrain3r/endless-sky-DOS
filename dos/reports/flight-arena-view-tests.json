@@ -1,0 +1,31 @@
+{
+  "results": {
+    "status": "pass",
+    "render_cases": "88",
+    "render_deterministic_and_read_only": "pass"
+  },
+  "sanitizers": "ASan/UBSan including leak checks",
+  "scope": "Actual rasterizer and verbatim production font; edges, remote positions, selection, death, projectiles, sparks, camera offsets; repeatability and no simulation mutations.",
+  "sources": {
+    "dos/flight/arena_view_test.c": "97a5370b2723aa7da4bc47836583895163f93486ed1f33b165879a68c66d247e",
+    "dos/flight/arena_view.c": "594199fd3b6dcf4600379411ef5afd0cd3227364ba2f2c01a1b4977e9bb96ce9",
+    "dos/flight/arena.c": "68f7149007a3e75a3671ca28246321e2876ad7d71c933e83a05d0fd7e76371b5",
+    "dos/flight/sprite.c": "402be0f03bcc4e7d5213c9b6e5918f3b748b1bba090bc2af41200578fd47b84f",
+    "dos/flight/sprite_reference.c": "f1775a3f555a97e0755255ec7041bd3a43d390b68aee9db2c9d3c5d5ab1e7ddf",
+    "dos/flight/practice.c": "f6e31fdf79b4155905efe17322bc2422aaf68a68b73289c3b92f895488ea4c76",
+    "dos/flight/target_power.c": "0758a0ff29fd080276701d61280bdfcc615db631bc991aa85dd8da5f87344545",
+    "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
+    "dos/flight/opponent.c": "192a7c63b19f31ccaf11fe23027c8882cf39306bf50c1f3242f017f696425c81",
+    "dos/flight/threat.c": "9a591eae6a3b0d9e4ab46475960e107477b932ea394fe816fe44c07f5159e3d9",
+    "dos/pursuit/pursuit.c": "118d8214f130c2584a012079f13e5bd14f363ea42a922dca025bcb1b08ccd121",
+    "dos/propulsion/propulsion.c": "0288c5eda365de84b44682c17e32704f739afdf3b84bd78a10a72aa223c58d6c",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
+    "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
+    "dos/shields/shields.c": "6708828685fb0ca7ab96e728c15c6c6592b4f28a69024b7e0d97c84a08c26945",
+    "dos/resources/resources.c": "bc74eb068617b6e236c5581fddc8a9f4923583873e822cc8b54464dde6b2a5e9",
+    "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/flight/video.c": "a4d9149b40ac6a936899abe8a0468521745e2fd003111610b9286aa8056521e1",
+    "dos/flight/test_arena_view.py": "aac1271e55bb6b7263bf76f516f83264383d58b621d4de697aa5a1be69a404aa"
+  }
+}

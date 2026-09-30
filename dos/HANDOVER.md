@@ -1,15 +1,19 @@
 # Endless Sky DOS handover
-Updated 2026-09-30. Powered opponent human accepted: normal/heat/energy rounds.
+Updated 2026-09-30. Two-opponent arena/HUD staged; human playtest pending.
 
 ## Current build
-- Launch `python3 dos/flight/watch.py --pilot --pursuit`.
-  Docker/X11,120seconds. --incoming-fire alone keeps ellipse; omit both flags for quiet range.
-  W/Up thrust, A/D/arrows turn, Space fire, Tab camera, R reset, Esc/CtrlF9 exit.
-  H drains 25% player shields once per press (explicit trainer input).
+- Launch `python3 dos/flight/watch.py --arena`; Docker/X11,120seconds,800x600.
+  W/Up thrust, A/D/arrows turn, Space fire; T cycle/N nearest target, Tab camera,
+  R whole-encounter reset, H25% player shield drain, Esc/CtrlF9 exit.
+- Arena:2 independent Barge trainers, own health/resources/pools,2second grace.
+  Selection only changes HUD; shots hit nearest intersected living enemy.
+  Player bars, selected health/range, radar, offscreen marker;6 visual buoys.
+  Fixed open layout, no boundaries/collisions; disable/death/shot survival retained.
+  flight/ARENA.md: ownership/order, controls, evidence and human checks.
+- Earlier `--pilot --pursuit`, `--pilot --incoming-fire` and quiet `--pilot` remain.
 - Sparrow has native movement, no reverse; healthy release coasts without drag.
   Shared energy/heat, fractional steering/thrust, overheat/recovery are human accepted.
   Shield recharge and incoming shield→hull→disable→destruction human accepted.
-- Stock shield1400, hull300, hull-disable threshold134, all native getter-derived.
   Recharge .2 shield and .2 energy/tick, prior energy BEFORE generation/movement/fire.
   Generator1.9/tick > recharge .2: normal recharge does not visibly drain battery.
   --resource-stress energy: capacity40/generation.25; heat: max450/passiveheat0.
@@ -30,32 +34,27 @@ Updated 2026-09-30. Powered opponent human accepted: normal/heat/energy rounds.
 - Pursuit target defaults30shield/26hull/minimum9.516; native recharge .2/tick.
   --opponent-stock:600shield/1000hull/min366; --opponent-stress energy|heat.
   Enemy hull disable blocks control/fire/generation/repair, still drifts; R resets.
-  Power, thermal state and health preset shown on enemy HUD;48tick death sparks.
   --stationary-target and --invulnerable-target retain comparison modes.
 - No ship collisions, landing, missions, saves, audio, repairs, boarding or loot.
-- Local checkpoint only; central HANDOVER has commit. No public push.
 
 ## Current evidence
-- dos/shields/README.md: unchanged Ship::DoGeneration,10cases423ticks,
-  zero observed shield/energy/heat error native ASan/UBSan and DOS; root reproduced.
-- flight/test_threat.py: native ASan/UBSan +DOS direct/overflow/dodge/grace,
-  inherited velocity, source-death shot, strict hull thresholds, reset, bad profile.
-  Root independently reproduced; reports/flight-threat-tests.json.
-- flight/test_power.py: recharge/generation/steering/thrust/fire order, heat recovery,
-  persistent hull disable, drift, camera/reset. Native ASan/UBSan and DOS pass.
-- Pursuit helper:16commands/11intercepts, zero observed error native ASan/UBSan
-  and DOS; root reran. NaN/infinity classifications and malformed profiles checked.
-- Opponent integration native ASan/UBSan +DOS: physical approach, bounded turns,
-  postmove collision pose, death/reset, predictive aim/range gates all pass.
-- Pursuit900tick route preserves accepted player motion;26shots22hits,0pooldrops.
-  reports/flight-6-ships-pursuit-profile.json; root inspected capture.
-  Counted heap2,899,242B (+224 vs pursuit); excludes code/stack/runtime/VRAM.
-  23.126ms mean frame on route leaving Sol backdrop; not full-battle FPS.
-- Final quiet/incoming/pursuit actual keyboard tests pass;0discarded sim time.
-  Reports bind current executable/profiles. Default/stock/energy/heat app routes pass.
-- opponent_profile/:430native generation ticks, zeroerror native/DOS, root verified.
-  test_opponent.py: costs/repair order/overheat/disable/reset/presets ASan+DOS pass.
-  All tests/builds Docker, i386/noMMX/SSE,16MiB/20k/no swap; cycles are not MHz.
+- Arena: native ASan/UBSan +DOS independent gates, nearest collision regardless of
+  selection, same-tick kill/disable, owner-death bolts/shared player damage,
+  target/reset and bounded pool/no dropped-shot resource charge pass.
+- Renderer:88actual sprite/font cases under ASan/UBSan/leaks, edge/far positions,
+  selection/death/camera, repeatability and no simulation mutation pass.
+- 900tick arena route matches native player position/velocity within1e-7, heading
+  exact.48hostile shots/46hits,0pooldrops. Counted heap2,901,342B (+2,100).
+  29.361ms mean/34.344max uncapped frame; not whole-game FPS. Legacy per-layer
+  timing fields unmeasured zeros in arena; whole draw measured. DOS capture reviewed.
+- Arena actual keyboard pass:held T cycles once,N delivered,reset,camera,both owners
+  firing,0discarded time. Quiet+pursuit application keyboard regressions pass.
+- Existing opponent/power/threat native ASan+DOS and IRQ decoder/vector tests pass.
+  Reports:flight-arena-tests.json,flight-arena-view-tests.json,
+  flight-controls-arena.json,flight-6-ships-arena-profile.json under dos/reports.
+- Previous native oracles retained:shield10cases423ticks; Barge430generation ticks;
+  pursuit16commands/11intercepts, zero observed error. See module READMEs/reports.
+- Docker i386/noMMX/SSE,16MiB/20k/no swap; cycles are not MHz. Source/data unchanged.
 
 ## Earlier contracts and pointers
 - dos/propulsion/: native Ship::Move17cases667steps, zero observed state error;
@@ -76,5 +75,6 @@ Updated 2026-09-30. Powered opponent human accepted: normal/heat/energy rounds.
 - Earlier preserved flight .work/flight/accepted-44aced341; --accepted uses0636c12dc.
 
 ## Next
-- Human normal/heat/energy pass: low-energy fire slows/rotates; overheat halts motion.
-  Stock-health human test unreported. Next: choose navigation/multiple-target slice.
+- Human arena check: fight both, change selection while firing, offscreen contact,
+  reset after kill; HUD readability/usable viewport. Then choose navigation or combat.
+- Powered single-opponent normal/heat/energy humanaccepted; stock HP unreported.

@@ -50,6 +50,14 @@ int main(void)
     assert(input_state_take(&s)==INPUT_SHIELD_TEST);
     input_state_feed(&s,0x23); input_state_feed(&s,0xa3);
     assert(input_state_take(&s)==0); /* Holding H does not relatch. */
+    input_state_feed(&s,0x14); input_state_feed(&s,0x14);
+    assert(input_state_take(&s)==INPUT_TARGET_NEXT);
+    input_state_feed(&s,0x14); input_state_feed(&s,0x94);
+    assert(input_state_take(&s)==0); /* Repeat cannot relatch a target cycle. */
+    input_state_feed(&s,0x14); input_state_feed(&s,0x94);
+    input_state_feed(&s,0x31); input_state_feed(&s,0xb1);
+    assert(input_state_take(&s)==(INPUT_TARGET_NEXT|INPUT_TARGET_NEAREST));
+    assert(input_state_take(&s)==0);
     input_state_feed(&s,0xe1);
     input_state_feed(&s,0x1d); input_state_feed(&s,0x45);
     input_state_feed(&s,0xe1); input_state_feed(&s,0x9d); input_state_feed(&s,0xc5);

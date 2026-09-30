@@ -11,6 +11,8 @@
 #define INPUT_CAMERA 64u
 #define INPUT_FIRE 128u
 #define INPUT_SHIELD_TEST 256u
+#define INPUT_TARGET_NEXT 512u
+#define INPUT_TARGET_NEAREST 1024u
 
 typedef struct {
     volatile unsigned char normal[128];

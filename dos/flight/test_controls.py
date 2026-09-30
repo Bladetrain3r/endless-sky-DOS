@@ -15,7 +15,7 @@ RUN = ROOT / '.work/flight/run'
 IMAGE = 'modern-arena-tools:0.1'
 
 
-def guest(stress=None,incoming=False,pursuit=False):
+def guest(stress=None,incoming=False,pursuit=False,arena=False):
     result = RUN / 'KEYS.TXT'
     result.unlink(missing_ok=True)
     process = subprocess.Popen(['dosbox', '-conf', '.work/flight/run/keys.conf'],
@@ -42,7 +42,28 @@ def guest(stress=None,incoming=False,pursuit=False):
             subprocess.run(['xdotool', action, key], check=True)
             time.sleep(pause)
 
-        if incoming or pursuit:
+        if arena:
+            # Exercise movement/fire and camera, then reset. Only the post-reset
+            # target taps may remain in selection counters. Hold T past repeat.
+            send('keydown', 'w', .3)
+            send('keydown', 'd', .4)
+            send('keyup', 'w', .1)
+            send('keyup', 'd', .1)
+            send('keydown', 'space', .5)
+            send('keyup', 'space', .1)
+            send('key', 'Tab', .1)
+            send('key', 'r', .2)
+            send('keydown', 't', .8)
+            send('keyup', 't', .1)
+            send('key', 'n', .1)
+            # Reset again to guarantee nearest target and grace start regardless
+            # of scheduling; final held T must produce exactly one change.
+            send('key', 'r', .2)
+            send('keydown', 't', .8)
+            send('keyup', 't', 3.2)
+            send('key', 'Tab', .1)
+            send('key', 'Escape', .1)
+        elif incoming or pursuit:
             send('keydown', 'h', .8)
             send('keyup', 'h', 4.0)
             send('key', 'Escape', .1)
@@ -70,6 +91,17 @@ def guest(stress=None,incoming=False,pursuit=False):
         process.wait(timeout=20)
         fields = dict(line.split('=', 1) for line in result.read_text().splitlines() if '=' in line)
         assert fields['status'] == 'ok' and fields['video_verify'] == 'pass', fields
+        if arena:
+            assert fields['arena']=='1' and fields['arena_alive']=='2',fields
+            assert fields['arena_selected']=='1' and fields['arena_selection_changes']=='1',fields
+            assert fields['practice_shots']=='0' and fields['pilot_follow']=='0',fields
+            assert float(fields['pilot_x'])==400. and float(fields['pilot_y'])==300.,fields
+            assert int(fields['pilot_input_bits']) & (512|1024)==(512|1024),fields
+            assert int(fields['arena_0_shots'])>0 and int(fields['arena_1_shots'])>0,fields
+            assert int(fields['enemy_hits'])>0 and fields['enemy_dropped']=='0',fields
+            assert fields['discarded_sim_ms']=='0.000',fields
+            print(json.dumps(fields))
+            return
         if incoming or pursuit:
             assert fields['incoming_fire']=='1' and int(fields['enemy_hits'])>0,fields
             assert fields['shield_test_pulses']=='1' and fields['practice_shots']=='0',fields
@@ -110,16 +142,18 @@ def guest(stress=None,incoming=False,pursuit=False):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--arena',action='store_true')
     parser.add_argument('--guest',action='store_true')
     parser.add_argument('--incoming-fire',action='store_true')
     parser.add_argument('--pursuit',action='store_true')
     parser.add_argument('--resource-stress',choices=('energy','heat'))
     args = parser.parse_args()
-    if args.guest: return guest(args.resource_stress,args.incoming_fire,args.pursuit)
+    if args.guest: return guest(args.resource_stress,args.incoming_fire,args.pursuit,args.arena)
     stress_option = ' --resource-stress '+args.resource_stress if args.resource_stress else ''
     if args.incoming_fire: stress_option+=' --incoming-fire'
+    if args.arena: stress_option+=' --arena'
     if args.pursuit: stress_option+=' --pursuit'
-    target_option='' if args.pursuit else ' --stationary-target'
+    target_option='' if (args.pursuit or args.arena) else ' --stationary-target'
     base = (ROOT / 'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     config = base + ('[autoexec]\nmount c /work/.work/flight/run\nc:\nCWSDPMI -s-\n'
                      f'FLIGHT.EXE --demo --pilot{target_option} --seconds 25{stress_option} > KEYS.TXT\nexit\n')
@@ -130,7 +164,8 @@ def main():
         IMAGE, 'timeout', '55s', 'xvfb-run', '-a', 'python3', 'dos/flight/test_controls.py', '--guest',
         *(['--resource-stress',args.resource_stress] if args.resource_stress else []),
         *(['--incoming-fire'] if args.incoming_fire else []),
-        *(['--pursuit'] if args.pursuit else [])],
+        *(['--pursuit'] if args.pursuit else []),
+        *(['--arena'] if args.arena else [])],
         check=True, capture_output=True, text=True, timeout=65)
     fields = json.loads(result.stdout)
     assert tested_hash == hashlib.sha256((RUN / 'FLIGHT.EXE').read_bytes()).hexdigest()
@@ -143,8 +178,8 @@ def main():
               'propulsion_profile_sha256': hashlib.sha256((RUN/'PROPULSE.DAT').read_bytes()).hexdigest(), 'dos_config': config,
               'test_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'image_id': subprocess.check_output(['docker','image','inspect','--format','{{.Id}}',IMAGE],text=True).strip(),
-              'scope': 'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; held H single shield drain and recharge; physical feel awaits human check.'}
-    (ROOT / ('dos/reports/flight-controls'+('-pursuit' if args.pursuit else '-incoming' if args.incoming_fire else '')+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
+              'scope': ('Arena: pre-reset thrust/turn/fire, reset, held T cycle once, N delivery, camera, two owners firing at one player; ' if args.arena else '')+'X11 key injection into actual pilot build: simultaneous thrust/turn, releases, camera/reset/Escape and held Space shots/hits; held H single shield drain and recharge; physical feel awaits human check.'}
+    (ROOT / ('dos/reports/flight-controls'+('-arena' if args.arena else '-pursuit' if args.pursuit else '-incoming' if args.incoming_fire else '')+('-'+args.resource_stress if args.resource_stress else '')+'.json')).write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(fields, indent=2))
 
 

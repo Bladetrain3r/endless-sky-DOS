@@ -3,8 +3,10 @@
 The800×600,256-color DOS executable loads Sol from the compact world pack and
 now offers a controllable stock Sparrow using native-matched movement. Earth,
 Luna, the Falcon and scripted traffic provide reference points. This is a flight
-sandbox with one training blaster and a destructible scripted target.
-No ship collisions, landing, AI, missions or saves. Propulsion and firing now share an
+sandbox with a training blaster, single-target comparison modes, and an optional
+[two-opponent arena and cockpit HUD](ARENA.md). Launch it with
+`python3 dos/flight/watch.py --arena`. No ship collisions, landing, complete AI,
+missions or saves. Propulsion and firing now share an
 energy/heat budget.64 baked sprite headings are
 still an experimental rotation shortcut; simulation uses all65,536 headings.
 
@@ -417,8 +419,9 @@ premultiplied once before palette mapping. Only one additive frame is exercised;
 premultiplied-file variants, half-additive assets, animation interpolation,
 faction recoloring and runtime rotation remain unqualified.
 
-Next: shield regeneration, wider disabled-ship contracts and real hardpoints/beams. Bounded
-unprotected shield/hull damage is now implemented; see ../damage/README.md.
+Next: human arena/HUD feedback, then choose navigation/landing or a broader combat
+slice. Shield regeneration and hull-disable resource contracts are implemented;
+real hardpoints/beams remain outside this trainer. See ../damage/README.md.
 Ordinary bolt traces and the first firing range are qualified in ../projectile/README.md;
 complete combat and heavier scenes remain unqualified.
 

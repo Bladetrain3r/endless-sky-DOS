@@ -46,6 +46,8 @@ void practice_target(Practice *p);
 void practice_step(Practice *p,const Pilot *pilot,int fire);
 void practice_begin_tick(Practice *p);
 void practice_begin_tick_disabled(Practice *p,int hull_disabled);
+/* Move/fire player bolts only; caller supplies collision targets and active count. */
+void practice_fire_tick(Practice *p,const Pilot *pilot,int fire);
 void practice_finish_tick(Practice *p,const Pilot *pilot,int fire);
 void practice_draw(unsigned char *frame,const Practice *p,const Scene *scene,
                    const Sprite *barge,const unsigned char *blend,const unsigned char *add);

@@ -16,11 +16,13 @@ installing a second handler. `input_keys()` returns zero while closed.
 | `INPUT_CAMERA` | Tab |
 | `INPUT_FIRE` | Space |
 | `INPUT_SHIELD_TEST` | H (trainer drain) |
+| `INPUT_TARGET_NEXT` | T (arena target cycle) |
+| `INPUT_TARGET_NEAREST` | N (arena nearest target) |
 
 The handler consumes scan-code set 1 make/break bytes directly. It tracks
 physical aliases separately: releasing W does not cancel a held Up key. Key
 repeat leaves the state unchanged. Space is a held level: firing stops when
-Space is released, independently of thrust. Escape, R, Tab and H make edges stay
+Space is released, independently of thrust. Escape, R, Tab, H, T and N make edges stay
 latched until the next `input_keys()` call, so a short tap between polls is delivered
 once. Pause/E1 is ignored. The handler sends one
 PIC end-of-interrupt and does not chain the previous IRQ1 handler after
@@ -45,3 +47,8 @@ future menu/event interface should expose discrete press events separately.
 H (scan code 0x23, bit 256) drains 25% of player maximum shields once per
 press. Quick taps latch like Reset/Camera; held-key repeat does not retrigger.
 This is explicitly a trainer control, not a combat weapon. R restores shields.
+
+Arena T (0x14, bit512) and N (0x31, bit1024) use the same latched make-edge
+contract. The arena consumes rising edges to avoid cycling every held frame.
+The decoder checks repeat/quick taps; `test_controls.py --arena` checks the actual
+application cycle/reset through DOSBox. Other modes ignore these target keys.

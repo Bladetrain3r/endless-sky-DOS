@@ -5,6 +5,9 @@ is a reasonably complete vanilla experience on DOS, 16 MB and fixed 20,000
 DOSBox cycles, preferably 800x600 at 30 FPS. This directory starts the port's
 measurement and planning record. **There is a playable flight/combat sandbox, not a complete DOS port.**
 
+Latest playtest: [two-opponent combat arena and initial cockpit HUD](flight/ARENA.md),
+`python3 dos/flight/watch.py --arena`. Earlier quiet and single-opponent modes remain.
+
 Current upstream checkout: `061a9461a93898fb691504536589d1dcddc5d79b`
 (CMake project version 0.11.4). See [feasibility](FEASIBILITY.md) and
 [handover](HANDOVER.md). Source/backend work should retain upstream notices and

@@ -99,14 +99,9 @@ void practice_step(Practice *p,const Pilot *pilot,int fire)
     practice_begin_tick(p);
     practice_finish_tick(p,pilot,fire);
 }
-void practice_finish_tick(Practice *p,const Pilot *pilot,int fire)
+void practice_fire_tick(Practice *p,const Pilot *pilot,int fire)
 {
     unsigned i;
-    if(p->explosion) --p->explosion;
-    if(!p->destroyed) {
-        ++p->target_ticks;
-        if(!p->pursuit_target) practice_target(p); /* Post-move collision/render pose. */
-    }
     if(p->flash) --p->flash;
     if(p->cooldown) --p->cooldown;
     /* Existing shots move first. New shots join for this tick's collision pass
@@ -134,6 +129,16 @@ void practice_finish_tick(Practice *p,const Pilot *pilot,int fire)
         } else ++p->dropped;
         p->cooldown=(unsigned)p->reload;
     }
+}
+void practice_finish_tick(Practice *p,const Pilot *pilot,int fire)
+{
+    unsigned i;
+    if(p->explosion) --p->explosion;
+    if(!p->destroyed) {
+        ++p->target_ticks;
+        if(!p->pursuit_target) practice_target(p); /* Post-move collision/render pose. */
+    }
+    practice_fire_tick(p,pilot,fire);
     p->active=0;
     for(i=0;i<PRACTICE_BOLTS;++i) {
         Bolt *b=&p->bolts[i]; double fraction;

@@ -3,7 +3,7 @@
   "djgpp_compile": "pass",
   "irq_code": {
     "handler_bytes": 48,
-    "decoder_bytes": 384,
+    "decoder_bytes": 416,
     "locked_bytes_per_function": 4096,
     "handler_calls": "decoder only",
     "decoder_calls": "none"
@@ -11,9 +11,9 @@
   "source_sha256": {
     "dos/flight/input.c": "e057927e9816a732241adac5c8777f62c0317402997c623d5aa8263928eae5c6",
     "dos/flight/input.h": "9a01008c4eaf782aa25610ce1dee6e1d289cfe5d28a5dea228e0439ba6aaf1d9",
-    "dos/flight/input_state.c": "c689f09eb287dcde385ea4cf2d9539364cfc0b97cafbfe8df1aa149e8fe4c23f",
-    "dos/flight/input_state.h": "d92f48544466b7a755e921036ab51c40e8508e4e5955710f8c0dbea270e896a1",
-    "dos/flight/input_test.c": "69797885d38002da2a861459c93ef48b594e12ae66ff33aac1a848fe947b8e35",
+    "dos/flight/input_state.c": "435b7592c43750ed56aa9adbc0ad43a2fcb6d6961af3063e3be952dac395e275",
+    "dos/flight/input_state.h": "565783a667b1af3807c99d581fcb691147b6033a840446132a7031b74fd09d33",
+    "dos/flight/input_test.c": "a2037cb6f0fae9c79a3073ae6e1c11e8bcdbe6a110186a626acaefe9889f4d92",
     "dos/flight/test_input.py": "2bd3c9f2d0070fca4b60ea6c2dbb3f4938746cd455c8195cdbb4d3e0d6e7306d"
   },
   "image_ids": {

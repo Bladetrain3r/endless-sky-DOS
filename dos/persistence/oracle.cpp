@@ -14,6 +14,7 @@
 #include "GameData.h"
 #include "PilotProfile.h"
 #include "Planet.h"
+#include "Outfit.h"
 #include "PluginManager.h"
 #include "Preferences.h"
 #include "Random.h"
@@ -82,6 +83,22 @@ int main(int argc,char **argv)
   require(selected>=0,"Food missing");player.SetMapColoring(selected);
   State before=state(player);require(before.qty==0 && before.free>=4 && before.price>0,"bad initial cargo");
   require(player.CanBeSaved(),"landed save ineligible");
+  // Native-owned capacity/resource/movement limits for the bounded DOS pilot.
+  const Ship &stock=*player.Flagship();
+  ofstream limits(work/"LIMITS.json");require(bool(limits),"limits open failed");
+  limits<<setprecision(17)<<"{\"capacity\":"<<before.capacity
+    <<",\"max_crew\":"<<stock.Attributes().Get("bunks")
+    <<",\"required_crew\":"<<stock.RequiredCrew()<<",\"fuel\":"<<stock.MaxFuel()
+    <<",\"shields\":"<<stock.MaxShields()<<",\"hull\":"<<stock.MaxHull()
+    <<",\"date\":["<<player.GetDate().Day()<<','<<player.GetDate().Month()<<','<<player.GetDate().Year()
+    <<"],\"cargo_profiles\":[";
+  for(int tons=0;tons<=before.capacity;++tons) {
+   Ship loaded(stock);loaded.Cargo().Add(COMMODITY,tons);
+   if(tons) limits<<',';
+   limits<<'['<<loaded.Acceleration()<<','<<loaded.ReverseAcceleration()<<','<<loaded.TurnRate()
+     <<','<<loaded.DragForce()<<",1,"<<loaded.MaxHeat()<<','<<loaded.IdleHeat()<<']';
+  }
+  limits<<"]}\n";limits.close();require(bool(limits),"limits write failed");
   auto save=[&](const char *name){player.Save((work/name).string());profile->Save();};
   save("BEFORE.TXT");
   buy(player,3);State after=state(player);

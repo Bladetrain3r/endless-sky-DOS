@@ -44,7 +44,7 @@ def inside():
             ('PlayerInfo.cpp','Ship.cpp','PilotProfile.cpp','DataWriter.cpp','Files.cpp','TradingPanel.cpp','GameData.cpp','CargoHold.cpp','Account.cpp')},
         'data_sha256':{str(p.relative_to('/src')):digest(p) for p in sorted(Path('/src/data').rglob('*.txt'))},
         'checks':{key:'pass' for key in expected},'compiler_flags':flags,
-        'artifact_sha256':{p.name:digest(p) for p in sorted(work.iterdir()) if p.suffix in ('.TXT','.csv')},
+        'artifact_sha256':{p.name:digest(p) for p in sorted(work.iterdir()) if p.suffix in ('.TXT','.csv') or p.name=='LIMITS.json'},
         'limits':'Native fixture only, one stock Sparrow at Earth, Food transactions and selected normalized fields. '
                  'No DOS codec, interrupted-write durability, full campaign equality or native interchange is qualified.'}
     (work/'report.json').write_text(json.dumps(record,indent=2)+'\n')
@@ -69,6 +69,7 @@ def outside():
     (WORK/'report.json').write_text(json.dumps(record,indent=2)+'\n')
     import shutil
     shutil.copyfile(WORK/'report.json', ROOT/'dos/reports/native-persistence-contract.json')
+    shutil.copyfile(WORK/'LIMITS.json', ROOT/'dos/persistence/native-limits.json')
     shutil.copyfile(WORK/'trace.csv', ROOT/'dos/persistence/native-trace.csv')
 if __name__=='__main__':
     try: inside() if sys.argv[1:]==['--inside'] else outside()

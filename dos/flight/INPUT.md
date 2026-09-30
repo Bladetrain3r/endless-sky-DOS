@@ -20,11 +20,12 @@ installing a second handler. `input_keys()` returns zero while closed.
 | `INPUT_TARGET_NEAREST` | N (arena nearest target) |
 | `INPUT_LAND` | L (navigation approach / depart) |
 | `INPUT_PLANET` | P (navigation destination cycle) |
+| `INPUT_SAVE` | F5 (persistent pilot, docked only) |
 
 The handler consumes scan-code set 1 make/break bytes directly. It tracks
 physical aliases separately: releasing W does not cancel a held Up key. Key
 repeat leaves the state unchanged. Space is a held level: firing stops when
-Space is released, independently of thrust. Escape, R, Tab, H, T, N, L and P make edges stay
+Space is released, independently of thrust. Escape, R, Tab, H, T, N, L, P and F5 make edges stay
 latched until the next `input_keys()` call, so a short tap between polls is delivered
 once. Pause/E1 is ignored. The handler sends one
 PIC end-of-interrupt and does not chain the previous IRQ1 handler after

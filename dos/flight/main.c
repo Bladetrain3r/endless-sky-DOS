@@ -9,6 +9,7 @@
 #include "opponent.h"
 #include "arena_view.h"
 #include "navigation_view.h"
+#include "campaign.h"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -80,7 +81,8 @@ int main(int argc,char **argv)
     int controlled=0,replay=0,keyboard=0,practice_test=0,stationary_target=0,invulnerable_target=0;
     int resource_stress=0,incoming_fire=0,incoming_test=0,pursuit=0;
     int opponent_stock=0,opponent_stress=0,arena_mode=0;
-    Arena *arena=NULL;Navigation *navigation=NULL;
+    Arena *arena=NULL;Navigation *navigation=NULL;Campaign *campaign=NULL;
+    int campaign_mode=0;unsigned campaign_revision=0;
     int navigation_mode=0,navigation_test=0,nav_stage=0,dock_cached=0,dock_follow=0;unsigned dock_ticks=0,docked_ticks=0;
     unsigned keys_seen=0;
     uint64_t id; size_t memory=0;
@@ -90,6 +92,7 @@ int main(int argc,char **argv)
     for(i=1;i<(unsigned)argc;++i) {
         if(!strcmp(argv[i],"--demo")) demo=1;
         else if(!strcmp(argv[i],"--incoming-fire")) incoming_fire=1;
+        else if(!strcmp(argv[i],"--campaign")) campaign_mode=navigation_mode=controlled=1;
         else if(!strcmp(argv[i],"--navigation")) navigation_mode=controlled=1;
         else if(!strcmp(argv[i],"--navigation-test")) navigation_test=navigation_mode=controlled=replay=1;
         else if(!strcmp(argv[i],"--arena")) arena_mode=controlled=pursuit=incoming_fire=1;
@@ -126,6 +129,7 @@ int main(int argc,char **argv)
        resource_stress || opponent_stock || opponent_stress || (replay && !navigation_test))) {
         error="navigation_incompatible_options";goto done;
     }
+    if(campaign_mode && navigation_test) { error="campaign_incompatible_replay";goto done; }
     if(arena_mode && (stationary_target || practice_test || incoming_test || camera)) { error="arena_incompatible_route";goto done; }
     if(pursuit && (!controlled || stationary_target)) { error="pursuit_requires_pilot_moving_target"; goto done; }
     if((opponent_stock || opponent_stress) && !pursuit) { error="opponent_options_require_pursuit";goto done; }
@@ -178,6 +182,14 @@ int main(int argc,char **argv)
                !pursuit_load(&pilot.parameters,"APPROACH.DAT")) {error="navigation_assets_failed";goto done;}
             memory+=sizeof(*navigation);
             if(navigation_test) practice_shield_test(practice);
+            if(campaign_mode) {
+                PSResult result;
+                campaign=malloc(sizeof(*campaign));
+                if(!campaign) {error="campaign_memory";goto done;}
+                result=campaign_open(campaign,"SAVE",navigation,&pilot,&scene,practice,threat);
+                if(result!=PS_OK) {error=ps_error(result);goto done;}
+                memory+=sizeof(*campaign);
+            }
         }
         if(incoming_test) for(i=0;i<4;++i) practice_shield_test(practice);
         memory+=sizeof(*practice)+sizeof(*threat)+sizeof(*opponent);
@@ -209,6 +221,7 @@ int main(int argc,char **argv)
             unsigned keys=input_keys();
             keys_seen|=keys;
             if(keys & INPUT_EXIT) break;
+            if(campaign)keys=campaign_keys(campaign,navigation,practice,threat,keys,pilot.previous_keys);
             if((keys & ~pilot.previous_keys) & INPUT_RESET) {
                 practice_reset(practice);threat_reset(threat);opponent_reset(opponent,practice);
                 if(arena) arena_reset(arena,practice);
@@ -234,7 +247,12 @@ int main(int argc,char **argv)
             else ++docked_ticks;
             if(controlled) {
                 if(replay && !navigation_test) pilot_keys(&pilot,&scene,incoming_test?0:(practice_test?INPUT_FIRE:pilot_replay_keys(pilot.ticks)));
-                if(navigation) navigation_step(navigation,&pilot,&scene,practice,threat,&drive);
+                if(navigation) {
+                    NavPhase previous_phase=navigation->phase;
+                    navigation_step(navigation,&pilot,&scene,practice,threat,&drive);
+                    if(campaign && previous_phase!=NAV_DOCKED && navigation->phase==NAV_DOCKED)
+                        campaign_landed(campaign,navigation,practice,threat);
+                }
                 else {
                     practice_begin_tick_disabled(practice,threat->disabled);
                     if(threat->destroyed) ++pilot.ticks; /* Trainer death freezes position until R. */
@@ -254,8 +272,11 @@ int main(int argc,char **argv)
         if(navigation) {
             /* The dock screen has no ticking systems. Reuse its frame until
              * departure/reset or a camera-mode change alters the cockpit text. */
-            if(navigation->phase!=NAV_DOCKED || !dock_cached || dock_follow!=pilot.follow)
+            if(navigation->phase!=NAV_DOCKED || !dock_cached || dock_follow!=pilot.follow ||
+               (campaign && campaign_revision!=campaign->revision)) {
                 navigation_view_draw(frame,navigation,practice,&pilot,threat,&scene,sprites,blend,add);
+                if(campaign) {campaign_draw(frame,campaign,navigation);campaign_revision=campaign->revision;}
+            }
             dock_cached=navigation->phase==NAV_DOCKED;dock_follow=pilot.follow;
             b=ms();sample(&draw,b-a);a=b;
         } else if(arena) {
@@ -371,6 +392,7 @@ done:
             tp->stock,tp->stress,tp->resources.energy,tp->resources.heat,tp->resources.overheated,
             tp->disabled,tp->minimum_hull,tp->blocked_energy,tp->blocked_heat);
     }
+    if(campaign && ok)campaign_report(campaign);
     if(arena && ok) arena_report(arena);
     if(navigation && ok) {navigation_report(navigation);printf("nav_test_stage=%d\nnav_docked_ticks=%u\n",nav_stage,docked_ticks);}
     report("background",&background); report("orbital",&orbital);
@@ -378,7 +400,7 @@ done:
     if(controlled) report("pilot_draw",&pilot_draw_time);
     report("sim",&sim); report("draw",&draw); report("present",&present); report("frame",&total);
     for(i=0;i<6;++i) sprite_free(&sprites[i]);
-    free(navigation); free(arena); free(opponent); free(threat); free(practice); free(hud_pixels); free(frame); free(blend); free(add);
+    free(campaign); free(navigation); free(arena); free(opponent); free(threat); free(practice); free(hud_pixels); free(frame); free(blend); free(add);
     world_release_system(&system); world_close(world);
     return ok?0:1;
 }

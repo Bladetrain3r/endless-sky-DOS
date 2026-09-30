@@ -1,7 +1,8 @@
-# Native persistence fixture
+# Persistence implementation and native fixture
 
-2026-09-30. This directory begins the save/load work with a **native reference
-fixture**, not a DOS save implementation. The governing implementation contract is
+2026-09-30. The version-1 codec, two-slot DOS store and persistent navigation
+pilot are implemented. Start with [CAMPAIGN.md](../flight/CAMPAIGN.md) for playtest,
+ownership and evidence limits. The governing implementation contract is
 [PERSISTENCE-CONTRACT.md](../planning/PERSISTENCE-CONTRACT.md); the source review is
 [NATIVE-SAVE-AUDIT.md](../planning/NATIVE-SAVE-AUDIT.md).
 
@@ -56,7 +57,31 @@ full executable restart. It does not compare every mission, profile or ship fiel
 and the random new-pilot identity/full campaign save bytes need not be reproducible
 between runs. The checked trace and selected next action are the evidence.
 
-No DOS codec, file-failure durability, native interchange, broad campaign parity,
-or whole-game memory/performance is qualified here. ESDOS-003 must implement and
-pass PS-01–09, including actual DOS restart and injected I/O failure cases. Landed
-campaign saves and deterministic in-flight checkpoints remain separate artifacts.
+The native oracle itself does not qualify DOS durability or native interchange.
+Separate `python3 dos/persistence/test.py` gates cover the codec/store/adapter in
+native sanitizers and reference DOSBox; `python3 dos/persistence/test_app.py`
+exercises actual executable restarts and IRQ controls with disposable saves.
+Human restart acceptance remains pending. Landed campaign saves and deterministic
+in-flight checkpoints remain separate artifacts; broad campaign parity remains open.
+
+## Implementation boundaries
+
+- `state.h/.c`: bounded owners and semantic validation; typed content keys, IDs,
+  calendar, stock scope, quantities/capacity and UTF-8 validation.
+- `codec.h/.c`: field-wise little-endian TLV envelope, binary64, CRC32, staged decode.
+  Recognizable future schema/header layouts are preserved as unsupported even if
+  their checksum layout is unknown. An embedded NUL cannot hide trailing data.
+- `store.h/.c`: alternating generations, stale/conflict checks, last-good recovery,
+  exact write/flush/commit/close/readback checks and explicit failure injection.
+  DJGPP libc fsync was inspected and found to tolerate some DOS errors; production
+  DOS commits instead call INT21h/AH68h directly and reject carry/DPMI failure.
+- `assets.py`: immutable build identity + native cargo profiles; no pilot mutation.
+- `../flight/campaign*`: save eligibility, port normalization, input filtering and
+  presentation. The existing trainers retain independent reset behavior.
+
+`native-limits.json` now also exports stock capacity, bunk/crew/fuel limits and
+all16 supported cargo-dependent motion/heat profiles from unchanged native getters.
+These are included in oracle provenance and the development content identity.
+The test-only after-purchase fixture retains the native 8,485 credits/3 tons/
+1,515 basis. A player-facing trade operation and next-purchase differential gate
+remain ESDOS-004; serializing these fields is not a claim of trading gameplay.

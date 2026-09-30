@@ -2,8 +2,8 @@
   "schema": 1,
   "kind": "native-persistence-contract-not-DOS-save-support",
   "source_commit": "061a9461a93898fb691504536589d1dcddc5d79b",
-  "oracle_source_sha256": "f9833143d6fa640e6602e75134afead7533ff5bc6a4ecb01932e642b7ddc02e1",
-  "runner_source_sha256": "ff8623be781699096874dd9e55a0cb8887b4e8e3848e2bf53d31123e8138f246",
+  "oracle_source_sha256": "e8997ecce1988be97836fa582be26316a5107fbe20ae916b4def45e610105d01",
+  "runner_source_sha256": "88f4f95e452f25b68ae6208cbe87acfea06cb493c227e4f032bed8d162e659f0",
   "behavior_source_sha256": {
     "PlayerInfo.cpp": "a08649d697dc98839f45bf693d39258c4b47845ef5118669e83c7b986163e8eb",
     "Ship.cpp": "1073d0efb023c3780b9cbbbffc3b153b57fb933f0d77c5bf39a8e6b0aca44dd9",
@@ -246,11 +246,12 @@
     "-fno-rtti"
   ],
   "artifact_sha256": {
-    "AFTER.TXT": "660a2a0c23401fb673b157d598d142209130fe16515006b70bd11d718b6711f0",
-    "BEFORE.TXT": "396344b8978194b6b067b3d7a040e2ba6f95627a86df13bda753eb21f4670c77",
-    "COMMIT.TXT": "9c489ad759aa2953c9dbd3440e2fe13e647718e701c7bf0fc8b5c878fb41fe8b",
-    "SOLD.TXT": "80b0181355ed0dd7e4633bf72bf414eff86f094aa6f2929fe2f2686a1149b396",
-    "TXN.TXT": "660a2a0c23401fb673b157d598d142209130fe16515006b70bd11d718b6711f0",
+    "AFTER.TXT": "bf5afeffd87d14955850227ebab2ecb209872ee23b5af1dd44428f914fc984c0",
+    "BEFORE.TXT": "c8889c89ed63a22253b09dd8b67813b3f1e41261235bc69111e0f256c480eeec",
+    "COMMIT.TXT": "6df4ceed3586a1e74eb44cf8779833f98e2bd8c916c5267bfab80e452b5f75e4",
+    "LIMITS.json": "9f64651e436431a58131ab8fdcdbd55db10f014d23dee1a7623f2e55288ef306",
+    "SOLD.TXT": "c84b4a064f86642c426107d3de0ebaef3f3d0d09a946a40c604cb4c4c3d2770a",
+    "TXN.TXT": "bf5afeffd87d14955850227ebab2ecb209872ee23b5af1dd44428f914fc984c0",
     "trace.csv": "cc456b51c754d9f82f270c44f413a8f5a686f965e133d1587d14d3d98f4d2a90"
   },
   "limits": "Native fixture only, one stock Sparrow at Earth, Food transactions and selected normalized fields. No DOS codec, interrupted-write durability, full campaign equality or native interchange is qualified.",

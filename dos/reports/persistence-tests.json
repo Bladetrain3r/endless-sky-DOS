@@ -1,0 +1,81 @@
+{
+  "results": {
+    "codec": {
+      "native": "status=pass",
+      "dos": "status=pass"
+    },
+    "store": {
+      "native": "short_write_cases=622\nstore tests passed",
+      "dos": "short_write_cases=146\nstore tests passed"
+    },
+    "campaign": {
+      "native": "status=pass\ncampaign_port_reload=pass\ncargo_profile=pass\nheld_save_and_departure=pass",
+      "dos": "status=pass\ncampaign_port_reload=pass\ncargo_profile=pass\nheld_save_and_departure=pass"
+    }
+  },
+  "sources": {
+    "dos/collision/mask.c": "d6856ed0f30e30697c3aaffb0c37e4ed8fc1eff0af719d71566d2174b23171fb",
+    "dos/damage/damage.c": "84431567ed424102126589f25f1ad03003a59e4c0c6bd3c6e481495bc2c6efc0",
+    "dos/flight/arena.h": "5f6c02419dc2c2244931aecbee3c71d39f4f894c1fcc77a73bb1f48f50c056ec",
+    "dos/flight/arena_view.h": "3e17a441e97b88e29e478ae085e749af5ac56b6632a779a41ee2d8d382b02b2e",
+    "dos/flight/campaign.c": "c48c5783455c76954b7afe186955f0fb652c5efbc9ef771bc8344918aa8ed2dc",
+    "dos/flight/campaign.h": "72408b76128ef279115bbaf687717fb89b6a22b6e90ecbafc2f74d6cf34d3d56",
+    "dos/flight/campaign_test.c": "5f82c414aec5d2a3ed4070c0d42ae3a5d940c937f8cec505f91d6b81a78bbbdd",
+    "dos/flight/input.h": "9a01008c4eaf782aa25610ce1dee6e1d289cfe5d28a5dea228e0439ba6aaf1d9",
+    "dos/flight/input_state.h": "565783a667b1af3807c99d581fcb691147b6033a840446132a7031b74fd09d33",
+    "dos/flight/navigation.c": "9b5c98324d933f66ce7300122d000276f9d51984e7d1a487baf2748f3cf39cdd",
+    "dos/flight/navigation.h": "04b98da40825a11492dfa9769c239bf376ca0809f0d070ce5b4c7917314b3a1c",
+    "dos/flight/navigation_view.h": "88216b306699b900170d931ee940e94cfdd9aaf100e60e45788c71f6d2d8dc61",
+    "dos/flight/opponent.c": "192a7c63b19f31ccaf11fe23027c8882cf39306bf50c1f3242f017f696425c81",
+    "dos/flight/opponent.h": "3f108c6b6e4b27b981ae2de3276b103c50c4a37aecb548582389442075a26d72",
+    "dos/flight/pilot.c": "798d8f53a0091e3c4e01b77225b544416ff25453db2711c89136a4490459a0bf",
+    "dos/flight/pilot.h": "80c5fed814002b335e32faf087b6ee95f0e72ff98343d8db4c9f805853f82149",
+    "dos/flight/power.c": "e7bcba87d457dbc13544e4886a50e81e1317b3080fc0f738211bd59ae79a5776",
+    "dos/flight/power.h": "c1e9c7147d3db6affd1c6e28d572eed9522412ea9100aae6264bb319b0a555a3",
+    "dos/flight/practice.c": "f6e31fdf79b4155905efe17322bc2422aaf68a68b73289c3b92f895488ea4c76",
+    "dos/flight/practice.h": "bb0a37d449f5963cdc8fc5d532cb2606cc6a5418c8bf8102fee4ff64ee723b2c",
+    "dos/flight/scene.h": "4973b395a90cfca22319105459d3dc608753fdc566132da595823c7a6a373d6d",
+    "dos/flight/sprite.h": "a698db3ba5bb794f45c138c6bb455a1ab5006ac346e18930695a2ecaab673fdb",
+    "dos/flight/target_power.c": "0758a0ff29fd080276701d61280bdfcc615db631bc991aa85dd8da5f87344545",
+    "dos/flight/target_power.h": "02100cec5d3ee615e7990004833649e737a14f0a7f3bf56ec78ca3af0e1b4d73",
+    "dos/flight/threat.c": "9a591eae6a3b0d9e4ab46475960e107477b932ea394fe816fe44c07f5159e3d9",
+    "dos/flight/threat.h": "f801d59c6e7c63fa5fded1f2f71b82f1f9a1664b7e98a0cd008163db2776e294",
+    "dos/flight/video.h": "8d2eca66af840597026c3947b6407d7650e26b50800b0ddf5d1a45cd25c1dfcd",
+    "dos/motion/motion.c": "4634e0624b4cdf41cc3c709fc3d08efc50308ba599c30dae2e62f82ca9061f50",
+    "dos/navigation/approach.c": "5d0cf2db21b7788e78261ad5f378c0365030dfe75c5bf5e5dc524894a1601b49",
+    "dos/persistence/codec.c": "5b0e7f4420fa66692d1bd246bfe92ad01be15b884f148b36dd9938b98ff41837",
+    "dos/persistence/codec.h": "1b2a0201eb9c02e1668bcf6ff7cbf2435a1c6ec901aaecf3985542ba4aca58f9",
+    "dos/persistence/codec_test.c": "e6cd60da26d67a774aed4480ce25dd99f968ed7f05a37ae519278927e1cae145",
+    "dos/persistence/state.c": "4f199d7b452991664487f20aba39d198369f0b677ce8fa26973060715c1c966b",
+    "dos/persistence/state.h": "97effabedad2be444dc0ebb91e9a679e3a75ea91fd88ffc502f55e4120a8ade9",
+    "dos/persistence/store.c": "3e59a7b31d41849c52205c8d09fc23c1ec9faa5708d5200f6075e0de98846d49",
+    "dos/persistence/store.h": "10ae3aa1ff043a157ca5bcf82a0a49a7b5d63fb746ae7f9115f1641cfebf00bf",
+    "dos/persistence/store_test.c": "941522d2436c64767554c51185dc0992f8c49386537d721baf66da1c9625545e",
+    "dos/projectile/projectile.c": "7d337881c8c51c6dba6c419d11bedcdea57ef25a7bb6ab1f281074bd290fedbc",
+    "dos/propulsion/propulsion.c": "0288c5eda365de84b44682c17e32704f739afdf3b84bd78a10a72aa223c58d6c",
+    "dos/pursuit/pursuit.c": "118d8214f130c2584a012079f13e5bd14f363ea42a922dca025bcb1b08ccd121",
+    "dos/resources/resources.c": "bc74eb068617b6e236c5581fddc8a9f4923583873e822cc8b54464dde6b2a5e9",
+    "dos/shields/shields.c": "6708828685fb0ca7ab96e728c15c6c6592b4f28a69024b7e0d97c84a08c26945"
+  },
+  "runner_sha256": "9416df89666c58eeda734431842b98ddf8ed8ab58fd26bb18d850bdd14577004",
+  "content_manifest_sha256": "eea8928c78e6c6ccb8208adfb063edc7799c897bf2bf16da5a16722a7bba7c45",
+  "images": {
+    "endless-sky-dos-native-reference:local": "sha256:0b940c387b6939e9e82a96ee275d12228c42d6e2360a5dbcd696913d53db3f8a",
+    "modern-arena-tools:0.1": "sha256:d556f4b0276c89bcfd7d9e9e3df6f2b7fe21766771703f5b981b1ddd96b7be4c"
+  },
+  "native_sanitizers": "ASan/UBSan/leak detection",
+  "dos_flags": [
+    "-std=gnu99",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-I.work/flight/run",
+    "-march=i386",
+    "-mtune=i586",
+    "-mno-mmx",
+    "-mno-sse",
+    "-mno-sse2"
+  ],
+  "limits": "Emulated DOS commit/readback and injected failures; not physical power-loss/FAT/controller qualification. Campaign adapter test is in-process; actual executable restart tested separately."
+}

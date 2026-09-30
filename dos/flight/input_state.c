@@ -28,6 +28,7 @@ __attribute__((noinline)) void input_state_feed(InputState *state, unsigned char
             if(key==0x14) state->pending|=INPUT_TARGET_NEXT;
             if(key==0x26) state->pending|=INPUT_LAND;
             if(key==0x19) state->pending|=INPUT_PLANET;
+            if(key==0x3f) state->pending|=INPUT_SAVE;
             if(key==0x31) state->pending|=INPUT_TARGET_NEAREST;
         }
     }
@@ -49,6 +50,7 @@ unsigned input_state_keys(const InputState *s)
     if(s->normal[0x14]) keys|=INPUT_TARGET_NEXT;
     if(s->normal[0x26]) keys|=INPUT_LAND;
     if(s->normal[0x19]) keys|=INPUT_PLANET;
+    if(s->normal[0x3f]) keys|=INPUT_SAVE;
     if(s->normal[0x31]) keys|=INPUT_TARGET_NEAREST;
     return keys|s->pending;
 }

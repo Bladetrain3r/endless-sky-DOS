@@ -2,8 +2,8 @@
 
 2026-09-30 — ESDOS-002 design checkpoint, authored/reviewed by Astra.
 Native baseline: `061a9461a93898fb691504536589d1dcddc5d79b`.
-This specifies the next implementation; **no DOS save/load feature is implemented
-by this document**. [Native audit](NATIVE-SAVE-AUDIT.md), [fixture](../persistence/README.md),
+This is the version-1 design contract; its bounded implementation now lives in
+[CAMPAIGN.md](../flight/CAMPAIGN.md). Wider campaign and interchange gates remain open. [Native audit](NATIVE-SAVE-AUDIT.md), [fixture](../persistence/README.md),
 [work queue](../TICKETS.md), [parity ledger](../VANILLA-PARITY.md).
 
 ## Decision and boundaries
@@ -255,3 +255,16 @@ Native plugin/settings availability matters more than filenames listed in a save
 Real user pilots remain outside current fixture work. General native interchange,
 full campaign persistence and the future replay checkpoint remain open coverage
 items until their implementations and gates exist.
+
+
+## Implementation checkpoint — 2026-09-30
+
+ESDOS-003 implements the bounded codec/store/navigation adapter. Envelope/state
+validation, two-slot recovery, injected failures and DOS restart evidence are
+indexed in CAMPAIGN.md. The epoch-zero scene still freezes calendar/world economy;
+nonempty mission/event/overlay and general profile policies remain unsupported.
+PS-06 currently covers native fixture state persistence/port normalization and
+cargo-dependent movement; executing the production next trade awaits ESDOS-004.
+PS-08 human restart acceptance is pending. PS-09 is the bounded scene's memory and
+regression evidence, not a mature full-game budget certification. Future-envelope
+recognition conservatively blocks writes before assuming a known CRC layout.

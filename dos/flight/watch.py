@@ -2,6 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Watch the already-built prototype in the reference DOSBox container via local X11."""
 import argparse
+import fcntl
+import hashlib
+import json
+import uuid
 import os
 from pathlib import Path
 import socket
@@ -14,6 +18,7 @@ RUN=ROOT/'.work/flight/run'
 
 def main():
     parser=argparse.ArgumentParser()
+    parser.add_argument('--campaign',action='store_true',help='persistent development pilot; autosave at ports and F5')
     parser.add_argument('--navigation',action='store_true',help='quiet Sol planet selection, landing and takeoff')
     parser.add_argument('--arena',action='store_true',help='two-opponent combat arena and cockpit HUD')
     parser.add_argument('--opponent-stock',action='store_true',help='full native Barge health instead of reduced training health')
@@ -28,6 +33,7 @@ def main():
     parser.add_argument('--pilot',action='store_true',help='fly the stock Sparrow with held keys')
     parser.add_argument('--seconds',type=int,default=None,help='duration1..120seconds; default30watch/120pilot')
     args=parser.parse_args()
+    if args.campaign: args.navigation=True
     if args.navigation:
         args.pilot=True
         if args.arena or args.pursuit or args.incoming_fire or args.accepted or args.stationary_target or args.invulnerable_target or args.resource_stress or args.opponent_stock or args.opponent_stress:
@@ -44,7 +50,8 @@ def main():
     if args.invulnerable_target and (not args.pilot or args.accepted): parser.error('invulnerable-target requires current --pilot build')
     if args.stationary_target and (not args.pilot or args.accepted): parser.error('stationary-target requires current --pilot build')
     camera=' --pilot' if args.pilot else ('' if args.stationary else ' --camera')
-    if args.navigation: camera+=' --navigation'
+    if args.campaign: camera+=' --campaign'
+    elif args.navigation: camera+=' --navigation'
     if args.arena: camera+=' --arena'
     elif args.pursuit: camera+=' --pursuit'
     if args.opponent_stock: camera+=' --opponent-stock'
@@ -58,6 +65,24 @@ def main():
         sys.exit('A local X11/XWayland DISPLAY is needed for the reference window.')
     if not (run/'FLIGHT.EXE').is_file():
         sys.exit('Build first: python3 dos/flight/run.py')
+    # One launcher owns the shared run directory/config and pilot slots at a time.
+    lock=(run/'watch.lock').open('a')
+    try: fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+    except BlockingIOError: sys.exit('A reference flight session already owns this run directory.')
+    if args.campaign:
+        build=json.loads((run/'BUILD.json').read_text())
+        for name,key in [('FLIGHT.EXE','exe_sha256'),('SAVEKEY.json','manifest_file_sha256'),('SAVEKEY.H','header_sha256')]:
+            if hashlib.sha256((run/name).read_bytes()).hexdigest()!=build[key]:
+                sys.exit('Pilot build is incomplete or changed; rebuild first: '+name)
+        manifest=json.loads((run/'SAVEKEY.json').read_text())
+        for group,basepath in [('profiles',run),('gameplay',ROOT)]:
+            for name,expected in manifest[group].items():
+                if hashlib.sha256((basepath/name).read_bytes()).hexdigest()!=expected:
+                    sys.exit('Persistent-pilot inputs changed; rebuild before launching: '+name)
+        save=run/'SAVE';save.mkdir(exist_ok=True)
+        if not any((save/n).exists() for n in ('PILOT0.SAV','PILOT1.SAV','SEED.DAT')):
+            with (save/'SEED.DAT').open('xb') as f:
+                f.write(uuid.uuid4().bytes+uuid.uuid4().bytes)
     base=(ROOT/'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     (run/'watch.conf').write_text(base+'[autoexec]\nmount c /work/.work/flight/run\nc:\n'
         f'CWSDPMI -s-\nFLIGHT.EXE --demo --seconds {seconds}{camera} > DEMO.TXT\nexit\n')
@@ -72,7 +97,14 @@ def main():
               '-e','XAUTHORITY=/tmp/flight.xauthority']
     cmd+=['modern-arena-tools:0.1','timeout',f'{seconds+30}s','dosbox','-conf','.work/flight/run/watch.conf']
     # No xhost changes, no network, no fullscreen, no audio, bounded runtime.
-    raise SystemExit(subprocess.run(cmd).returncode)
+    result=subprocess.run(cmd).returncode
+    if args.campaign and (run/'DEMO.TXT').exists():
+        fields=dict(line.split('=',1) for line in (run/'DEMO.TXT').read_text().splitlines() if '=' in line)
+        if fields.get('status')!='ok':
+            print('Pilot could not start: '+fields.get('error','see DEMO.TXT'),file=sys.stderr)
+            result=1
+        else: print('Pilot: '+fields.get('save_notice','')+'; last port '+fields.get('saved_planet',''))
+    raise SystemExit(result)
 
 
 if __name__=='__main__': main()

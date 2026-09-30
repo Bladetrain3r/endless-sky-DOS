@@ -15,6 +15,7 @@
 #define INPUT_TARGET_NEAREST 1024u
 #define INPUT_LAND 2048u
 #define INPUT_PLANET 4096u
+#define INPUT_SAVE 8192u
 
 typedef struct {
     volatile unsigned char normal[128];

@@ -5,7 +5,9 @@ is a reasonably complete vanilla experience on DOS, 16 MB and fixed 20,000
 DOSBox cycles, preferably 800x600 at 30 FPS. This directory starts the port's
 measurement and planning record. **There is a playable flight/combat sandbox, not a complete DOS port.**
 
-Latest playtest: [Sol landing and takeoff loop](flight/NAVIGATION.md),
+Latest playtest: [persistent development pilot](flight/CAMPAIGN.md),
+`python3 dos/flight/watch.py --campaign`. The stateless
+[Sol landing and takeoff loop](flight/NAVIGATION.md) remains available with
 `python3 dos/flight/watch.py --navigation`. The accepted
 [combat arena and cockpit HUD](flight/ARENA.md) remains available with `--arena`;
 earlier quiet and single-opponent modes remain.
@@ -21,8 +23,9 @@ Current upstream checkout: `061a9461a93898fb691504536589d1dcddc5d79b`
 GPL-3.0-or-later licensing; asset conversions retain the per-file provenance and
 terms recorded in `../copyright`.
 
-Next: [persistent-pilot contract](planning/PERSISTENCE-CONTRACT.md) and
-[native save/reload fixture](persistence/README.md); DOS persistence remains to implement.
+Persistence: [pilot contract](planning/PERSISTENCE-CONTRACT.md),
+[codec/store and native fixture](persistence/README.md). The bounded DOS pilot is
+implemented and awaits human restart acceptance; trade gameplay comes next.
 
 ## First executable: banked VBE diagnostic
 

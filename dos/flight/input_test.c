@@ -9,6 +9,11 @@ int main(void)
     InputState s;
     input_state_clear(&s);
     assert(input_state_take(&s)==0);
+    input_state_feed(&s,0x3f);input_state_feed(&s,0xbf);
+    assert(input_state_take(&s)==INPUT_SAVE);assert(input_state_take(&s)==0);
+    input_state_feed(&s,0x3f);input_state_feed(&s,0x3f);
+    assert(input_state_take(&s)==INPUT_SAVE);input_state_feed(&s,0xbf);
+    assert(input_state_take(&s)==0);
     input_state_feed(&s,0x11); input_state_feed(&s,0x39);
     assert(input_state_take(&s)==(INPUT_FORWARD|INPUT_FIRE));
     assert(input_state_take(&s)==(INPUT_FORWARD|INPUT_FIRE));

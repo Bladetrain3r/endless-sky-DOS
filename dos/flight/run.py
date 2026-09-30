@@ -14,7 +14,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[2]
 RUN=ROOT/'.work/flight/run'
 IMAGE='modern-arena-tools:0.1'
-SOURCES=['dos/flight/navigation.c','dos/flight/navigation_view.c','dos/navigation/approach.c','dos/flight/arena.c','dos/flight/arena_view.c','dos/flight/target_power.c','dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
+SOURCES=['dos/flight/campaign.c','dos/flight/campaign_view.c','dos/persistence/state.c','dos/persistence/codec.c','dos/persistence/store.c','dos/flight/navigation.c','dos/flight/navigation_view.c','dos/navigation/approach.c','dos/flight/arena.c','dos/flight/arena_view.c','dos/flight/target_power.c','dos/flight/opponent.c','dos/pursuit/pursuit.c','dos/flight/threat.c','dos/flight/main.c','dos/flight/video.c','dos/flight/sprite.c',
          'dos/flight/scene.c','dos/flight/power.c','dos/propulsion/propulsion.c','dos/flight/sprite_reference.c','dos/world/active.c',
          'dos/shields/shields.c','dos/resources/resources.c','dos/damage/damage.c','dos/flight/practice.c','dos/projectile/projectile.c','dos/collision/mask.c',
          'dos/flight/pilot.c','dos/flight/input.c','dos/flight/input_state.c','dos/motion/motion.c']
@@ -85,11 +85,14 @@ def main():
     assert digest(archive)=='deacda0488e1cdd7c4a9f32fab45662b34c0ed6b2d7d4d13bc07041b62004a8c'
     with zipfile.ZipFile(archive) as z:
         (RUN/'CWSDPMI.EXE').write_bytes(z.read('bin/CWSDPMI.EXE'))
-    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h','dos/shields/shields.h','dos/resources/resources.h','dos/propulsion/propulsion.h','dos/pursuit/pursuit.h','dos/navigation/approach.h']
+    subprocess.run(docker+['python3','dos/persistence/assets.py'],check=True)
+    inputs=SOURCES+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/persistence').glob('*.h'))]+['.work/flight/run/SAVEKEY.H']+[str(p.relative_to(ROOT)) for p in sorted((ROOT/'dos/flight').glob('*.h'))]+['dos/world/active.h','dos/motion/motion.h','dos/projectile/projectile.h','dos/collision/mask.h','dos/damage/damage.h','dos/shields/shields.h','dos/resources/resources.h','dos/propulsion/propulsion.h','dos/pursuit/pursuit.h','dos/navigation/approach.h']
     source_hashes={s:digest(ROOT/s) for s in inputs}
-    subprocess.run(docker+['.work/toolchain/djgpp/bin/i586-pc-msdosdjgpp-gcc',*FLAGS,
+    subprocess.run(docker+['.work/toolchain/djgpp/bin/i586-pc-msdosdjgpp-gcc',*FLAGS,'-I.work/flight/run',
                           *(['-DREFERENCE_RENDERER'] if args.reference else []),*SOURCES,'-lm','-o','.work/flight/run/FLIGHT.EXE'],check=True)
     assert source_hashes=={s:digest(ROOT/s) for s in inputs}, 'source changed during build'
+    (RUN/'BUILD.json').write_text(json.dumps({'exe_sha256':digest(RUN/'FLIGHT.EXE'),
+        'manifest_file_sha256':digest(RUN/'SAVEKEY.json'),'header_sha256':digest(RUN/'SAVEKEY.H')},indent=2)+'\n')
     base=(ROOT/'dos/probes/runtime.conf').read_text().split('[autoexec]')[0]
     options=f'--ships {args.ships} --frames {args.frames}'
     if args.navigation_test: options+=' --navigation-test'

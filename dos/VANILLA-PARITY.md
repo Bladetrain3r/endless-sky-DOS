@@ -54,11 +54,16 @@ Source: `StartConditions`, `PlayerInfo`, `PilotProfile`, `SavedGame`, `LoadPanel
 | Check | ID | DOS | Feature and proof required |
 |---|---|---|---|
 | [ ] | LIFE-01 | N | All valid vanilla starts, unlock/display conditions, naming, initial ship/date/credits/debt/conditions and introduction; compare initialized native state. |
-| [ ] | LIFE-02 | N | Player-owned persistent ship/fleet/cargo/accounts/location/knowledge model with stable identities; avoid trainer reset state masquerading as a pilot. |
-| [ ] | LIFE-03 | N | Landed save/autosave policy, pilot selection, named snapshots, restore/delete; match eligibility and next action after reload. |
-| [ ] | LIFE-04 | N | Save all mission instances, UUID links, event queue, mutable universe, economy, logs, storage, ships and conditions; interrupted save preserves last good state. |
+| [ ] | LIFE-02 | P | Player-owned persistent ship/fleet/cargo/accounts/location/knowledge model with stable identities; avoid trainer reset state masquerading as a pilot. |
+| [ ] | LIFE-03 | P | Landed save/autosave policy, pilot selection, named snapshots, restore/delete; match eligibility and next action after reload. |
+| [ ] | LIFE-04 | P | Save all mission instances, UUID links, event queue, mutable universe, economy, logs, storage, ships and conditions; interrupted save preserves last good state. |
 | [ ] | LIFE-05 | N | Death, pilot locking and vanilla gamerules: permadeath/save restrictions, fleet limits, presets and locking; default behavior plus configurable variants. |
 | [ ] | LIFE-06 | D | Native save import/export compatibility and supported version range. DOS save/load is mandatory; interchange format is a separate proposed capability. |
+
+Sept30 evidence: [persistent pilot](flight/CAMPAIGN.md) covers one stock ship,
+credits/cargo/date/location, port autosaves and failure recovery with native/DOS
+and actual restart tests. Human acceptance pending. Full profile/fleet/mission/
+event/universe saves, pilot UI and next trade remain open; no family is complete.
 
 ## B. Flight, navigation and exploration
 

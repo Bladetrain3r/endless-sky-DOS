@@ -1,80 +1,74 @@
 # Endless Sky DOS handover
-Updated 2026-09-30. Earth/Luna human accepted; persistence design/native oracle complete.
+Updated 2026-09-30. Persistent pilot implemented; ESDOS-003 awaits human restart test.
 
-## Current build
-- Latest: `python3 dos/flight/watch.py --navigation`; Docker/X11,120seconds,800x600.
-  Quiet Earth/Luna: P cycles destination, L approaches/lands; L at dock departs.
-  W/Up thrust,A/D/arrows turn cancel approach; Space fire,Tab camera,R reset,H drain.
-  Sept30 user quick playtest landed at both Earth and Luna; ESDOS-001 closed.
-- Native-derived stock Sparrow braking/turning approach; strict radius/speed gates.
-  Binary32 landing/takeoff fade, original descriptions/initial permissions/services.
-  Dock restores hull/shield/energy, sets native IdleHeat; space sim pauses at dock.
-  Held L cannot depart; flight controls need release after takeoff. Seeded placement.
-  Only two epoch-zero destinations; no cargo/fuel/trade/outfitting/missions/saves yet.
-  flight/NAVIGATION.md records ownership, native contracts, limitations and tests.
-- Accepted arena remains `--arena`:2 independent Barge trainers,2second grace;
-  Tcycle/Nnearest, selection only changes HUD, nearest intersected ship gets hit.
-  Bars/radar/offscreen marker,6visualbuoys,no boundaries/collisions. See flight/ARENA.md.
-- Earlier pilot/pursuit/incoming-fire remain; R reset,H shield drain,Esc/CtrlF9 exit.
-- Sparrow native movement/no reverse; healthy release coasts without drag.
-  Shared propulsion/gun energy/heat, fractional steering/thrust, overheat/recovery.
-  Recharge .2shield/.2energy per tick, uses prior energy BEFORE generation/motion/fire.
-  Generator1.9/tick > recharge .2: normal recharge does not visibly drain battery.
-  --resource-stress energy:capacity40/generation.25; heat:max450/passiveheat0.
-  Deliberate test presets, not stock loadouts. Normal/heat/energy human accepted.
-- --pursuit: native Star Barge motion/MoveToAttack/TurnToward/RendezvousTime lead.
-  Own engine/energy/heat/recharge budget; no tactics/avoidance/full-AI parity claim.
-  Stock HP option/stress presets in flight/ARENA.md; stock HP human test unreported.
-- --incoming-fire: scripted ellipse, artificial unlimited-power turret, no lead.
-  Fixed16-shot pools; native masks; friendly hits before hostile firing;
-  owner death stops new fire, existing shots survive. R resets pools/grace/resources.
-- Hull <134 disables Sparrow controls/fire/generation/recharge and applies drift.
-  Hull <0 destroys; trainer hides/freezes player until R. H four taps aids hull test.
-- Combat modes have no landing/port services; no ship collisions/audio/boarding/loot.
+## Current build and next human test
+- Run `python3 dos/flight/watch.py --campaign` from project root; Docker/X11,120s.
+  First Pilot/First Light stock Sparrow,10000cr,empty15t hold, starts docked Earth.
+  L depart; P destination; L approach/land; F5 dock save; Escape exit. Restart resumes
+  last saved port. R cannot reset pilot; H/trainer gun inactive in this quiet mode.
+- Autosave on landing/before departure; failed departure save keeps ship docked.
+  Held F5 saves once, held L cannot bypass failed save; in-flight save refused.
+- Human next: Earth→Luna, exit/relaunch docked Luna; F5/refusal/R feedback.
+  flight/CAMPAIGN.md documents controls, ownership, compatibility and limits.
+- Two slots .work/flight/run/SAVE/PILOT0.SAV+PILOT1.SAV, last-good recovery; SEED.DAT
+  host UUIDs only for initial creation. Build preserves SAVE. No native/user saves used.
+  SAVEKEY.json+compiled header bind exact supported data/kernels; BUILD.json binds exe.
+  Launcher checks binding and locks shared directory. DOS store single-writer only.
+- Persistent IDs/credits/cargo/basis/date/location/fuel/crew; landed normalization.
+  Native cargo profiles0–15t affect motion/heat capacity. No trade UI/jump/fuel burn,
+  daily economy/date advance/missions/general fleet/profile policy/native interchange.
+  Development format rejects incompatible builds; frozen epoch-zero Sol scene.
 
-## Current evidence
-- Navigation helper:20 native command cases, exact flags/zero turn error, native
-  ASan/UBSan +DOS; initial Earth/Luna permissions require Politics::Reset.
-- Native/DOS navigation gates: approaches/services/dock/input release/reset/malformed profiles pass.
-- Navigation renderer:88 actual sprite/font ASan/UBSan/leak cases; no state mutation.
-- 900frame Earth→Luna route:2landings/2takeoffs,1682space+118dock ticks,0enemy fire.
-  Counted heap2,901,550B;26.576ms avg/62.183max mixes flight/dock,not game FPS.
-- Actual final-executable keyboard:landing/held L,port restoration,departure/fire,
-  approach cancellation; arena/quiet/pursuit regressions. IRQ decoder tests pass.
-- Reports dos/reports/flight-navigation-{tests,view-tests}.json,
-  flight-controls-navigation-{dock,launch}.json,flight-6-ships-navigation-profile.json,
-  navigation-approach-equivalence.json. Profiles from dos/navigation/native.py.
-- Prior arena gates,900tick player parity,renderer88cases and power/threat tests pass;
-  see flight/ARENA.md and prior reports. Navigation does not requalify full native AI.
-- Docker i386/noMMX/SSE,16MiB/20k/no swap; cycles are not MHz. Source/data unchanged.
+## Persistence evidence
+- dos/persistence/{state,codec,store}.{c,h}; two bounded Sol delegates/root review.
+  Codec is explicit little-endian, binary64,CRC32,bounded TLV; staged publication.
+  Reject embedded NUL,invalid IDs/UTF8/counts/numbers; preserve future envelopes.
+- Native ASan/UBSan/leak + DJGPP i386/noMMX/SSE codec/store/adapter gates pass:
+  reports/persistence-tests.json;622 exhaustive native short writes,146 DOS samples
+  (all header bytes/regular payload/end),all injected flush/commit/close/readback faults.
+- DOS commit uses explicit INT21h/AH68h/carry checking; libc fsync tolerated some errors.
+  Last-good slot/session remains intact on failure; late failure can leave recoverable
+  newer candidate. No physical power-cut/FAT/controller durability claim.
+- reports/persistence-application.json:actual IRQ/executable separate-process Earth→Luna
+  autosave/restart,held F5/R,in-flight refusal,corrupt-newest recovery,future-file refusal,
+  native after-purchase3t/8485cr identity across2launches. Screenshot inspected.
+- Counted campaign resident2,914,462B; extra store heap bound262,404B separately reported.
+  DPMI free pages3711→3079;16MiB/no swap. These are bounded scene data,not full-game peak.
+- planning/PERSISTENCE-CONTRACT.md + NATIVE-SAVE-AUDIT.md; persistence/native.py links
+  unchanged upstream,6purchase/reload/next-action/clamp/pending-sale/eligibility checks.
+  native-limits.json exports stock capacities/crew/cargo-motion/heat; source/data hashes.
+  DOS production next-trade differential gate belongs ESDOS-004,not implemented yet.
 
-## Earlier contracts and pointers
-- dos/propulsion/: native Ship::Move17cases667steps, zero observed state error;
-  generation→turn→thrust→gun; native overheat/NeedsEnergy drag. 900tick route matched.
-- IMPORTANT: DOS decimal reader perturbed even .5/.25, changing thrust/drag branch.
-  Exact binary64 runtime profiles/traces fixed transfer; no epsilon/snap gameplay.
-  RESOURCE.DAT ESRES2 +7d; PROPULSE.DAT ESPROP2 +4d; SHIELD.DAT ESSHLD2 +7d+2u32.
-- dos/motion/:14cases12600ticks/all65536directions. dos/collision/:11772queries.
-  flight/ALIGNMENT.md: half-PNG world scale,64 baked headings; native masks unchanged.
-- Projectile: life48→47moves, inherited velocity, native half-parent muzzle correction;
-  post-move target sweep, birth-tick queries, fraction<1. Player spread uses seededLCG.
-  White7pixel tracers and procedural target explosion are explicit visual departures.
-- dos/world/:694systems/648042Bpack,619planets10commodities5518objects.
-  Native all-orbits crashes; bounded Sol qualified; no save format qualification.
-- Palette256=16UI+32gray+208learned/6bitDAC human accepted. Wishlist unchanged.
-  Upstream061a9461a93898fb691504536589d1dcddc5d79b,0.11.4; Git, GPL3+/asset terms.
-  Original source/data/images untouched. No bundled-library-wide ISA audit.
+## Accepted trainers and retained evidence
+- `--navigation`: stateless Earth/Luna, P/L,WAD cancellation,Space gun,R reset,H drain.
+  Human quick landings at both accepted Sept30; ESDOS-001 closed. NAVIGATION.md.
+- Navigation900frames2landings/2takeoffs,1682space+118dock ticks still pass;~26.576ms
+  mixed route average is not whole-game FPS. Strict gates/held-L/service checks retained.
+- `--arena`:2independent Barge trainers,2s grace; Tcycle/Nnearest,radar/cockpit.
+  Human several rounds/HUD accepted;450frame900tick regression still passes.
+- Prior `--pilot --pursuit`, `--pilot --incoming-fire`, quiet `--pilot` remain.
+  R encounter reset,H25%shield drain,Esc/CtrlF9 exit; no persistent writes in trainers.
+- F5 added IRQ decoder; native and actual DOS input/vector-restoration checks pass.
+- Stock unassisted Sparrow motion; propulsion/gun shared power/heat in trainers.
+  Generator1.9/tick > shield recharge .2; recharge consults prior energy.
+  Human normal/energy/heat stress and pursuit budget behaviour accepted.
+- Native motion/propulsion/projectile/collision qualified kernels remain in dos/;
+  decimal parsing changed branch behaviour,so runtime profiles use exact binary64.
+  Player shot spread uses separate trainer LCG; substitute blaster/explosion explicit.
+- Pursuit shares Barge budget/lead helpers,not full vanilla AI. No ship collisions/audio.
+- flight/ALIGNMENT.md:half-PNG world scale,64baked headings; native masks unchanged.
+- World:694systems/648042B pack,619planets10commodities5518objects. Native all-orbits
+  crash remains separate/unresolved; bounded Sol only. No general universe runtime.
 
-## Next
-- User: vanilla parity is beta; our flair follows toward1.0. dos/VANILLA-PARITY.md
-  +ROADMAP.md +TICKETS.md; detailed source audits in dos/planning/,204-file inventory.
-- ESDOS-002 done: planning/PERSISTENCE-CONTRACT.md + NATIVE-SAVE-AUDIT.md.
-  Native persistence/oracle.cpp:6 checks pass; report + native-trace.csv checked in.
-  Purchase/reload/next action, transaction snapshot, clamps, pending sales, eligibility.
-  Same-process native fixture only; no DOS save/interchange or full campaign claim.
-- ESDOS-003 ready: two-slot 8.3 binary save, content hash, stable IDs, PS-01–09 gates.
-  Next implement codec/failure gates then DOS commit/recovery + dock/restart adapter.
-  004 trade/005 travel remain proposed; native conversion later; see TICKETS.md.
-- Fresh /data/NuCode/Swarm_Workboard independent Fossil;48 tests/empty CLI/site pass.
-  Its WB-002 integrity checker next; ESDOS tickets stay canonical here. No deployment.
-- Arena humanaccepted:several rounds,damage/victory; HUD polish deferred until systems settle.
+## Queue, source and limits
+- Beta=vanilla parity; flair afterward. VANILLA-PARITY.md83families,ROADMAP.md,TICKETS.md.
+  LIFE02–04 partial only. ESDOS-002 done;003 awaiting_playtest;004trade/005travel proposed.
+- Next engineering: choose bounded two-port native commodity transaction fixture/UI,
+  with clamping/zero-availability/retry/reload and loaded motion; define ticket before work.
+- Upstream061a9461a93898fb691504536589d1dcddc5d79b,0.11.4,GPL3+/asset terms.
+  source/data/images/Wishlist and user's screenshot untouched. Local commits,no push.
+- /data/NuCode/Swarm_Workboard independent Fossil48tests; WB-002 integrity checker next.
+  ESDOS Git tickets remain canonical. No Workboard deployment/model service.
+- User also requested Space Denizen feature skeleton: docs/FEATURE-CHECKLIST.md there,
+  local Fossil b745ea6b076a + wiki handover. Full survey after ES-DOS beta/chosen checkpoint;
+  original game's priorities,not vanilla parity. No Space Denizen gameplay resumed.

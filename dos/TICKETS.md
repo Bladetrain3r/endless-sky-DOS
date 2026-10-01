@@ -17,7 +17,7 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
 |---|---|---|---|---|
 | ESDOS-001 | done | astra_dawn; playtester Ziggy | Earth/Luna landing acceptance | none |
 | ESDOS-002 | done | astra_dawn | Persistent-pilot and transaction contract, research/design only | none |
-| ESDOS-003 | awaiting_playtest | astra_dawn | Implement smallest durable pilot/save slice | ESDOS-002 |
+| ESDOS-003 | done | astra_dawn | Implement smallest durable pilot/save slice | ESDOS-002 |
 | ESDOS-004 | proposed | unassigned | Two-port commodity trade loop | ESDOS-003; ESDOS-001 |
 | ESDOS-005 | proposed | unassigned | Fuel/drive/system-transition slice specification | ESDOS-002 |
 
@@ -63,12 +63,13 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
   quantity clamps, pending-sale reload and save eligibility. Root reviewed source
   and inspected trace/report. Design includes a mission/condition/event growth
   example; its nonempty state is deliberately unsupported in version 1.
-- Two-slot DOS envelope/recovery and PS-01–09 acceptance are specified, not yet
-  implemented. No native-save compatibility or campaign persistence claimed.
+- This design ticket specified two-slot DOS recovery and PS-01–09; subsequent
+  bounded implementation/acceptance is ESDOS-003. No native-save compatibility claimed.
 
 ### ESDOS-003 — smallest durable pilot
 
-- Created 2026-09-30; implemented, awaiting human restart playtest; owner astra_dawn.
+- Created 2026-09-30; closed 2026-10-01 on human restart acceptance; owner astra_dawn.
+  Implementation local `8828e304f`; no public release.
 - Intended outcome: current dock/flight scene runs from persistent player-owned
   ship/location/credits/cargo state; landed save/restart retains it.
 - Contract: [PERSISTENCE-CONTRACT.md](planning/PERSISTENCE-CONTRACT.md), PS-01–09.
@@ -79,12 +80,13 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
 - Evidence: [CAMPAIGN.md](flight/CAMPAIGN.md), persistence-tests.json and
   persistence-application.json. Codec corruption,622 native/146 DOS short writes,
   injected stage failures, port/cargo normalization and actual process restarts pass.
-- Human next: `python3 dos/flight/watch.py --campaign`; depart Earth, land at Luna,
-  exit/relaunch there; F5 dock save, in-flight refusal and R leaves pilot intact.
-  See CAMPAIGN.md for frozen calendar/scope and development save compatibility.
+- Human acceptance 2026-10-01: Ziggy flew Earth→Luna, pressed F5, exited and
+  relaunched docked at Luna; returned to Earth, exited without a reported manual
+  save, and relaunched at Earth. Manual save and landing autosave restart paths
+  accepted. No additional human refusal/reset/fault-case testing claimed.
 - Scope excludes full missions/fleets/native-save import. Existing trainers stay
   reproducible; trainer reset cannot overwrite a persistent campaign.
-- Human restart check still required for closure. Links LIFE-02–04 subsets.
+- Bounded pilot checkpoint closed; full LIFE-02–04 families remain partial.
   Native next-action trade gate transfers to ESDOS-004: persistence holds the
   native after-purchase state, but player-facing trade is not implemented here.
 
@@ -118,3 +120,6 @@ split. Done requires acceptance evidence and review, not a delegate's assertion.
   completed as design/native evidence; ESDOS-003 ready, no DOS save code yet.
 
 - 2026-09-30: ESDOS-003 implementation/automated gates pass; human acceptance pending.
+
+- 2026-10-01: ESDOS-003 closed after human manual-save and autosave restarts at
+  Luna/Earth on8828e304f. Nightcap: stop development here; next is ESDOS-004 specification.

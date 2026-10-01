@@ -1,14 +1,15 @@
 # Endless Sky DOS handover
-Updated 2026-09-30. Persistent pilot implemented; ESDOS-003 awaits human restart test.
+Updated 2026-10-01. ESDOS-003 accepted on8828e304f; nightcap, development stopped.
 
-## Current build and next human test
+## Current accepted build
 - Run `python3 dos/flight/watch.py --campaign` from project root; Docker/X11,120s.
   First Pilot/First Light stock Sparrow,10000cr,empty15t hold, starts docked Earth.
   L depart; P destination; L approach/land; F5 dock save; Escape exit. Restart resumes
   last saved port. R cannot reset pilot; H/trainer gun inactive in this quiet mode.
 - Autosave on landing/before departure; failed departure save keeps ship docked.
   Held F5 saves once, held L cannot bypass failed save; in-flight save refused.
-- Human next: Earth→Luna, exit/relaunch docked Luna; F5/refusal/R feedback.
+- Oct1 human: Earth→Luna,F5,exit/relaunch at Luna; return Earth,exit/relaunch there.
+  Manual+landing autosave accepted; no extra human refusal/reset/fault checks claimed.
   flight/CAMPAIGN.md documents controls, ownership, compatibility and limits.
 - Two slots .work/flight/run/SAVE/PILOT0.SAV+PILOT1.SAV, last-good recovery; SEED.DAT
   host UUIDs only for initial creation. Build preserves SAVE. No native/user saves used.
@@ -62,7 +63,7 @@ Updated 2026-09-30. Persistent pilot implemented; ESDOS-003 awaits human restart
 
 ## Queue, source and limits
 - Beta=vanilla parity; flair afterward. VANILLA-PARITY.md83families,ROADMAP.md,TICKETS.md.
-  LIFE02–04 partial only. ESDOS-002 done;003 awaiting_playtest;004trade/005travel proposed.
+  LIFE02–04 partial only. ESDOS-002 done;003 done;004trade/005travel proposed.
 - Next engineering: choose bounded two-port native commodity transaction fixture/UI,
   with clamping/zero-availability/retry/reload and loaded motion; define ticket before work.
 - Upstream061a9461a93898fb691504536589d1dcddc5d79b,0.11.4,GPL3+/asset terms.

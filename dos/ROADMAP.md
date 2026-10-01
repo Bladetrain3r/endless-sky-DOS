@@ -14,7 +14,7 @@ useful sandbox, not a campaign runtime. No full-game completion percentage yet.
 
 Persistence foundation: [reviewed contract](planning/PERSISTENCE-CONTRACT.md) and
 [native transaction/reload fixture](persistence/README.md) complete. Bounded DOS save/load
-now implemented and awaiting human restart acceptance (ESDOS-003). Native interchange remains a separate gate.
+now implemented and human restart accepted2026-10-01 (ESDOS-003). Native interchange remains a separate gate.
 
 ## Sequence
 

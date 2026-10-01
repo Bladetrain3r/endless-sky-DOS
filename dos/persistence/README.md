@@ -61,7 +61,7 @@ The native oracle itself does not qualify DOS durability or native interchange.
 Separate `python3 dos/persistence/test.py` gates cover the codec/store/adapter in
 native sanitizers and reference DOSBox; `python3 dos/persistence/test_app.py`
 exercises actual executable restarts and IRQ controls with disposable saves.
-Human restart acceptance remains pending. Landed campaign saves and deterministic
+Human manual-save/autosave restart acceptance at Luna/Earth recorded2026-10-01. Landed campaign saves and deterministic
 in-flight checkpoints remain separate artifacts; broad campaign parity remains open.
 
 ## Implementation boundaries

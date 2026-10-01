@@ -1,6 +1,6 @@
 # Persistent development pilot
 
-2026-09-30 — ESDOS-003 implementation checkpoint. This is the first saved pilot
+2026-10-01 — ESDOS-003 bounded checkpoint accepted; implementation `8828e304f`. This is the first saved pilot
 inside the bounded Sol navigation scene, not a complete campaign or native-save
 importer. [Save contract](../planning/PERSISTENCE-CONTRACT.md),
 [implementation/evidence](../persistence/README.md), [queue](../TICKETS.md).
@@ -27,9 +27,11 @@ Subsequent launches resume the saved pilot at the last saved port.
 - **R** reports that reset belongs to the trainers and keeps the pilot. H and the
   trainer blaster are inactive here. Combat trainers remain available separately.
 
-Suggested acceptance: launch, depart Earth, select/land at Luna, check the save
-message, exit and relaunch. You should be docked at Luna with the same pilot and
-credits. Try F5 in flight, and R at the dock. No new trade UI exists yet.
+Human acceptance, 2026-10-01: Ziggy departed Earth, landed at Luna, used F5,
+exited/relaunched and resumed at Luna. Returning to Earth and exiting/relaunching
+without a reported F5 resumed at Earth, confirming landing autosave as well.
+Refusal/reset and injected failures retain their automated evidence; no extra
+human checks are inferred. No trade UI exists yet.
 
 ## State and data
 

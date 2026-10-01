@@ -62,7 +62,7 @@ Source: `StartConditions`, `PlayerInfo`, `PilotProfile`, `SavedGame`, `LoadPanel
 
 Sept30 evidence: [persistent pilot](flight/CAMPAIGN.md) covers one stock ship,
 credits/cargo/date/location, port autosaves and failure recovery with native/DOS
-and actual restart tests. Human acceptance pending. Full profile/fleet/mission/
+and actual restart tests. Human Luna/Earth restart acceptance recorded2026-10-01. Full profile/fleet/mission/
 event/universe saves, pilot UI and next trade remain open; no family is complete.
 
 ## B. Flight, navigation and exploration

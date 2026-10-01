@@ -265,6 +265,6 @@ indexed in CAMPAIGN.md. The epoch-zero scene still freezes calendar/world econom
 nonempty mission/event/overlay and general profile policies remain unsupported.
 PS-06 currently covers native fixture state persistence/port normalization and
 cargo-dependent movement; executing the production next trade awaits ESDOS-004.
-PS-08 human restart acceptance is pending. PS-09 is the bounded scene's memory and
+PS-08 human restart acceptance recorded2026-10-01 at Luna and Earth. PS-09 is the bounded scene's memory and
 regression evidence, not a mature full-game budget certification. Future-envelope
 recognition conservatively blocks writes before assuming a known CRC layout.
